@@ -14,10 +14,10 @@ type ThinkingStep = {
 };
 
 const THINKING_STEPS: ThinkingStep[] = [
-  { id: "scan", label: "Scanning your profile data", icon: Search, duration: 1100 },
-  { id: "extract", label: "Extracting employment details", icon: User, duration: 1000 },
-  { id: "draft", label: "Drafting employment contract", icon: FileText, duration: 1300 },
-  { id: "send", label: "Sending contract via email", icon: Mail, duration: 1100 },
+  { id: "doc", label: "Reading Beevr documentation in Notion", icon: FileStack, duration: 1200 },
+  { id: "find", label: "Looking up Adithya in your contacts", icon: User, duration: 1000 },
+  { id: "draft", label: "Drafting employment contract from Beevr template", icon: FileText, duration: 1400 },
+  { id: "send", label: "Sending contract to adithya@beevr.io", icon: Mail, duration: 1100 },
 ];
 
 type Message =
