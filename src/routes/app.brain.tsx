@@ -32,7 +32,7 @@ const THINKING_STEPS: ThinkingStep[] = [
     substeps: [
       { text: "Searching Gmail contacts for 'Adithya'…", ms: 700 },
       { text: "2 matches found · disambiguating by recent threads", ms: 800 },
-      { text: "Resolved → Adithya Rao · adithya@beevr.io", ms: 600 },
+      { text: "Resolved → Adithya Pradeep · adithya@beevr.io", ms: 600 },
     ],
   },
   {
@@ -43,7 +43,7 @@ const THINKING_STEPS: ThinkingStep[] = [
       { text: "Filling employee details…", ms: 700 },
       { text: "Applying Beevr compensation grid (L4 · Engineering)", ms: 900 },
       { text: "Inserting equity vesting schedule (4y / 1y cliff)", ms: 800 },
-      { text: "Rendering PDF · adithya-rao-employment.pdf (3 pages)", ms: 700 },
+      { text: "Rendering PDF · adithya-pradeep-employment.pdf (3 pages)", ms: 700 },
     ],
   },
   {
@@ -255,8 +255,8 @@ function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }>
             <p>I read the Beevr company doc, found Adithya's details, and generated an employment contract using the standard Beevr template:</p>
             <ul className="space-y-2">
               <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>Pulled company terms & policies <span className="text-muted-foreground">(Notion: Beevr / Handbook)</span></span></li>
-              <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>Resolved recipient: <span className="font-medium">Adithya Rao</span> <span className="text-muted-foreground">(Gmail contacts)</span></span></li>
-              <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>Generated <span className="font-medium">adithya-rao-employment.pdf</span> and dispatched for signature <span className="text-muted-foreground">(DocuSign)</span></span></li>
+              <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>Resolved recipient: <span className="font-medium">Adithya Pradeep</span> <span className="text-muted-foreground">(Gmail contacts)</span></span></li>
+              <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>Generated <span className="font-medium">adithya-pradeep-employment.pdf</span> and dispatched for signature <span className="text-muted-foreground">(DocuSign)</span></span></li>
             </ul>
             <div className="mt-3 flex items-center gap-2 rounded-lg border border-primary/30 bg-accent/40 px-3 py-2.5 text-sm text-primary">
               <Mail className="h-4 w-4" />

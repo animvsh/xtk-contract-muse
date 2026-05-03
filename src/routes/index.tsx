@@ -255,7 +255,7 @@ function DashboardPreview() {
               </div>
               <div className="space-y-2 text-xs">
                 {[
-                  ["Adithya Rao", "created Beevr Hiring Doc", "Notion", "Synced"],
+                  ["Adithya Pradeep", "created Beevr Hiring Doc", "Notion", "Synced"],
                   ["Sarah Chen", "merged PR #482", "GitHub", "Synced"],
                   ["Sales Digest", "posted weekly summary", "Agent", "Pending"],
                 ].map(([who, what, src, status], i) => (
