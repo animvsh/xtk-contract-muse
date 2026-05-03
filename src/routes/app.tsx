@@ -20,54 +20,73 @@ function AppLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar p-4 md:block">
-        <Link to="/" className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Brain className="h-5 w-5" />
-          </div>
-          <span className="text-lg font-semibold">Acme Inc</span>
-        </Link>
-        <nav className="space-y-1">
-          {navItems.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+    <div className="min-h-screen bg-[oklch(0.04_0_0)] p-3 text-foreground">
+      {/* Orange ambient glow */}
+      <div className="pointer-events-none fixed -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-40 blur-[120px]" />
+      <div className="pointer-events-none fixed -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-40 blur-[120px]" />
 
-      <main className="flex flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b border-border px-6 py-3">
-          <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
-            <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
-            <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] overflow-hidden rounded-[24px] bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.93_0.1_75)] shadow-2xl">
+        <aside className="hidden w-60 shrink-0 flex-col bg-transparent p-5 md:flex">
+          <Link to="/" className="mb-8 flex items-center gap-2.5">
+            <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+            </div>
+            <span className="text-lg font-bold tracking-tight">Beevr</span>
+          </Link>
+          <nav className="space-y-1">
+            {navItems.map((item) => {
+              const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                    active
+                      ? "bg-[oklch(0.68_0.22_40)] text-white shadow-md shadow-[oklch(0.68_0.22_40)]/30 font-semibold"
+                      : "text-[oklch(0.3_0_0)] hover:bg-white/60"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto rounded-2xl border border-black/5 bg-white/60 p-4 backdrop-blur">
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)]" />
+              <div className="text-xs">
+                <div className="font-semibold">Animesh</div>
+                <div className="text-[oklch(0.45_0_0)]">Beevr · Admin</div>
+              </div>
+            </div>
           </div>
-          <div className="mx-auto rounded-md bg-muted px-4 py-1 text-xs text-muted-foreground">
-            app.beevr.io{pathname.replace(/^\/app/, "") || "/home"}
+        </aside>
+
+        <main className="flex flex-1 flex-col overflow-hidden border-l border-black/5 bg-white/40 backdrop-blur-sm">
+          <div className="flex items-center gap-2 border-b border-black/5 bg-white/60 px-6 py-3">
+            <div className="flex gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
+              <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
+              <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
+            </div>
+            <div className="mx-auto rounded-md border border-black/5 bg-white px-4 py-1 text-xs text-[oklch(0.4_0_0)]">
+              app.beevr.io{pathname.replace(/^\/app/, "") || "/home"}
+            </div>
           </div>
-        </div>
-        <div className="flex flex-1 overflow-hidden">
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            <Outlet />
+          <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              <Outlet />
+            </div>
+            <LiveFeed />
           </div>
-          <LiveFeed />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
