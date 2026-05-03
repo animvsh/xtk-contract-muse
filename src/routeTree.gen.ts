@@ -9,38 +9,144 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppTeamRouteImport } from './routes/app.team'
+import { Route as AppDocsRouteImport } from './routes/app.docs'
+import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppBrainRouteImport } from './routes/app.brain'
+import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
+import { Route as AppAgentsRouteImport } from './routes/app.agents'
 
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDocsRoute = AppDocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConnectionsRoute = AppConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBrainRoute = AppBrainRouteImport.update({
+  id: '/brain',
+  path: '/brain',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppApprovalsRoute = AppApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAgentsRoute = AppAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/agents': typeof AppAgentsRoute
+  '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/connections': typeof AppConnectionsRoute
+  '/app/docs': typeof AppDocsRoute
+  '/app/team': typeof AppTeamRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app/agents': typeof AppAgentsRoute
+  '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/connections': typeof AppConnectionsRoute
+  '/app/docs': typeof AppDocsRoute
+  '/app/team': typeof AppTeamRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/agents': typeof AppAgentsRoute
+  '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/connections': typeof AppConnectionsRoute
+  '/app/docs': typeof AppDocsRoute
+  '/app/team': typeof AppTeamRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/agents'
+    | '/app/approvals'
+    | '/app/brain'
+    | '/app/connections'
+    | '/app/docs'
+    | '/app/team'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/app/agents'
+    | '/app/approvals'
+    | '/app/brain'
+    | '/app/connections'
+    | '/app/docs'
+    | '/app/team'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/agents'
+    | '/app/approvals'
+    | '/app/brain'
+    | '/app/connections'
+    | '/app/docs'
+    | '/app/team'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +154,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/team': {
+      id: '/app/team'
+      path: '/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/docs': {
+      id: '/app/docs'
+      path: '/docs'
+      fullPath: '/app/docs'
+      preLoaderRoute: typeof AppDocsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/connections': {
+      id: '/app/connections'
+      path: '/connections'
+      fullPath: '/app/connections'
+      preLoaderRoute: typeof AppConnectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/brain': {
+      id: '/app/brain'
+      path: '/brain'
+      fullPath: '/app/brain'
+      preLoaderRoute: typeof AppBrainRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/approvals': {
+      id: '/app/approvals'
+      path: '/approvals'
+      fullPath: '/app/approvals'
+      preLoaderRoute: typeof AppApprovalsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/agents': {
+      id: '/app/agents'
+      path: '/agents'
+      fullPath: '/app/agents'
+      preLoaderRoute: typeof AppAgentsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAgentsRoute: typeof AppAgentsRoute
+  AppApprovalsRoute: typeof AppApprovalsRoute
+  AppBrainRoute: typeof AppBrainRoute
+  AppConnectionsRoute: typeof AppConnectionsRoute
+  AppDocsRoute: typeof AppDocsRoute
+  AppTeamRoute: typeof AppTeamRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAgentsRoute: AppAgentsRoute,
+  AppApprovalsRoute: AppApprovalsRoute,
+  AppBrainRoute: AppBrainRoute,
+  AppConnectionsRoute: AppConnectionsRoute,
+  AppDocsRoute: AppDocsRoute,
+  AppTeamRoute: AppTeamRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
