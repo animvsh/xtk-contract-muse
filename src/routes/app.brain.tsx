@@ -133,28 +133,30 @@ function BrainPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-        <h1 className="text-3xl font-bold">Ask your company brain</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Search across all your connected data sources</p>
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-4xl px-6 py-8">
+          <h1 className="text-3xl font-bold">Ask your company brain</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Search across all your connected data sources</p>
 
-        <div ref={scrollRef} className="mt-8 space-y-6">
-          {messages.map((msg) =>
-            msg.role === "user" ? (
-              <div key={msg.id} className="flex justify-end">
-                <div className="max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground">
-                  {msg.content}
+          <div className="mt-8 space-y-6">
+            {messages.map((msg) =>
+              msg.role === "user" ? (
+                <div key={msg.id} className="flex justify-end">
+                  <div className="max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground">
+                    {msg.content}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <AssistantBubble key={msg.id} msg={msg} />
-            ),
-          )}
+              ) : (
+                <AssistantBubble key={msg.id} msg={msg} />
+              ),
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-border bg-background px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-border bg-card p-2 focus-within:border-primary">
+      <div className="shrink-0 border-t border-black/5 bg-white/70 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-black/10 bg-white p-2 shadow-sm focus-within:border-primary">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
