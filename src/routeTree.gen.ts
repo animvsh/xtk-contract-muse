@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 
@@ -48,6 +49,11 @@ const AppConnectionsRoute = AppConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBrainRoute = AppBrainRouteImport.update({
+  id: '/brain',
+  path: '/brain',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppApprovalsRoute = AppApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/app/agents': typeof AppAgentsRoute
   '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app/agents': typeof AppAgentsRoute
   '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/app/agents': typeof AppAgentsRoute
   '/app/approvals': typeof AppApprovalsRoute
+  '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/agents'
     | '/app/approvals'
+    | '/app/brain'
     | '/app/connections'
     | '/app/docs'
     | '/app/team'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app/agents'
     | '/app/approvals'
+    | '/app/brain'
     | '/app/connections'
     | '/app/docs'
     | '/app/team'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/agents'
     | '/app/approvals'
+    | '/app/brain'
     | '/app/connections'
     | '/app/docs'
     | '/app/team'
@@ -170,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/brain': {
+      id: '/app/brain'
+      path: '/brain'
+      fullPath: '/app/brain'
+      preLoaderRoute: typeof AppBrainRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/approvals': {
       id: '/app/approvals'
       path: '/approvals'
@@ -190,6 +209,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAgentsRoute: typeof AppAgentsRoute
   AppApprovalsRoute: typeof AppApprovalsRoute
+  AppBrainRoute: typeof AppBrainRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
   AppTeamRoute: typeof AppTeamRoute
@@ -199,6 +219,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAgentsRoute: AppAgentsRoute,
   AppApprovalsRoute: AppApprovalsRoute,
+  AppBrainRoute: AppBrainRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
   AppTeamRoute: AppTeamRoute,
