@@ -1,419 +1,175 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { Send, Brain, Loader2, Check, FileText, Search, Mail, User, Home, Users, FileStack, Bot, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Brain, Sparkles, Zap, Shield, ArrowRight, Check } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Beevr — Your company's second brain" },
+      { name: "description", content: "Connect every tool. Ask anything. Beevr searches across Notion, Slack, Gmail and more — and acts on your behalf." },
+      { property: "og:title", content: "Beevr — Your company's second brain" },
+      { property: "og:description", content: "Connect every tool. Ask anything. Beevr acts on your behalf." },
+    ],
+  }),
+  component: Landing,
 });
 
-type ThinkingStep = {
-  id: string;
-  label: string;
-  icon: typeof Search;
-  substeps: { text: string; ms: number }[];
-};
-
-const THINKING_STEPS: ThinkingStep[] = [
-  {
-    id: "doc",
-    label: "Reading Beevr documentation in Notion",
-    icon: FileStack,
-    substeps: [
-      { text: "Connecting to Notion workspace…", ms: 600 },
-      { text: "Found 4 docs tagged #beevr", ms: 700 },
-      { text: "Parsing 'Employment & Hiring Policy.md'", ms: 900 },
-      { text: "Extracted 12 clauses · standard Beevr template v3", ms: 600 },
-    ],
-  },
-  {
-    id: "find",
-    label: "Looking up Adithya in your contacts",
-    icon: User,
-    substeps: [
-      { text: "Searching Gmail contacts for 'Adithya'…", ms: 700 },
-      { text: "2 matches found · disambiguating by recent threads", ms: 800 },
-      { text: "Resolved → Adithya Rao · adithya@beevr.io", ms: 600 },
-    ],
-  },
-  {
-    id: "draft",
-    label: "Drafting employment contract from Beevr template",
-    icon: FileText,
-    substeps: [
-      { text: "Filling employee details…", ms: 700 },
-      { text: "Applying Beevr compensation grid (L4 · Engineering)", ms: 900 },
-      { text: "Inserting equity vesting schedule (4y / 1y cliff)", ms: 800 },
-      { text: "Rendering PDF · adithya-rao-employment.pdf (3 pages)", ms: 700 },
-    ],
-  },
-  {
-    id: "send",
-    label: "Sending contract to adithya@beevr.io",
-    icon: Mail,
-    substeps: [
-      { text: "Uploading to DocuSign…", ms: 700 },
-      { text: "Configuring signature fields", ms: 600 },
-      { text: "Dispatching from animesh@beevr.io", ms: 700 },
-      { text: "Delivered ✓", ms: 400 },
-    ],
-  },
-];
-
-type Message =
-  | { id: string; role: "user"; content: string }
-  | {
-      id: string;
-      role: "assistant";
-      steps: {
-        step: ThinkingStep;
-        status: "pending" | "active" | "done";
-        subIndex: number;
-        elapsed: number;
-      }[];
-      startedAt: number;
-      done: boolean;
-    };
-
-function Index() {
-  const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
-  const [tick, setTick] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Global tick for live elapsed time
-  useEffect(() => {
-    if (!isRunning) return;
-    const id = setInterval(() => setTick((t) => t + 1), 100);
-    return () => clearInterval(id);
-  }, [isRunning]);
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, tick]);
-
-  const handleSend = async () => {
-    if (!input.trim() || isRunning) return;
-    setIsRunning(true);
-
-    const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: input.trim() };
-    const assistantId = crypto.randomUUID();
-    const assistantMsg: Message = {
-      id: assistantId,
-      role: "assistant",
-      steps: THINKING_STEPS.map((s) => ({ step: s, status: "pending", subIndex: 0, elapsed: 0 })),
-      startedAt: Date.now(),
-      done: false,
-    };
-
-    setMessages((m) => [...m, userMsg, assistantMsg]);
-    setInput("");
-
-    for (let i = 0; i < THINKING_STEPS.length; i++) {
-      const step = THINKING_STEPS[i];
-      // mark active
-      setMessages((m) =>
-        m.map((msg) =>
-          msg.id === assistantId && msg.role === "assistant"
-            ? {
-                ...msg,
-                steps: msg.steps.map((s, idx) => ({
-                  ...s,
-                  status: idx < i ? "done" : idx === i ? "active" : "pending",
-                  subIndex: idx === i ? 0 : s.subIndex,
-                })),
-              }
-            : msg,
-        ),
-      );
-
-      // walk through substeps
-      for (let j = 0; j < step.substeps.length; j++) {
-        await new Promise((r) => setTimeout(r, step.substeps[j].ms));
-        setMessages((m) =>
-          m.map((msg) =>
-            msg.id === assistantId && msg.role === "assistant"
-              ? {
-                  ...msg,
-                  steps: msg.steps.map((s, idx) =>
-                    idx === i ? { ...s, subIndex: j + 1 } : s,
-                  ),
-                }
-              : msg,
-          ),
-        );
-      }
-    }
-
-    setMessages((m) =>
-      m.map((msg) =>
-        msg.id === assistantId && msg.role === "assistant"
-          ? { ...msg, steps: msg.steps.map((s) => ({ ...s, status: "done" })), done: true }
-          : msg,
-      ),
-    );
-    setIsRunning(false);
-  };
-
-  const navItems = [
-    { label: "Home", icon: Home },
-    { label: "Brain", icon: Brain, active: true },
-    { label: "Team Spaces", icon: Users },
-    { label: "Docs", icon: FileStack },
-    { label: "Agents", icon: Bot },
-    { label: "Approvals", icon: ShieldCheck },
-  ];
-
+function Landing() {
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar p-4 md:block">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Brain className="h-5 w-5" />
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Nav */}
+      <header className="sticky top-0 z-10 border-b border-border/60 bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Brain className="h-4 w-4" />
+            </div>
+            <span className="font-semibold">Beevr</span>
           </div>
-          <span className="text-lg font-semibold">Acme Inc</span>
+          <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
+            <a href="#features" className="hover:text-foreground">Features</a>
+            <a href="#integrations" className="hover:text-foreground">Integrations</a>
+            <a href="#pricing" className="hover:text-foreground">Pricing</a>
+          </nav>
+          <Link
+            to="/app/brain"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            Open app
+          </Link>
         </div>
-        <nav className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.label}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                  item.active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+      </header>
 
-      {/* Main */}
-      <main className="flex flex-1 flex-col">
-        {/* Browser-like header */}
-        <div className="flex items-center gap-2 border-b border-border px-6 py-3">
-          <div className="flex gap-1.5">
+      {/* Hero */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 pb-24 text-center">
+        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+          <Sparkles className="h-3 w-3 text-primary" />
+          Now with cloud-hosted agents
+        </div>
+        <h1 className="mx-auto max-w-3xl text-5xl font-bold leading-tight tracking-tight md:text-6xl">
+          Your company's <span className="text-primary">second brain</span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
+          Connect every tool. Ask anything. Beevr searches across Notion, Slack,
+          Gmail and more — and quietly acts on your behalf.
+        </p>
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <Link
+            to="/app/brain"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            Try the demo <ArrowRight className="h-4 w-4" />
+          </Link>
+          <a
+            href="#features"
+            className="rounded-lg border border-border px-5 py-3 text-sm font-medium hover:bg-muted"
+          >
+            See how it works
+          </a>
+        </div>
+
+        {/* Mock app preview */}
+        <div className="mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-primary/10">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
             <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
             <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
             <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
+            <div className="mx-auto rounded-md bg-muted px-3 py-0.5 text-xs text-muted-foreground">
+              app.beevr.io/brain
+            </div>
           </div>
-          <div className="mx-auto rounded-md bg-muted px-4 py-1 text-xs text-muted-foreground">
-            app.beevr.io/brain
+          <div className="space-y-3 p-6 text-left">
+            <div className="ml-auto w-fit max-w-[80%] rounded-xl bg-primary px-4 py-2 text-sm text-primary-foreground">
+              Look at the doc about Beevr and send Adithya an employment contract
+            </div>
+            <div className="rounded-xl border border-border bg-background p-4 text-sm">
+              <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                <Sparkles className="h-3 w-3 text-primary" /> Thinking…
+              </div>
+              <ul className="space-y-1 text-muted-foreground">
+                <li>✓ Read Beevr doc in Notion</li>
+                <li>✓ Found Adithya in contacts</li>
+                <li>✓ Drafted contract</li>
+                <li className="text-foreground">→ Sending via Gmail…</li>
+              </ul>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-          <h1 className="text-3xl font-bold">Ask your company brain</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Search across all your connected data sources
-          </p>
-
-          <div ref={scrollRef} className="mt-8 space-y-6">
-            {messages.map((msg) =>
-              msg.role === "user" ? (
-                <div key={msg.id} className="flex justify-end">
-                  <div className="max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground">
-                    {msg.content}
-                  </div>
+      {/* Features */}
+      <section id="features" className="border-t border-border bg-card/30 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center text-3xl font-bold">Built for teams that move fast</h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              { icon: Brain, title: "Unified brain", desc: "One search across every doc, channel, and inbox in your stack." },
+              { icon: Zap, title: "Cloud agents", desc: "Spin up agents that act on your data — no code, no cron." },
+              { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs out of the box." },
+            ].map((f) => (
+              <div key={f.title} className="rounded-xl border border-border bg-card p-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-primary">
+                  <f.icon className="h-5 w-5" />
                 </div>
-              ) : (
-                <AssistantBubble key={msg.id} msg={msg} />
-              ),
-            )}
+                <h3 className="font-semibold">{f.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Input */}
-        <div className="border-t border-border bg-background px-6 py-4">
-          <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-border bg-card p-2 focus-within:border-primary">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              rows={1}
-              placeholder="Ask anything about your company…"
-              className="max-h-40 flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
-              disabled={isRunning}
-            />
-            <button
-              onClick={handleSend}
-              disabled={isRunning || !input.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
-            >
-              {isRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </button>
+      {/* Integrations */}
+      <section id="integrations" className="py-20">
+        <div className="mx-auto max-w-6xl px-6 text-center">
+          <h2 className="text-3xl font-bold">Connects to everything</h2>
+          <p className="mt-3 text-muted-foreground">Notion · Slack · Gmail · Linear · Drive · GitHub · Figma · 40+ more</p>
+          <div className="mt-10 grid grid-cols-3 gap-3 md:grid-cols-6">
+            {["Notion","Slack","Gmail","Linear","Drive","GitHub","Figma","Jira","HubSpot","Zoom","Salesforce","Stripe"].map((n) => (
+              <div key={n} className="rounded-lg border border-border bg-card px-4 py-6 text-sm font-medium">
+                {n}
+              </div>
+            ))}
           </div>
         </div>
-      </main>
-    </div>
-  );
-}
+      </section>
 
-function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }> }) {
-  const allDone = msg.steps.every((s) => s.status === "done");
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    if (allDone) return;
-    const id = setInterval(() => setNow(Date.now()), 100);
-    return () => clearInterval(id);
-  }, [allDone]);
-
-  const elapsed = ((allDone ? now : Date.now()) - msg.startedAt) / 1000;
-
-  return (
-    <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
-        <Brain className="h-4 w-4" />
-      </div>
-      <div className="flex-1 rounded-xl border border-border bg-card p-5">
-        {/* Thinking section */}
-        <div className="mb-4">
-          <div className="mb-3 flex items-center justify-between text-xs font-medium text-muted-foreground">
-            <div className="flex items-center gap-2">
-              {!allDone ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                  <span>Thinking…</span>
-                </>
-              ) : (
-                <>
-                  <Check className="h-3.5 w-3.5 text-primary" />
-                  <span>Completed</span>
-                </>
-              )}
-            </div>
-            <span className="tabular-nums text-[11px] text-muted-foreground/70">
-              {elapsed.toFixed(1)}s
-            </span>
-          </div>
-          <ol className="space-y-1.5">
-            {msg.steps.map(({ step, status, subIndex }) => {
-              const Icon = step.icon;
-              const isActive = status === "active";
-              const isDone = status === "done";
-              const visibleSubs = isDone ? step.substeps.length : subIndex;
-              return (
-                <li
-                  key={step.id}
-                  className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
-                    isActive ? "bg-muted" : ""
-                  }`}
+      {/* Pricing */}
+      <section id="pricing" className="border-t border-border bg-card/30 py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-center text-3xl font-bold">Simple pricing</h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {[
+              { name: "Team", price: "$20", per: "per user / month", features: ["Unlimited search", "5 connectors", "Up to 10 agents"] },
+              { name: "Business", price: "$50", per: "per user / month", features: ["Everything in Team", "Unlimited connectors", "SSO + audit logs"], featured: true },
+            ].map((p) => (
+              <div key={p.name} className={`rounded-xl border p-6 ${p.featured ? "border-primary bg-accent/30" : "border-border bg-card"}`}>
+                <div className="text-sm text-muted-foreground">{p.name}</div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-4xl font-bold">{p.price}</span>
+                  <span className="text-sm text-muted-foreground">{p.per}</span>
+                </div>
+                <ul className="mt-6 space-y-2 text-sm">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-primary" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/app/brain"
+                  className={`mt-6 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium ${p.featured ? "bg-primary text-primary-foreground hover:opacity-90" : "border border-border hover:bg-muted"}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${
-                        isDone
-                          ? "bg-accent text-primary"
-                          : isActive
-                          ? "bg-primary/20 text-primary"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {isDone ? (
-                        <Check className="h-3.5 w-3.5" />
-                      ) : isActive ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Icon className="h-3.5 w-3.5" />
-                      )}
-                    </span>
-                    <span
-                      className={
-                        status === "pending"
-                          ? "text-muted-foreground"
-                          : isActive
-                          ? "font-medium text-foreground"
-                          : "text-foreground"
-                      }
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                  {(isActive || isDone) && visibleSubs > 0 && (
-                    <ul className="ml-9 mt-1.5 space-y-1 border-l border-border/60 pl-3">
-                      {step.substeps.slice(0, visibleSubs).map((sub, idx) => {
-                        const isLastActive = isActive && idx === visibleSubs - 1;
-                        return (
-                          <li
-                            key={idx}
-                            className="animate-in fade-in slide-in-from-left-1 flex items-center gap-2 text-xs text-muted-foreground"
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                isLastActive ? "bg-primary animate-pulse" : "bg-muted-foreground/40"
-                              }`}
-                            />
-                            <span className={isLastActive ? "text-foreground/90" : ""}>
-                              {sub.text}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-
-        {msg.done && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-3 border-t border-border pt-4 text-sm leading-relaxed">
-            <p className="text-foreground">
-              I read the Beevr company doc, found Adithya's details, and generated an
-              employment contract using the standard Beevr template:
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-start gap-2">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>
-                  Pulled company terms & policies{" "}
-                  <span className="text-muted-foreground">(Notion: Beevr / Handbook)</span>
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>
-                  Resolved recipient: <span className="font-medium">Adithya Rao</span>{" "}
-                  <span className="text-muted-foreground">(Gmail contacts)</span>
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>
-                  Generated <span className="font-medium">adithya-rao-employment.pdf</span> and dispatched for signature{" "}
-                  <span className="text-muted-foreground">(DocuSign)</span>
-                </span>
-              </li>
-            </ul>
-            <div className="mt-3 flex items-center gap-2 rounded-lg border border-primary/30 bg-accent/40 px-3 py-2.5 text-sm text-primary">
-              <Mail className="h-4 w-4" />
-              Contract sent to adithya@beevr.io using your email address.
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button className="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
-                <FileText className="h-4 w-4" />
-                View Contract
-              </button>
-              <button className="rounded-md border border-border px-3 py-2 text-sm hover:bg-muted">
-                View Sources
-              </button>
-            </div>
+                  Start free
+                </Link>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
+        © 2026 Beevr Inc. — Your company's second brain.
+      </footer>
     </div>
   );
 }
