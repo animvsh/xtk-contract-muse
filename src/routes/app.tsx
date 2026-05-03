@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug } from "lucide-react";
+import { LiveFeed } from "@/components/live-feed";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -60,7 +61,12 @@ function AppLayout() {
             app.beevr.io{pathname.replace(/^\/app/, "") || "/home"}
           </div>
         </div>
-        <Outlet />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-y-auto">
+            <Outlet />
+          </div>
+          <LiveFeed />
+        </div>
       </main>
     </div>
   );
