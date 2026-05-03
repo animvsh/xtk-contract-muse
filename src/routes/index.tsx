@@ -10,14 +10,53 @@ type ThinkingStep = {
   id: string;
   label: string;
   icon: typeof Search;
-  duration: number;
+  substeps: { text: string; ms: number }[];
 };
 
 const THINKING_STEPS: ThinkingStep[] = [
-  { id: "doc", label: "Reading Beevr documentation in Notion", icon: FileStack, duration: 1200 },
-  { id: "find", label: "Looking up Adithya in your contacts", icon: User, duration: 1000 },
-  { id: "draft", label: "Drafting employment contract from Beevr template", icon: FileText, duration: 1400 },
-  { id: "send", label: "Sending contract to adithya@beevr.io", icon: Mail, duration: 1100 },
+  {
+    id: "doc",
+    label: "Reading Beevr documentation in Notion",
+    icon: FileStack,
+    substeps: [
+      { text: "Connecting to Notion workspace…", ms: 600 },
+      { text: "Found 4 docs tagged #beevr", ms: 700 },
+      { text: "Parsing 'Employment & Hiring Policy.md'", ms: 900 },
+      { text: "Extracted 12 clauses · standard Beevr template v3", ms: 600 },
+    ],
+  },
+  {
+    id: "find",
+    label: "Looking up Adithya in your contacts",
+    icon: User,
+    substeps: [
+      { text: "Searching Gmail contacts for 'Adithya'…", ms: 700 },
+      { text: "2 matches found · disambiguating by recent threads", ms: 800 },
+      { text: "Resolved → Adithya Rao · adithya@beevr.io", ms: 600 },
+    ],
+  },
+  {
+    id: "draft",
+    label: "Drafting employment contract from Beevr template",
+    icon: FileText,
+    substeps: [
+      { text: "Filling employee details…", ms: 700 },
+      { text: "Applying Beevr compensation grid (L4 · Engineering)", ms: 900 },
+      { text: "Inserting equity vesting schedule (4y / 1y cliff)", ms: 800 },
+      { text: "Rendering PDF · adithya-rao-employment.pdf (3 pages)", ms: 700 },
+    ],
+  },
+  {
+    id: "send",
+    label: "Sending contract to adithya@beevr.io",
+    icon: Mail,
+    substeps: [
+      { text: "Uploading to DocuSign…", ms: 700 },
+      { text: "Configuring signature fields", ms: 600 },
+      { text: "Dispatching from animesh@beevr.io", ms: 700 },
+      { text: "Delivered ✓", ms: 400 },
+    ],
+  },
 ];
 
 type Message =
@@ -25,7 +64,13 @@ type Message =
   | {
       id: string;
       role: "assistant";
-      steps: { step: ThinkingStep; status: "pending" | "active" | "done" }[];
+      steps: {
+        step: ThinkingStep;
+        status: "pending" | "active" | "done";
+        subIndex: number;
+        elapsed: number;
+      }[];
+      startedAt: number;
       done: boolean;
     };
 
@@ -33,11 +78,19 @@ function Index() {
   const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [tick, setTick] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Global tick for live elapsed time
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = setInterval(() => setTick((t) => t + 1), 100);
+    return () => clearInterval(id);
+  }, [isRunning]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, tick]);
 
   const handleSend = async () => {
     if (!input.trim() || isRunning) return;
@@ -48,7 +101,8 @@ function Index() {
     const assistantMsg: Message = {
       id: assistantId,
       role: "assistant",
-      steps: THINKING_STEPS.map((s) => ({ step: s, status: "pending" })),
+      steps: THINKING_STEPS.map((s) => ({ step: s, status: "pending", subIndex: 0, elapsed: 0 })),
+      startedAt: Date.now(),
       done: false,
     };
 
@@ -56,6 +110,8 @@ function Index() {
     setInput("");
 
     for (let i = 0; i < THINKING_STEPS.length; i++) {
+      const step = THINKING_STEPS[i];
+      // mark active
       setMessages((m) =>
         m.map((msg) =>
           msg.id === assistantId && msg.role === "assistant"
@@ -64,12 +120,29 @@ function Index() {
                 steps: msg.steps.map((s, idx) => ({
                   ...s,
                   status: idx < i ? "done" : idx === i ? "active" : "pending",
+                  subIndex: idx === i ? 0 : s.subIndex,
                 })),
               }
             : msg,
         ),
       );
-      await new Promise((r) => setTimeout(r, THINKING_STEPS[i].duration));
+
+      // walk through substeps
+      for (let j = 0; j < step.substeps.length; j++) {
+        await new Promise((r) => setTimeout(r, step.substeps[j].ms));
+        setMessages((m) =>
+          m.map((msg) =>
+            msg.id === assistantId && msg.role === "assistant"
+              ? {
+                  ...msg,
+                  steps: msg.steps.map((s, idx) =>
+                    idx === i ? { ...s, subIndex: j + 1 } : s,
+                  ),
+                }
+              : msg,
+          ),
+        );
+      }
     }
 
     setMessages((m) =>
@@ -189,6 +262,15 @@ function Index() {
 
 function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }> }) {
   const allDone = msg.steps.every((s) => s.status === "done");
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    if (allDone) return;
+    const id = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(id);
+  }, [allDone]);
+
+  const elapsed = ((allDone ? now : Date.now()) - msg.startedAt) / 1000;
 
   return (
     <div className="flex gap-3">
@@ -198,57 +280,89 @@ function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }>
       <div className="flex-1 rounded-xl border border-border bg-card p-5">
         {/* Thinking section */}
         <div className="mb-4">
-          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            {!allDone ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                Thinking…
-              </>
-            ) : (
-              <>
-                <Check className="h-3.5 w-3.5 text-primary" />
-                Completed
-              </>
-            )}
+          <div className="mb-3 flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <div className="flex items-center gap-2">
+              {!allDone ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                  <span>Thinking…</span>
+                </>
+              ) : (
+                <>
+                  <Check className="h-3.5 w-3.5 text-primary" />
+                  <span>Completed</span>
+                </>
+              )}
+            </div>
+            <span className="tabular-nums text-[11px] text-muted-foreground/70">
+              {elapsed.toFixed(1)}s
+            </span>
           </div>
           <ol className="space-y-1.5">
-            {msg.steps.map(({ step, status }) => {
+            {msg.steps.map(({ step, status, subIndex }) => {
               const Icon = step.icon;
+              const isActive = status === "active";
+              const isDone = status === "done";
+              const visibleSubs = isDone ? step.substeps.length : subIndex;
               return (
                 <li
                   key={step.id}
-                  className={`flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                    status === "active" ? "bg-muted" : ""
+                  className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
+                    isActive ? "bg-muted" : ""
                   }`}
                 >
-                  <span
-                    className={`flex h-6 w-6 items-center justify-center rounded-md ${
-                      status === "done"
-                        ? "bg-accent text-primary"
-                        : status === "active"
-                        ? "bg-primary/20 text-primary"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {status === "done" ? (
-                      <Check className="h-3.5 w-3.5" />
-                    ) : status === "active" ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Icon className="h-3.5 w-3.5" />
-                    )}
-                  </span>
-                  <span
-                    className={
-                      status === "pending"
-                        ? "text-muted-foreground"
-                        : status === "active"
-                        ? "font-medium text-foreground"
-                        : "text-foreground"
-                    }
-                  >
-                    {step.label}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${
+                        isDone
+                          ? "bg-accent text-primary"
+                          : isActive
+                          ? "bg-primary/20 text-primary"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {isDone ? (
+                        <Check className="h-3.5 w-3.5" />
+                      ) : isActive ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Icon className="h-3.5 w-3.5" />
+                      )}
+                    </span>
+                    <span
+                      className={
+                        status === "pending"
+                          ? "text-muted-foreground"
+                          : isActive
+                          ? "font-medium text-foreground"
+                          : "text-foreground"
+                      }
+                    >
+                      {step.label}
+                    </span>
+                  </div>
+                  {(isActive || isDone) && visibleSubs > 0 && (
+                    <ul className="ml-9 mt-1.5 space-y-1 border-l border-border/60 pl-3">
+                      {step.substeps.slice(0, visibleSubs).map((sub, idx) => {
+                        const isLastActive = isActive && idx === visibleSubs - 1;
+                        return (
+                          <li
+                            key={idx}
+                            className="animate-in fade-in slide-in-from-left-1 flex items-center gap-2 text-xs text-muted-foreground"
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                isLastActive ? "bg-primary animate-pulse" : "bg-muted-foreground/40"
+                              }`}
+                            />
+                            <span className={isLastActive ? "text-foreground/90" : ""}>
+                              {sub.text}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}
