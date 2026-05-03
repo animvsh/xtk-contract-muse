@@ -30,7 +30,7 @@ type Message =
     };
 
 function Index() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
