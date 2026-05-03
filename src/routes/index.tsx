@@ -262,6 +262,15 @@ function Index() {
 
 function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }> }) {
   const allDone = msg.steps.every((s) => s.status === "done");
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    if (allDone) return;
+    const id = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(id);
+  }, [allDone]);
+
+  const elapsed = ((allDone ? now : Date.now()) - msg.startedAt) / 1000;
 
   return (
     <div className="flex gap-3">
@@ -271,57 +280,89 @@ function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }>
       <div className="flex-1 rounded-xl border border-border bg-card p-5">
         {/* Thinking section */}
         <div className="mb-4">
-          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            {!allDone ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                Thinking…
-              </>
-            ) : (
-              <>
-                <Check className="h-3.5 w-3.5 text-primary" />
-                Completed
-              </>
-            )}
+          <div className="mb-3 flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <div className="flex items-center gap-2">
+              {!allDone ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                  <span>Thinking…</span>
+                </>
+              ) : (
+                <>
+                  <Check className="h-3.5 w-3.5 text-primary" />
+                  <span>Completed</span>
+                </>
+              )}
+            </div>
+            <span className="tabular-nums text-[11px] text-muted-foreground/70">
+              {elapsed.toFixed(1)}s
+            </span>
           </div>
           <ol className="space-y-1.5">
-            {msg.steps.map(({ step, status }) => {
+            {msg.steps.map(({ step, status, subIndex }) => {
               const Icon = step.icon;
+              const isActive = status === "active";
+              const isDone = status === "done";
+              const visibleSubs = isDone ? step.substeps.length : subIndex;
               return (
                 <li
                   key={step.id}
-                  className={`flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                    status === "active" ? "bg-muted" : ""
+                  className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
+                    isActive ? "bg-muted" : ""
                   }`}
                 >
-                  <span
-                    className={`flex h-6 w-6 items-center justify-center rounded-md ${
-                      status === "done"
-                        ? "bg-accent text-primary"
-                        : status === "active"
-                        ? "bg-primary/20 text-primary"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {status === "done" ? (
-                      <Check className="h-3.5 w-3.5" />
-                    ) : status === "active" ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Icon className="h-3.5 w-3.5" />
-                    )}
-                  </span>
-                  <span
-                    className={
-                      status === "pending"
-                        ? "text-muted-foreground"
-                        : status === "active"
-                        ? "font-medium text-foreground"
-                        : "text-foreground"
-                    }
-                  >
-                    {step.label}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${
+                        isDone
+                          ? "bg-accent text-primary"
+                          : isActive
+                          ? "bg-primary/20 text-primary"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {isDone ? (
+                        <Check className="h-3.5 w-3.5" />
+                      ) : isActive ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Icon className="h-3.5 w-3.5" />
+                      )}
+                    </span>
+                    <span
+                      className={
+                        status === "pending"
+                          ? "text-muted-foreground"
+                          : isActive
+                          ? "font-medium text-foreground"
+                          : "text-foreground"
+                      }
+                    >
+                      {step.label}
+                    </span>
+                  </div>
+                  {(isActive || isDone) && visibleSubs > 0 && (
+                    <ul className="ml-9 mt-1.5 space-y-1 border-l border-border/60 pl-3">
+                      {step.substeps.slice(0, visibleSubs).map((sub, idx) => {
+                        const isLastActive = isActive && idx === visibleSubs - 1;
+                        return (
+                          <li
+                            key={idx}
+                            className="animate-in fade-in slide-in-from-left-1 flex items-center gap-2 text-xs text-muted-foreground"
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                isLastActive ? "bg-primary animate-pulse" : "bg-muted-foreground/40"
+                              }`}
+                            />
+                            <span className={isLastActive ? "text-foreground/90" : ""}>
+                              {sub.text}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}
