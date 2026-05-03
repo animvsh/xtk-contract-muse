@@ -10,14 +10,53 @@ type ThinkingStep = {
   id: string;
   label: string;
   icon: typeof Search;
-  duration: number;
+  substeps: { text: string; ms: number }[];
 };
 
 const THINKING_STEPS: ThinkingStep[] = [
-  { id: "doc", label: "Reading Beevr documentation in Notion", icon: FileStack, duration: 1200 },
-  { id: "find", label: "Looking up Adithya in your contacts", icon: User, duration: 1000 },
-  { id: "draft", label: "Drafting employment contract from Beevr template", icon: FileText, duration: 1400 },
-  { id: "send", label: "Sending contract to adithya@beevr.io", icon: Mail, duration: 1100 },
+  {
+    id: "doc",
+    label: "Reading Beevr documentation in Notion",
+    icon: FileStack,
+    substeps: [
+      { text: "Connecting to Notion workspace…", ms: 600 },
+      { text: "Found 4 docs tagged #beevr", ms: 700 },
+      { text: "Parsing 'Employment & Hiring Policy.md'", ms: 900 },
+      { text: "Extracted 12 clauses · standard Beevr template v3", ms: 600 },
+    ],
+  },
+  {
+    id: "find",
+    label: "Looking up Adithya in your contacts",
+    icon: User,
+    substeps: [
+      { text: "Searching Gmail contacts for 'Adithya'…", ms: 700 },
+      { text: "2 matches found · disambiguating by recent threads", ms: 800 },
+      { text: "Resolved → Adithya Rao · adithya@beevr.io", ms: 600 },
+    ],
+  },
+  {
+    id: "draft",
+    label: "Drafting employment contract from Beevr template",
+    icon: FileText,
+    substeps: [
+      { text: "Filling employee details…", ms: 700 },
+      { text: "Applying Beevr compensation grid (L4 · Engineering)", ms: 900 },
+      { text: "Inserting equity vesting schedule (4y / 1y cliff)", ms: 800 },
+      { text: "Rendering PDF · adithya-rao-employment.pdf (3 pages)", ms: 700 },
+    ],
+  },
+  {
+    id: "send",
+    label: "Sending contract to adithya@beevr.io",
+    icon: Mail,
+    substeps: [
+      { text: "Uploading to DocuSign…", ms: 700 },
+      { text: "Configuring signature fields", ms: 600 },
+      { text: "Dispatching from animesh@beevr.io", ms: 700 },
+      { text: "Delivered ✓", ms: 400 },
+    ],
+  },
 ];
 
 type Message =
@@ -25,7 +64,13 @@ type Message =
   | {
       id: string;
       role: "assistant";
-      steps: { step: ThinkingStep; status: "pending" | "active" | "done" }[];
+      steps: {
+        step: ThinkingStep;
+        status: "pending" | "active" | "done";
+        subIndex: number;
+        elapsed: number;
+      }[];
+      startedAt: number;
       done: boolean;
     };
 
@@ -33,11 +78,19 @@ function Index() {
   const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [tick, setTick] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Global tick for live elapsed time
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = setInterval(() => setTick((t) => t + 1), 100);
+    return () => clearInterval(id);
+  }, [isRunning]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, tick]);
 
   const handleSend = async () => {
     if (!input.trim() || isRunning) return;
@@ -48,7 +101,8 @@ function Index() {
     const assistantMsg: Message = {
       id: assistantId,
       role: "assistant",
-      steps: THINKING_STEPS.map((s) => ({ step: s, status: "pending" })),
+      steps: THINKING_STEPS.map((s) => ({ step: s, status: "pending", subIndex: 0, elapsed: 0 })),
+      startedAt: Date.now(),
       done: false,
     };
 
@@ -56,6 +110,8 @@ function Index() {
     setInput("");
 
     for (let i = 0; i < THINKING_STEPS.length; i++) {
+      const step = THINKING_STEPS[i];
+      // mark active
       setMessages((m) =>
         m.map((msg) =>
           msg.id === assistantId && msg.role === "assistant"
@@ -64,12 +120,29 @@ function Index() {
                 steps: msg.steps.map((s, idx) => ({
                   ...s,
                   status: idx < i ? "done" : idx === i ? "active" : "pending",
+                  subIndex: idx === i ? 0 : s.subIndex,
                 })),
               }
             : msg,
         ),
       );
-      await new Promise((r) => setTimeout(r, THINKING_STEPS[i].duration));
+
+      // walk through substeps
+      for (let j = 0; j < step.substeps.length; j++) {
+        await new Promise((r) => setTimeout(r, step.substeps[j].ms));
+        setMessages((m) =>
+          m.map((msg) =>
+            msg.id === assistantId && msg.role === "assistant"
+              ? {
+                  ...msg,
+                  steps: msg.steps.map((s, idx) =>
+                    idx === i ? { ...s, subIndex: j + 1 } : s,
+                  ),
+                }
+              : msg,
+          ),
+        );
+      }
     }
 
     setMessages((m) =>
