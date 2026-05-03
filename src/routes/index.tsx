@@ -14,10 +14,10 @@ type ThinkingStep = {
 };
 
 const THINKING_STEPS: ThinkingStep[] = [
-  { id: "scan", label: "Scanning your profile data", icon: Search, duration: 1100 },
-  { id: "extract", label: "Extracting employment details", icon: User, duration: 1000 },
-  { id: "draft", label: "Drafting employment contract", icon: FileText, duration: 1300 },
-  { id: "send", label: "Sending contract via email", icon: Mail, duration: 1100 },
+  { id: "doc", label: "Reading Beevr documentation in Notion", icon: FileStack, duration: 1200 },
+  { id: "find", label: "Looking up Adithya in your contacts", icon: User, duration: 1000 },
+  { id: "draft", label: "Drafting employment contract from Beevr template", icon: FileText, duration: 1400 },
+  { id: "send", label: "Sending contract to adithya@beevr.io", icon: Mail, duration: 1100 },
 ];
 
 type Message =
@@ -258,35 +258,35 @@ function AssistantBubble({ msg }: { msg: Extract<Message, { role: "assistant" }>
         {msg.done && (
           <div className="animate-in fade-in slide-in-from-bottom-2 space-y-3 border-t border-border pt-4 text-sm leading-relaxed">
             <p className="text-foreground">
-              Based on your profile data across HR records, Notion, and Gmail, I drafted a complete
-              employment contract with your details:
+              I read the Beevr company doc, found Adithya's details, and generated an
+              employment contract using the standard Beevr template:
             </p>
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
-                  Pulled name, role, and start date{" "}
-                  <span className="text-muted-foreground">(Notion: HR/Onboarding)</span>
+                  Pulled company terms & policies{" "}
+                  <span className="text-muted-foreground">(Notion: Beevr / Handbook)</span>
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
-                  Compensation & equity terms{" "}
-                  <span className="text-muted-foreground">(Gmail: Offer letter thread)</span>
+                  Resolved recipient: <span className="font-medium">Adithya Rao</span>{" "}
+                  <span className="text-muted-foreground">(Gmail contacts)</span>
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>
-                  Generated PDF and dispatched for signature{" "}
+                  Generated <span className="font-medium">adithya-rao-employment.pdf</span> and dispatched for signature{" "}
                   <span className="text-muted-foreground">(DocuSign)</span>
                 </span>
               </li>
             </ul>
             <div className="mt-3 flex items-center gap-2 rounded-lg border border-primary/30 bg-accent/40 px-3 py-2.5 text-sm text-primary">
               <Mail className="h-4 w-4" />
-              Contract sent using your email address.
+              Contract sent to adithya@beevr.io using your email address.
             </div>
             <div className="flex gap-2 pt-1">
               <button className="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
