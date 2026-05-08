@@ -72,7 +72,8 @@ type Message =
     };
 
 function BrainPage() {
-  const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
+  const { q } = Route.useSearch();
+  const [input, setInput] = useState(q ?? "Look at the doc about Beevr and send Adithya an employment contract");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
