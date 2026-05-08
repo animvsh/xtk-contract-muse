@@ -110,7 +110,7 @@ function AgentDetail() {
             {runs.map((r, idx) => (
               <div key={r.id} className="space-y-1.5">
                 <div className="px-1 text-[11px] text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
-                <ReasoningSteps log={r.log} live={idx === 0 && running === false ? false : false} />
+                <ReasoningSteps log={r.log} live={idx === 0} />
               </div>
             ))}
           </div>
