@@ -15,12 +15,13 @@ type ChatRequestBody = { messages?: unknown };
 const tools = {
   think: tool({
     description:
-      "Record a short reasoning step describing what you plan to do next or what you just learned. Use BEFORE every tool call, and after results to summarize. One sentence.",
+      "Record ONE short reasoning step (a single sentence) describing what you plan to do next, what you just learned, or how pieces connect. Call this MULTIPLE times throughout a response — at least 3-5 times for any non-trivial request — to walk the user through your reasoning.",
     inputSchema: z.object({
-      thought: z.string().describe("A single sentence reasoning step"),
+      thought: z.string().describe("A single concise sentence reasoning step, written in first person ('I'll…', 'Now I…', 'Looks like…')."),
     }),
     execute: async ({ thought }) => {
-      await new Promise((r) => setTimeout(r, 300));
+      // Slight delay so reasoning steps feel deliberate as they stream in
+      await new Promise((r) => setTimeout(r, 550));
       return { ok: true, thought };
     },
   }),
