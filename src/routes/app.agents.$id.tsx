@@ -5,6 +5,7 @@ import { ArrowLeft, Play, Loader2, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { runAgent } from "@/lib/agents.functions";
 import { AgentCanvas } from "@/components/agent-canvas";
+import { ReasoningSteps } from "@/components/reasoning-steps";
 import { PageHeader } from "@/components/page-header";
 import { toast } from "sonner";
 
@@ -106,10 +107,10 @@ function AgentDetail() {
           </div>
         ) : (
           <div className="space-y-2">
-            {runs.map((r) => (
-              <div key={r.id} className="rounded-xl border border-black/[0.06] bg-white/70 p-4 backdrop-blur">
-                <div className="mb-1.5 text-[11px] text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
-                <pre className="whitespace-pre-wrap text-xs leading-relaxed text-foreground/90">{r.log}</pre>
+            {runs.map((r, idx) => (
+              <div key={r.id} className="space-y-1.5">
+                <div className="px-1 text-[11px] text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
+                <ReasoningSteps log={r.log} live={idx === 0} />
               </div>
             ))}
           </div>
