@@ -14,7 +14,6 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppTeamRouteImport } from './routes/app.team'
-import { Route as AppMcpRouteImport } from './routes/app.mcp'
 import { Route as AppKeysRouteImport } from './routes/app.keys'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
@@ -50,11 +49,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
   path: '/team',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMcpRoute = AppMcpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
   getParentRoute: () => AppRoute,
 } as any)
 const AppKeysRoute = AppKeysRouteImport.update({
@@ -124,7 +118,6 @@ export interface FileRoutesByFullPath {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
-  '/app/mcp': typeof AppMcpRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
@@ -142,7 +135,6 @@ export interface FileRoutesByTo {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
-  '/app/mcp': typeof AppMcpRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
@@ -162,7 +154,6 @@ export interface FileRoutesById {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
-  '/app/mcp': typeof AppMcpRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
@@ -183,7 +174,6 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
-    | '/app/mcp'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
@@ -201,7 +191,6 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
-    | '/app/mcp'
     | '/app/team'
     | '/app'
     | '/app/agents/$id'
@@ -220,7 +209,6 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
-    | '/app/mcp'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
@@ -271,13 +259,6 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/app/team'
       preLoaderRoute: typeof AppTeamRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/mcp': {
-      id: '/app/mcp'
-      path: '/mcp'
-      fullPath: '/app/mcp'
-      preLoaderRoute: typeof AppMcpRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/keys': {
@@ -403,7 +384,6 @@ interface AppRouteChildren {
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
   AppKeysRoute: typeof AppKeysRouteWithChildren
-  AppMcpRoute: typeof AppMcpRoute
   AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -415,7 +395,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
   AppKeysRoute: AppKeysRouteWithChildren,
-  AppMcpRoute: AppMcpRoute,
   AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
@@ -431,3 +410,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
