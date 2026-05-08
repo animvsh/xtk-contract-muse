@@ -244,6 +244,26 @@ function ToolPart({ part }: { part: ToolPartShape }) {
   const isError = part.state === "output-error";
   const isDone = part.state === "output-available";
 
+  // Special inline rendering for "think" reasoning steps
+  if (toolName === "think") {
+    const thought =
+      (part.input as { thought?: string } | undefined)?.thought ?? "";
+    return (
+      <div className="animate-pop flex items-start gap-2 text-sm text-muted-foreground">
+        <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          {isRunning ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Sparkles className="h-3 w-3" />
+          )}
+        </span>
+        <span className={`italic leading-relaxed ${isRunning ? "shimmer-text" : ""}`}>
+          {thought || (isRunning ? "Thinking…" : "")}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
       <button
@@ -269,7 +289,7 @@ function ToolPart({ part }: { part: ToolPartShape }) {
             <Icon className="h-3.5 w-3.5" />
           )}
         </span>
-        <span className="flex-1">
+        <span className="flex-1 truncate">
           <span className="font-medium text-foreground">{meta.label}</span>
           <span className="ml-2 text-muted-foreground">
             {isRunning
