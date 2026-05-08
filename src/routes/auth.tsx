@@ -44,7 +44,14 @@ function AuthPage() {
         navigate({ to: "/app" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      if (mode === "signin" && /invalid login credentials/i.test(msg)) {
+        toast.error("No account found, or wrong password. Try creating an account.", {
+          action: { label: "Sign up", onClick: () => setMode("signup") },
+        });
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(false);
     }
