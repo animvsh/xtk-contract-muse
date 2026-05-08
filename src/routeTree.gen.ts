@@ -16,6 +16,7 @@ import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
 import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
+import { Route as DocsCloudBuildsRouteImport } from './routes/docs.cloud-builds'
 import { Route as DocsBuildingToolsRouteImport } from './routes/docs.building-tools'
 import { Route as DocsApprovalsRouteImport } from './routes/docs.approvals'
 import { Route as DocsAgentsRouteImport } from './routes/docs.agents'
@@ -30,6 +31,8 @@ import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as DocsExamplesBookstoreSalesAgentRouteImport } from './routes/docs.examples.bookstore-sales-agent'
+import { Route as DocsCloudBuildsAgentsRouteImport } from './routes/docs.cloud-builds.agents'
 import { Route as DocsCliOpencodeRouteImport } from './routes/docs.cli.opencode'
 import { Route as DocsCliCursorRouteImport } from './routes/docs.cli.cursor'
 import { Route as DocsCliClaudeCodeRouteImport } from './routes/docs.cli.claude-code'
@@ -72,6 +75,11 @@ const DocsQuickstartRoute = DocsQuickstartRouteImport.update({
 const DocsExamplesRoute = DocsExamplesRouteImport.update({
   id: '/docs/examples',
   path: '/docs/examples',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsCloudBuildsRoute = DocsCloudBuildsRouteImport.update({
+  id: '/docs/cloud-builds',
+  path: '/docs/cloud-builds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsBuildingToolsRoute = DocsBuildingToolsRouteImport.update({
@@ -144,6 +152,17 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsExamplesBookstoreSalesAgentRoute =
+  DocsExamplesBookstoreSalesAgentRouteImport.update({
+    id: '/bookstore-sales-agent',
+    path: '/bookstore-sales-agent',
+    getParentRoute: () => DocsExamplesRoute,
+  } as any)
+const DocsCloudBuildsAgentsRoute = DocsCloudBuildsAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => DocsCloudBuildsRoute,
+} as any)
 const DocsCliOpencodeRoute = DocsCliOpencodeRouteImport.update({
   id: '/docs/cli/opencode',
   path: '/docs/cli/opencode',
@@ -204,7 +223,8 @@ export interface FileRoutesByFullPath {
   '/docs/agents': typeof DocsAgentsRoute
   '/docs/approvals': typeof DocsApprovalsRoute
   '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
-  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/cloud-builds': typeof DocsCloudBuildsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRouteWithChildren
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/app/': typeof AppIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -216,6 +236,8 @@ export interface FileRoutesByFullPath {
   '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
   '/docs/cli/cursor': typeof DocsCliCursorRoute
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
+  '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
+  '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -234,7 +256,8 @@ export interface FileRoutesByTo {
   '/docs/agents': typeof DocsAgentsRoute
   '/docs/approvals': typeof DocsApprovalsRoute
   '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
-  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/cloud-builds': typeof DocsCloudBuildsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRouteWithChildren
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/app': typeof AppIndexRoute
   '/docs': typeof DocsIndexRoute
@@ -246,6 +269,8 @@ export interface FileRoutesByTo {
   '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
   '/docs/cli/cursor': typeof DocsCliCursorRoute
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
+  '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
+  '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -266,7 +291,8 @@ export interface FileRoutesById {
   '/docs/agents': typeof DocsAgentsRoute
   '/docs/approvals': typeof DocsApprovalsRoute
   '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
-  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/cloud-builds': typeof DocsCloudBuildsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRouteWithChildren
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/app/': typeof AppIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -278,6 +304,8 @@ export interface FileRoutesById {
   '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
   '/docs/cli/cursor': typeof DocsCliCursorRoute
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
+  '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
+  '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -299,6 +327,7 @@ export interface FileRouteTypes {
     | '/docs/agents'
     | '/docs/approvals'
     | '/docs/building-tools'
+    | '/docs/cloud-builds'
     | '/docs/examples'
     | '/docs/quickstart'
     | '/app/'
@@ -311,6 +340,8 @@ export interface FileRouteTypes {
     | '/docs/cli/claude-code'
     | '/docs/cli/cursor'
     | '/docs/cli/opencode'
+    | '/docs/cloud-builds/agents'
+    | '/docs/examples/bookstore-sales-agent'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -329,6 +360,7 @@ export interface FileRouteTypes {
     | '/docs/agents'
     | '/docs/approvals'
     | '/docs/building-tools'
+    | '/docs/cloud-builds'
     | '/docs/examples'
     | '/docs/quickstart'
     | '/app'
@@ -341,6 +373,8 @@ export interface FileRouteTypes {
     | '/docs/cli/claude-code'
     | '/docs/cli/cursor'
     | '/docs/cli/opencode'
+    | '/docs/cloud-builds/agents'
+    | '/docs/examples/bookstore-sales-agent'
   id:
     | '__root__'
     | '/'
@@ -360,6 +394,7 @@ export interface FileRouteTypes {
     | '/docs/agents'
     | '/docs/approvals'
     | '/docs/building-tools'
+    | '/docs/cloud-builds'
     | '/docs/examples'
     | '/docs/quickstart'
     | '/app/'
@@ -372,6 +407,8 @@ export interface FileRouteTypes {
     | '/docs/cli/claude-code'
     | '/docs/cli/cursor'
     | '/docs/cli/opencode'
+    | '/docs/cloud-builds/agents'
+    | '/docs/examples/bookstore-sales-agent'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -384,7 +421,8 @@ export interface RootRouteChildren {
   DocsAgentsRoute: typeof DocsAgentsRoute
   DocsApprovalsRoute: typeof DocsApprovalsRoute
   DocsBuildingToolsRoute: typeof DocsBuildingToolsRouteWithChildren
-  DocsExamplesRoute: typeof DocsExamplesRoute
+  DocsCloudBuildsRoute: typeof DocsCloudBuildsRouteWithChildren
+  DocsExamplesRoute: typeof DocsExamplesRouteWithChildren
   DocsQuickstartRoute: typeof DocsQuickstartRoute
   DocsIndexRoute: typeof DocsIndexRoute
   DocsCliClaudeCodeRoute: typeof DocsCliClaudeCodeRoute
@@ -441,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/docs/examples'
       fullPath: '/docs/examples'
       preLoaderRoute: typeof DocsExamplesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/cloud-builds': {
+      id: '/docs/cloud-builds'
+      path: '/docs/cloud-builds'
+      fullPath: '/docs/cloud-builds'
+      preLoaderRoute: typeof DocsCloudBuildsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs/building-tools': {
@@ -540,6 +585,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/examples/bookstore-sales-agent': {
+      id: '/docs/examples/bookstore-sales-agent'
+      path: '/bookstore-sales-agent'
+      fullPath: '/docs/examples/bookstore-sales-agent'
+      preLoaderRoute: typeof DocsExamplesBookstoreSalesAgentRouteImport
+      parentRoute: typeof DocsExamplesRoute
+    }
+    '/docs/cloud-builds/agents': {
+      id: '/docs/cloud-builds/agents'
+      path: '/agents'
+      fullPath: '/docs/cloud-builds/agents'
+      preLoaderRoute: typeof DocsCloudBuildsAgentsRouteImport
+      parentRoute: typeof DocsCloudBuildsRoute
     }
     '/docs/cli/opencode': {
       id: '/docs/cli/opencode'
@@ -674,6 +733,30 @@ const DocsBuildingToolsRouteChildren: DocsBuildingToolsRouteChildren = {
 const DocsBuildingToolsRouteWithChildren =
   DocsBuildingToolsRoute._addFileChildren(DocsBuildingToolsRouteChildren)
 
+interface DocsCloudBuildsRouteChildren {
+  DocsCloudBuildsAgentsRoute: typeof DocsCloudBuildsAgentsRoute
+}
+
+const DocsCloudBuildsRouteChildren: DocsCloudBuildsRouteChildren = {
+  DocsCloudBuildsAgentsRoute: DocsCloudBuildsAgentsRoute,
+}
+
+const DocsCloudBuildsRouteWithChildren = DocsCloudBuildsRoute._addFileChildren(
+  DocsCloudBuildsRouteChildren,
+)
+
+interface DocsExamplesRouteChildren {
+  DocsExamplesBookstoreSalesAgentRoute: typeof DocsExamplesBookstoreSalesAgentRoute
+}
+
+const DocsExamplesRouteChildren: DocsExamplesRouteChildren = {
+  DocsExamplesBookstoreSalesAgentRoute: DocsExamplesBookstoreSalesAgentRoute,
+}
+
+const DocsExamplesRouteWithChildren = DocsExamplesRoute._addFileChildren(
+  DocsExamplesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
@@ -684,7 +767,8 @@ const rootRouteChildren: RootRouteChildren = {
   DocsAgentsRoute: DocsAgentsRoute,
   DocsApprovalsRoute: DocsApprovalsRoute,
   DocsBuildingToolsRoute: DocsBuildingToolsRouteWithChildren,
-  DocsExamplesRoute: DocsExamplesRoute,
+  DocsCloudBuildsRoute: DocsCloudBuildsRouteWithChildren,
+  DocsExamplesRoute: DocsExamplesRouteWithChildren,
   DocsQuickstartRoute: DocsQuickstartRoute,
   DocsIndexRoute: DocsIndexRoute,
   DocsCliClaudeCodeRoute: DocsCliClaudeCodeRoute,
