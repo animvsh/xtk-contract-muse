@@ -29,7 +29,8 @@ function MCPPage() {
 
   const add = async () => {
     if (!name.trim() || !url.trim()) return toast.error("Name and URL required");
-    const { error } = await supabase.from("mcp_servers").insert({ name, url, description, enabled: true });
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from("mcp_servers").insert({ name, url, description, enabled: true, user_id: u.user?.id });
     if (error) return toast.error(error.message);
     toast.success("MCP server added");
     setName("");

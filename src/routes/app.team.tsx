@@ -36,7 +36,8 @@ function TeamSpaces() {
     if (!name.trim()) return;
     const colors = ["oklch(0.6 0.2 250)", "oklch(0.7 0.18 35)", "oklch(0.7 0.18 145)", "oklch(0.7 0.2 320)"];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const { error } = await supabase.from("team_spaces").insert({ name: name.trim(), color });
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from("team_spaces").insert({ name: name.trim(), color, user_id: u.user?.id });
     if (error) return toast.error(error.message);
     toast.success("Space created");
     setName("");
