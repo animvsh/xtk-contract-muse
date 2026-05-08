@@ -13,11 +13,13 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppTeamRouteImport } from './routes/app.team'
+import { Route as AppMcpRouteImport } from './routes/app.mcp'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
+import { Route as AppTeamIdRouteImport } from './routes/app.team.$id'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
 import { Route as AppAgentsIdRouteImport } from './routes/app.agents.$id'
 
@@ -39,6 +41,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMcpRoute = AppMcpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDocsRoute = AppDocsRouteImport.update({
@@ -66,6 +73,11 @@ const AppAgentsRoute = AppAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeamIdRoute = AppTeamIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppTeamRoute,
+} as any)
 const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -85,10 +97,12 @@ export interface FileRoutesByFullPath {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/team': typeof AppTeamRoute
+  '/app/mcp': typeof AppMcpRoute
+  '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,10 +111,12 @@ export interface FileRoutesByTo {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/team': typeof AppTeamRoute
+  '/app/mcp': typeof AppMcpRoute
+  '/app/team': typeof AppTeamRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,10 +127,12 @@ export interface FileRoutesById {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/team': typeof AppTeamRoute
+  '/app/mcp': typeof AppMcpRoute
+  '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,10 +144,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
+    | '/app/mcp'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/team/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,10 +158,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
+    | '/app/mcp'
     | '/app/team'
     | '/app'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/team/$id'
   id:
     | '__root__'
     | '/'
@@ -151,10 +173,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
+    | '/app/mcp'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/team/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/mcp': {
+      id: '/app/mcp'
+      path: '/mcp'
+      fullPath: '/app/mcp'
+      preLoaderRoute: typeof AppMcpRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/docs': {
       id: '/app/docs'
       path: '/docs'
@@ -227,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/team/$id': {
+      id: '/app/team/$id'
+      path: '/$id'
+      fullPath: '/app/team/$id'
+      preLoaderRoute: typeof AppTeamIdRouteImport
+      parentRoute: typeof AppTeamRoute
+    }
     '/app/agents/new': {
       id: '/app/agents/new'
       path: '/new'
@@ -258,13 +296,25 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
   AppAgentsRouteChildren,
 )
 
+interface AppTeamRouteChildren {
+  AppTeamIdRoute: typeof AppTeamIdRoute
+}
+
+const AppTeamRouteChildren: AppTeamRouteChildren = {
+  AppTeamIdRoute: AppTeamIdRoute,
+}
+
+const AppTeamRouteWithChildren =
+  AppTeamRoute._addFileChildren(AppTeamRouteChildren)
+
 interface AppRouteChildren {
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
-  AppTeamRoute: typeof AppTeamRoute
+  AppMcpRoute: typeof AppMcpRoute
+  AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -274,7 +324,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppBrainRoute: AppBrainRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
-  AppTeamRoute: AppTeamRoute,
+  AppMcpRoute: AppMcpRoute,
+  AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -287,3 +338,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
