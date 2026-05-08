@@ -105,7 +105,6 @@ export const runAgent = createServerFn({ method: "POST" })
 
     const log = `${result.summary}\n\n${result.log_lines.map((l: string) => `• ${l}`).join("\n")}`;
     await supabaseAdmin.from("agent_runs").insert({ agent_id: data.agentId, log, status: "completed" });
-    await supabaseAdmin.rpc("increment_agent_runs" as never).then(() => {}).catch(() => {});
     await supabaseAdmin
       .from("agents")
       .update({ runs_count: (agent.runs_count ?? 0) + 1 })
