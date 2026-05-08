@@ -1,6 +1,8 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, Network } from "lucide-react";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, Network, LogOut } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
