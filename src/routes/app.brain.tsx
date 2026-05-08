@@ -71,35 +71,41 @@ function BrainPage() {
     setInput("");
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl px-6 py-8">
-          {messages.length === 0 && (
-            <>
-              <h1 className="text-3xl font-bold">Ask your company brain</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+    <div className="relative flex h-[calc(100vh-3rem)] min-h-0 flex-1 flex-col">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">
+        <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
+          {isEmpty && (
+            <div className="animate-[fadeInUp_300ms_ease-out]">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-lg shadow-primary/20">
+                <Brain className="h-7 w-7" />
+              </div>
+              <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
+              <p className="mt-2 text-base text-muted-foreground">
                 Connected to Notion, Gmail contacts, document drafting, and email.
               </p>
-              <div className="mt-6 grid gap-2 text-sm">
+              <div className="mt-8 grid gap-2 text-sm sm:grid-cols-2">
                 {[
                   "Look at the doc about Beevr and send Adithya an employment contract",
                   "Find the Q3 roadmap in Notion and summarize it",
                   "Draft a follow-up email to the latest customer thread",
+                  "Who emailed me about pricing this week?",
                 ].map((s) => (
                   <button
                     key={s}
                     onClick={() => sendMessage({ text: s })}
-                    className="clicky rounded-lg border border-border bg-card px-3 py-2 text-left hover:border-primary/40 hover:bg-accent hover:shadow-sm"
+                    className="clicky group rounded-xl border border-black/5 bg-white/70 px-4 py-3 text-left leading-snug text-foreground/80 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:text-foreground hover:shadow-md"
                   >
                     {s}
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
-          <div className="mt-8 space-y-6">
+          <div className="space-y-6">
             {messages.map((msg) =>
               msg.role === "user" ? (
                 <div key={msg.id} className="flex justify-end">
