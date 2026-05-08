@@ -190,16 +190,16 @@ type UIMsg = ReturnType<typeof useChat>["messages"][number];
 function AssistantMessage({ msg }: { msg: UIMsg }) {
   return (
     <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
         <Brain className="h-4 w-4" />
       </div>
-      <div className="flex-1 space-y-2 rounded-xl border border-border bg-card p-5">
+      <div className="min-w-0 flex-1 space-y-2 rounded-2xl rounded-tl-md border border-black/5 bg-white/80 p-4 shadow-sm backdrop-blur">
         {msg.parts.map((part, idx) => {
           if (part.type === "text") {
             return (
               <div
                 key={idx}
-                className="whitespace-pre-wrap text-sm leading-relaxed text-foreground"
+                className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground"
               >
                 {part.text}
               </div>
