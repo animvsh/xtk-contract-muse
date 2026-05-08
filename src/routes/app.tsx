@@ -60,15 +60,25 @@ function AppLayout() {
             })}
           </nav>
 
-          <div className="mt-auto rounded-2xl border border-black/5 bg-white/60 p-4 backdrop-blur">
+          <div className="mt-auto rounded-2xl border border-black/5 bg-white/60 p-3 backdrop-blur">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)]" />
-              <div className="text-xs">
-                <div className="font-semibold">Animesh</div>
-                <div className="text-[oklch(0.45_0_0)]">Beevr · Admin</div>
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)] text-sm font-semibold text-white">
+                {initial}
               </div>
+              <div className="min-w-0 flex-1 text-xs">
+                <div className="truncate font-semibold">{displayName}</div>
+                <div className="truncate text-[oklch(0.45_0_0)]">{user.email}</div>
+              </div>
+              <button
+                onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
+                className="rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
           </div>
+
         </aside>
 
         <main className="flex flex-1 flex-col overflow-hidden border-l border-black/5 bg-white/40 backdrop-blur-sm">
