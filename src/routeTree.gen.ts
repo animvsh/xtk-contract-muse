@@ -19,6 +19,7 @@ import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
+import { Route as AppAgentsIdRouteImport } from './routes/app.agents.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -70,6 +71,11 @@ const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AppAgentsRoute,
 } as any)
+const AppAgentsIdRoute = AppAgentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppAgentsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
   '/app/': typeof AppIndexRoute
+  '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
 }
 export interface FileRoutesByTo {
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
   '/app': typeof AppIndexRoute
+  '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
 }
 export interface FileRoutesById {
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/app/docs': typeof AppDocsRoute
   '/app/team': typeof AppTeamRoute
   '/app/': typeof AppIndexRoute
+  '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
 }
 export interface FileRouteTypes {
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/team'
     | '/app/'
+    | '/app/agents/$id'
     | '/app/agents/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/team'
     | '/app'
+    | '/app/agents/$id'
     | '/app/agents/new'
   id:
     | '__root__'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/team'
     | '/app/'
+    | '/app/agents/$id'
     | '/app/agents/new'
   fileRoutesById: FileRoutesById
 }
@@ -222,14 +234,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgentsNewRouteImport
       parentRoute: typeof AppAgentsRoute
     }
+    '/app/agents/$id': {
+      id: '/app/agents/$id'
+      path: '/$id'
+      fullPath: '/app/agents/$id'
+      preLoaderRoute: typeof AppAgentsIdRouteImport
+      parentRoute: typeof AppAgentsRoute
+    }
   }
 }
 
 interface AppAgentsRouteChildren {
+  AppAgentsIdRoute: typeof AppAgentsIdRoute
   AppAgentsNewRoute: typeof AppAgentsNewRoute
 }
 
 const AppAgentsRouteChildren: AppAgentsRouteChildren = {
+  AppAgentsIdRoute: AppAgentsIdRoute,
   AppAgentsNewRoute: AppAgentsNewRoute,
 }
 
