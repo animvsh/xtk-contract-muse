@@ -71,39 +71,45 @@ function BrainPage() {
     setInput("");
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl px-6 py-8">
-          {messages.length === 0 && (
-            <>
-              <h1 className="text-3xl font-bold">Ask your company brain</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+    <div className="relative flex h-[calc(100vh-3rem)] min-h-0 flex-1 flex-col">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">
+        <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
+          {isEmpty && (
+            <div className="animate-[fadeInUp_300ms_ease-out]">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-lg shadow-primary/20">
+                <Brain className="h-7 w-7" />
+              </div>
+              <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
+              <p className="mt-2 text-base text-muted-foreground">
                 Connected to Notion, Gmail contacts, document drafting, and email.
               </p>
-              <div className="mt-6 grid gap-2 text-sm">
+              <div className="mt-8 grid gap-2 text-sm sm:grid-cols-2">
                 {[
                   "Look at the doc about Beevr and send Adithya an employment contract",
                   "Find the Q3 roadmap in Notion and summarize it",
                   "Draft a follow-up email to the latest customer thread",
+                  "Who emailed me about pricing this week?",
                 ].map((s) => (
                   <button
                     key={s}
                     onClick={() => sendMessage({ text: s })}
-                    className="clicky rounded-lg border border-border bg-card px-3 py-2 text-left hover:border-primary/40 hover:bg-accent hover:shadow-sm"
+                    className="clicky group rounded-xl border border-black/5 bg-white/70 px-4 py-3 text-left leading-snug text-foreground/80 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:text-foreground hover:shadow-md"
                   >
                     {s}
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
-          <div className="mt-8 space-y-6">
+          <div className="space-y-6">
             {messages.map((msg) =>
               msg.role === "user" ? (
                 <div key={msg.id} className="flex justify-end">
-                  <div className="animate-pop max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground shadow-sm">
+                  <div className="animate-pop max-w-[80%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[15px] leading-relaxed text-primary-foreground shadow-sm">
                     {msg.parts
                       .map((p) => (p.type === "text" ? p.text : ""))
                       .join("")}
@@ -138,34 +144,40 @@ function BrainPage() {
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-black/5 bg-white/70 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-black/10 bg-white p-2 shadow-sm transition-all focus-within:border-primary focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            rows={1}
-            placeholder="Ask anything about your company…"
-            className="max-h-40 flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
-            disabled={isLoading}
-          />
-          <button
-            onClick={handleSend}
-            disabled={isLoading || !input.trim()}
-            className="clicky clicky-sm flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm hover:shadow-md disabled:opacity-40"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </button>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+        <div className="h-16 bg-gradient-to-t from-white/90 via-white/60 to-transparent" />
+        <div className="pointer-events-auto bg-white/80 px-6 pb-5 pt-2 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-black/10 bg-white p-2 shadow-lg shadow-black/5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              rows={1}
+              placeholder="Ask anything about your company…"
+              className="max-h-40 flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] outline-none placeholder:text-muted-foreground"
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="clicky clicky-sm flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-all hover:shadow-md disabled:opacity-40"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          <p className="mx-auto mt-2 max-w-3xl text-center text-[11px] text-muted-foreground/70">
+            Press Enter to send · Shift + Enter for new line
+          </p>
         </div>
       </div>
 
@@ -178,16 +190,16 @@ type UIMsg = ReturnType<typeof useChat>["messages"][number];
 function AssistantMessage({ msg }: { msg: UIMsg }) {
   return (
     <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
         <Brain className="h-4 w-4" />
       </div>
-      <div className="flex-1 space-y-2 rounded-xl border border-border bg-card p-5">
+      <div className="min-w-0 flex-1 space-y-2 rounded-2xl rounded-tl-md border border-black/5 bg-white/80 p-4 shadow-sm backdrop-blur">
         {msg.parts.map((part, idx) => {
           if (part.type === "text") {
             return (
               <div
                 key={idx}
-                className="whitespace-pre-wrap text-sm leading-relaxed text-foreground"
+                className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground"
               >
                 {part.text}
               </div>
