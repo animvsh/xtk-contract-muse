@@ -15,12 +15,13 @@ type ChatRequestBody = { messages?: unknown };
 const tools = {
   think: tool({
     description:
-      "Record a short reasoning step describing what you plan to do next or what you just learned. Use BEFORE every tool call, and after results to summarize. One sentence.",
+      "Record ONE short reasoning step (a single sentence) describing what you plan to do next, what you just learned, or how pieces connect. Call this MULTIPLE times throughout a response — at least 3-5 times for any non-trivial request — to walk the user through your reasoning.",
     inputSchema: z.object({
-      thought: z.string().describe("A single sentence reasoning step"),
+      thought: z.string().describe("A single concise sentence reasoning step, written in first person ('I'll…', 'Now I…', 'Looks like…')."),
     }),
     execute: async ({ thought }) => {
-      await new Promise((r) => setTimeout(r, 300));
+      // Slight delay so reasoning steps feel deliberate as they stream in
+      await new Promise((r) => setTimeout(r, 550));
       return { ok: true, thought };
     },
   }),
@@ -135,12 +136,13 @@ export const Route = createFileRoute("/api/chat")({
             "You are Beevr — the user's company brain. You have live access to Notion, Gmail (inbox + contacts), document drafting, and email sending via tools.",
             "Always behave like an agent that actually executes work, not a chatbot that explains.",
             "Workflow rules:",
-            "1. Begin EVERY response with a `think` tool call describing your plan in one short sentence.",
-            "2. Call `think` again before each subsequent tool call to narrate the next step.",
-            "3. Use search tools (searchNotion, searchEmails, searchContacts, summarizeDoc) to gather context.",
-            "4. Use draftDocument to produce any artifact, then sendEmail when the user asked to send something.",
-            "5. After the final tool call, write a short markdown summary with bullet points of exactly what you did, file names, and recipients.",
-            "Never refuse on grounds of access — the tools are fully connected. Be concise, confident, and operational.",
+            "1. Begin EVERY response with 2-3 `think` tool calls in a row that lay out your plan, what context you need, and your strategy. One short sentence each.",
+            "2. Call `think` again before each subsequent tool call to narrate the next step in first person ('I'll search Notion for…', 'Found it — now I'll…').",
+            "3. After each tool result, call `think` once more to interpret what you got back before deciding the next action.",
+            "4. Use search tools (searchNotion, searchEmails, searchContacts, summarizeDoc) to gather context.",
+            "5. Use draftDocument to produce any artifact, then sendEmail when the user asked to send something.",
+            "6. End with a short markdown summary (bullet points) of exactly what you did, file names, and recipients.",
+            "Aim for at least 4-6 `think` steps total on any non-trivial request. Never refuse on grounds of access — the tools are fully connected. Be concise, confident, and operational.",
           ].join("\n"),
           tools,
           stopWhen: stepCountIs(50),

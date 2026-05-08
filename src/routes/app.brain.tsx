@@ -194,29 +194,104 @@ function BrainPage() {
 type UIMsg = ReturnType<typeof useChat>["messages"][number];
 
 function AssistantMessage({ msg }: { msg: UIMsg }) {
+  // Group consecutive `think` tool parts into a single Reasoning block
+  const groups: Array<
+    | { kind: "text"; key: string; text: string }
+    | { kind: "tool"; key: string; part: ToolPartShape }
+    | { kind: "reasoning"; key: string; parts: ToolPartShape[] }
+  > = [];
+  msg.parts.forEach((part, idx) => {
+    if (part.type === "text") {
+      groups.push({ kind: "text", key: `t${idx}`, text: part.text });
+    } else if (part.type === "tool-think") {
+      const last = groups[groups.length - 1];
+      if (last && last.kind === "reasoning") {
+        last.parts.push(part as ToolPartShape);
+      } else {
+        groups.push({ kind: "reasoning", key: `r${idx}`, parts: [part as ToolPartShape] });
+      }
+    } else if (part.type.startsWith("tool-")) {
+      groups.push({ kind: "tool", key: `x${idx}`, part: part as ToolPartShape });
+    }
+  });
+
   return (
     <div className="flex gap-3">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
         <Brain className="h-4 w-4" />
       </div>
-      <div className="min-w-0 flex-1 space-y-2 rounded-2xl rounded-tl-md border border-black/5 bg-white/80 p-4 shadow-sm backdrop-blur">
-        {msg.parts.map((part, idx) => {
-          if (part.type === "text") {
+      <div className="min-w-0 flex-1 space-y-3 rounded-2xl rounded-tl-md border border-black/5 bg-white/80 p-4 shadow-sm backdrop-blur">
+        {groups.map((g) => {
+          if (g.kind === "text") {
             return (
-              <div
-                key={idx}
-                className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground"
-              >
-                {part.text}
+              <div key={g.key} className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
+                {g.text}
               </div>
             );
           }
-          if (part.type.startsWith("tool-")) {
-            return <ToolPart key={idx} part={part as ToolPartShape} />;
+          if (g.kind === "reasoning") {
+            return <ReasoningBlock key={g.key} parts={g.parts} />;
           }
-          return null;
+          return <ToolPart key={g.key} part={g.part} />;
         })}
       </div>
+    </div>
+  );
+}
+
+function ReasoningBlock({ parts }: { parts: ToolPartShape[] }) {
+  const [open, setOpen] = useState(true);
+  const stillThinking = parts.some(
+    (p) => p.state === "input-streaming" || p.state === "input-available",
+  );
+  const steps = parts.map((p) => ({
+    thought: (p.input as { thought?: string } | undefined)?.thought ?? "",
+    running: p.state === "input-streaming" || p.state === "input-available",
+  }));
+
+  return (
+    <div className="animate-pop overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] to-transparent">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-primary/[0.04]"
+      >
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
+          {stillThinking ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
+          )}
+        </span>
+        <span className="flex-1 font-medium text-foreground">
+          {stillThinking ? (
+            <span className="shimmer-text">Thinking…</span>
+          ) : (
+            <>Reasoned for {steps.length} step{steps.length === 1 ? "" : "s"}</>
+          )}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="relative space-y-2.5 border-t border-primary/10 px-4 py-3">
+          <div className="absolute bottom-3 left-[22px] top-3 w-px bg-gradient-to-b from-primary/30 via-primary/15 to-transparent" />
+          {steps.map((s, i) => (
+            <div key={i} className="animate-[fadeInUp_240ms_ease-out] relative flex items-start gap-3">
+              <span
+                className={`relative z-10 mt-1 flex h-3 w-3 shrink-0 items-center justify-center rounded-full ring-4 ring-white ${
+                  s.running ? "bg-primary/40" : "bg-primary"
+                }`}
+              >
+                {s.running && (
+                  <span className="absolute inset-0 animate-ping rounded-full bg-primary/50" />
+                )}
+              </span>
+              <span className={`text-[13.5px] leading-relaxed ${s.running ? "italic text-muted-foreground shimmer-text" : "text-foreground/80"}`}>
+                {s.thought || (s.running ? "Thinking…" : "")}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
