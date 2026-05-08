@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, Network } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 
 export const Route = createFileRoute("/app")({
@@ -9,10 +9,11 @@ export const Route = createFileRoute("/app")({
 const navItems = [
   { label: "Home", to: "/app" as const, icon: Home, exact: true },
   { label: "Brain", to: "/app/brain" as const, icon: Brain },
+  { label: "Agents", to: "/app/agents" as const, icon: Bot },
   { label: "Team Spaces", to: "/app/team" as const, icon: Users },
   { label: "Docs", to: "/app/docs" as const, icon: FileStack },
-  { label: "Agents", to: "/app/agents" as const, icon: Bot },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
+  { label: "MCP", to: "/app/mcp" as const, icon: Network },
   { label: "Approvals", to: "/app/approvals" as const, icon: ShieldCheck },
 ];
 
