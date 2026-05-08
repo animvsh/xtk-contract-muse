@@ -21,6 +21,7 @@ const navItems = [
 
 function AppLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavigating = useRouterState({ select: (s) => s.isLoading || s.isTransitioning });
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
 
