@@ -25,11 +25,35 @@ const ACCENTS: Record<string, string> = {
   jira: "oklch(0.65 0.2 250)",
 };
 
+const DEFAULT_SERVICES: Array<{ service_id: string; service_name: string }> = [
+  { service_id: "notion", service_name: "Notion" },
+  { service_id: "slack", service_name: "Slack" },
+  { service_id: "gmail", service_name: "Gmail" },
+  { service_id: "drive", service_name: "Google Drive" },
+  { service_id: "linear", service_name: "Linear" },
+  { service_id: "github", service_name: "GitHub" },
+  { service_id: "hubspot", service_name: "HubSpot" },
+  { service_id: "figma", service_name: "Figma" },
+  { service_id: "zoom", service_name: "Zoom" },
+  { service_id: "stripe", service_name: "Stripe" },
+  { service_id: "salesforce", service_name: "Salesforce" },
+  { service_id: "jira", service_name: "Jira" },
+];
+
 function Connections() {
   const [conns, setConns] = useState<Conn[]>([]);
 
   const load = async () => {
-    const { data } = await supabase.from("connections").select("*").order("service_name");
+    const { data: userData } = await supabase.auth.getUser();
+    const uid = userData.user?.id;
+    if (!uid) return;
+    let { data } = await supabase.from("connections").select("*").eq("user_id", uid).order("service_name");
+    if (!data || data.length === 0) {
+      await supabase.from("connections").insert(
+        DEFAULT_SERVICES.map((s) => ({ ...s, connected: false, user_id: uid })),
+      );
+      ({ data } = await supabase.from("connections").select("*").eq("user_id", uid).order("service_name"));
+    }
     setConns((data as Conn[] | null) ?? []);
   };
 

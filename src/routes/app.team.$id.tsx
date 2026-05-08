@@ -34,7 +34,8 @@ function TeamSpaceDetail() {
 
   const invite = async () => {
     if (!email.includes("@")) return toast.error("Enter a valid email");
-    const { error } = await supabase.from("space_members").insert({ space_id: id, email: email.trim(), role });
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from("space_members").insert({ space_id: id, email: email.trim(), role, user_id: u.user?.id });
     if (error) return toast.error(error.message);
     toast.success(`Invite sent to ${email}`);
     setEmail("");

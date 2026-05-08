@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type AgentSpec = {
   name: string;
@@ -36,8 +36,10 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, schema: o
 }
 
 export const createAgentFromPrompt = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { prompt: string }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
     const spec = (await callLovableAI(
       "You design automation agents. Given a user request, produce a clean, plausible agent specification with 3-5 concrete steps. Use real integrations from: Notion, Slack, Gmail, Google Drive, Linear, GitHub, HubSpot, Stripe, Zoom, Figma.",
       data.prompt,
@@ -74,9 +76,9 @@ export const createAgentFromPrompt = createServerFn({ method: "POST" })
       "create_agent_spec",
     )) as AgentSpec;
 
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await supabase
       .from("agents")
-      .insert({ name: spec.name, description: spec.description, spec, status: "active" })
+      .insert({ name: spec.name, description: spec.description, spec, status: "active", user_id: userId })
       .select()
       .single();
     if (error) throw new Error(error.message);
@@ -84,9 +86,11 @@ export const createAgentFromPrompt = createServerFn({ method: "POST" })
   });
 
 export const runAgent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { agentId: string }) => data)
-  .handler(async ({ data }) => {
-    const { data: agent } = await supabaseAdmin.from("agents").select("*").eq("id", data.agentId).single();
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: agent } = await supabase.from("agents").select("*").eq("id", data.agentId).single();
     if (!agent) throw new Error("Agent not found");
 
     const result = await callLovableAI(
@@ -104,8 +108,8 @@ export const runAgent = createServerFn({ method: "POST" })
     );
 
     const log = `${result.summary}\n\n${result.log_lines.map((l: string) => `• ${l}`).join("\n")}`;
-    await supabaseAdmin.from("agent_runs").insert({ agent_id: data.agentId, log, status: "completed" });
-    await supabaseAdmin
+    await supabase.from("agent_runs").insert({ agent_id: data.agentId, log, status: "completed", user_id: userId });
+    await supabase
       .from("agents")
       .update({ runs_count: (agent.runs_count ?? 0) + 1 })
       .eq("id", data.agentId);
