@@ -109,7 +109,7 @@ function BrainPage() {
             {messages.map((msg) =>
               msg.role === "user" ? (
                 <div key={msg.id} className="flex justify-end">
-                  <div className="animate-pop max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground shadow-sm">
+                  <div className="animate-pop max-w-[80%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[15px] leading-relaxed text-primary-foreground shadow-sm">
                     {msg.parts
                       .map((p) => (p.type === "text" ? p.text : ""))
                       .join("")}
