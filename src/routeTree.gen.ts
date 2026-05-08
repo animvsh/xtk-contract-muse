@@ -23,6 +23,7 @@ import { Route as DocsAgentsRouteImport } from './routes/docs.agents'
 import { Route as DocsActivityLogsRouteImport } from './routes/docs.activity-logs'
 import { Route as DocsAccessKeysRouteImport } from './routes/docs.access-keys'
 import { Route as AppTeamRouteImport } from './routes/app.team'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppKeysRouteImport } from './routes/app.keys'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
@@ -110,6 +111,11 @@ const DocsAccessKeysRoute = DocsAccessKeysRouteImport.update({
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppKeysRoute = AppKeysRouteImport.update({
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
+  '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/docs/access-keys': typeof DocsAccessKeysRoute
   '/docs/activity-logs': typeof DocsActivityLogsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
+  '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/docs/access-keys': typeof DocsAccessKeysRoute
   '/docs/activity-logs': typeof DocsActivityLogsRoute
@@ -285,6 +293,7 @@ export interface FileRoutesById {
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
+  '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
   '/docs/access-keys': typeof DocsAccessKeysRoute
   '/docs/activity-logs': typeof DocsActivityLogsRoute
@@ -321,6 +330,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
+    | '/app/settings'
     | '/app/team'
     | '/docs/access-keys'
     | '/docs/activity-logs'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
+    | '/app/settings'
     | '/app/team'
     | '/docs/access-keys'
     | '/docs/activity-logs'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
+    | '/app/settings'
     | '/app/team'
     | '/docs/access-keys'
     | '/docs/activity-logs'
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/app/team'
       preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/keys': {
@@ -703,6 +722,7 @@ interface AppRouteChildren {
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
   AppKeysRoute: typeof AppKeysRouteWithChildren
+  AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -715,6 +735,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
   AppKeysRoute: AppKeysRouteWithChildren,
+  AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
