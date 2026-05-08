@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Send, Brain, Loader2, Check, FileText, Search, Mail, User, FileStack } from "lucide-react";
+import { z } from "zod";
 
 export const Route = createFileRoute("/app/brain")({
+  validateSearch: z.object({ q: z.string().optional() }),
   component: BrainPage,
 });
 
@@ -70,7 +72,8 @@ type Message =
     };
 
 function BrainPage() {
-  const [input, setInput] = useState("Look at the doc about Beevr and send Adithya an employment contract");
+  const { q } = Route.useSearch();
+  const [input, setInput] = useState(q ?? "Look at the doc about Beevr and send Adithya an employment contract");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
