@@ -196,108 +196,7 @@ function BrainPage() {
 
 type UIMsg = ReturnType<typeof useChat>["messages"][number];
 
-function AssistantMessage({ msg }: { msg: UIMsg }) {
-  // Group consecutive `think` tool parts into a single Reasoning block
-  const groups: Array<
-    | { kind: "text"; key: string; text: string }
-    | { kind: "tool"; key: string; part: ToolPartShape }
-    | { kind: "reasoning"; key: string; parts: ToolPartShape[] }
-  > = [];
-  msg.parts.forEach((part, idx) => {
-    if (part.type === "text") {
-      groups.push({ kind: "text", key: `t${idx}`, text: part.text });
-    } else if (part.type === "tool-think") {
-      const last = groups[groups.length - 1];
-      if (last && last.kind === "reasoning") {
-        last.parts.push(part as ToolPartShape);
-      } else {
-        groups.push({ kind: "reasoning", key: `r${idx}`, parts: [part as ToolPartShape] });
-      }
-    } else if (part.type.startsWith("tool-")) {
-      groups.push({ kind: "tool", key: `x${idx}`, part: part as ToolPartShape });
-    }
-  });
-
-  return (
-    <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
-        <Brain className="h-4 w-4" />
-      </div>
-      <div className="min-w-0 flex-1 space-y-3 rounded-2xl rounded-tl-md border border-black/5 bg-white/80 p-4 shadow-sm backdrop-blur">
-        {groups.map((g) => {
-          if (g.kind === "text") {
-            return (
-              <div key={g.key} className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
-                {g.text}
-              </div>
-            );
-          }
-          if (g.kind === "reasoning") {
-            return <ReasoningBlock key={g.key} parts={g.parts} />;
-          }
-          return <ToolPart key={g.key} part={g.part} />;
-        })}
-      </div>
-    </div>
-  );
-}
-
-function ReasoningBlock({ parts }: { parts: ToolPartShape[] }) {
-  const [open, setOpen] = useState(true);
-  const stillThinking = parts.some(
-    (p) => p.state === "input-streaming" || p.state === "input-available",
-  );
-  const steps = parts.map((p) => ({
-    thought: (p.input as { thought?: string } | undefined)?.thought ?? "",
-    running: p.state === "input-streaming" || p.state === "input-available",
-  }));
-
-  return (
-    <div className="animate-pop overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] to-transparent">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-primary/[0.04]"
-      >
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
-          {stillThinking ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Sparkles className="h-3.5 w-3.5" />
-          )}
-        </span>
-        <span className="flex-1 font-medium text-foreground">
-          {stillThinking ? (
-            <span className="shimmer-text">Thinking…</span>
-          ) : (
-            <>Reasoned for {steps.length} step{steps.length === 1 ? "" : "s"}</>
-          )}
-        </span>
-        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="relative space-y-2.5 border-t border-primary/10 px-4 py-3">
-          <div className="absolute bottom-3 left-[22px] top-3 w-px bg-gradient-to-b from-primary/30 via-primary/15 to-transparent" />
-          {steps.map((s, i) => (
-            <div key={i} className="animate-[fadeInUp_240ms_ease-out] relative flex items-start gap-3">
-              <span
-                className={`relative z-10 mt-1 flex h-3 w-3 shrink-0 items-center justify-center rounded-full ring-4 ring-white ${
-                  s.running ? "bg-primary/40" : "bg-primary"
-                }`}
-              >
-                {s.running && (
-                  <span className="absolute inset-0 animate-ping rounded-full bg-primary/50" />
-                )}
-              </span>
-              <span className={`text-[13.5px] leading-relaxed ${s.running ? "italic text-muted-foreground shimmer-text" : "text-foreground/80"}`}>
-                {s.thought || (s.running ? "Thinking…" : "")}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+type UIMsg = ReturnType<typeof useChat>["messages"][number];
 
 type ToolPartShape = {
   type: string;
@@ -307,6 +206,209 @@ type ToolPartShape = {
   output?: unknown;
   errorText?: string;
 };
+
+function AssistantMessage({ msg }: { msg: UIMsg }) {
+  // Build the live plan + ordered render units from message parts
+  const plan: PlanTask[] = [];
+  const taskIndex = new Map<string, PlanTask>();
+  const subtaskIndex = new Map<string, { task: PlanTask; sub: PlanSubtask }>();
+
+  type Unit =
+    | { kind: "text"; key: string; text: string }
+    | { kind: "tool"; key: string; part: ToolPartShape }
+    | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
+
+  const units: Unit[] = [];
+  let planIntroduced = false;
+
+  msg.parts.forEach((part, idx) => {
+    if (part.type === "text") {
+      units.push({ kind: "text", key: `t${idx}`, text: part.text });
+      return;
+    }
+    if (!part.type.startsWith("tool-")) return;
+    const tp = part as ToolPartShape;
+    const name = tp.type.replace(/^tool-/, "");
+
+    if (name === "createPlan") {
+      const input = tp.input as { tasks?: PlanTask[] } | undefined;
+      const tasks = input?.tasks ?? [];
+      tasks.forEach((t) => {
+        const task: PlanTask = {
+          id: t.id,
+          title: t.title,
+          status: "pending",
+          subtasks: (t.subtasks ?? []).map((s) => ({
+            id: s.id,
+            title: s.title,
+            status: "pending",
+          })),
+        };
+        plan.push(task);
+        taskIndex.set(task.id, task);
+        task.subtasks.forEach((s) => subtaskIndex.set(s.id, { task, sub: s }));
+      });
+      if (!planIntroduced && plan.length > 0) {
+        planIntroduced = true;
+        units.push({ kind: "plan", key: "plan", snapshot: [], running: true });
+      }
+      return;
+    }
+
+    if (name === "updateStep") {
+      const input = tp.input as { id?: string; status?: StepStatus } | undefined;
+      if (input?.id && input.status) {
+        const t = taskIndex.get(input.id);
+        if (t) t.status = input.status;
+        const s = subtaskIndex.get(input.id);
+        if (s) s.sub.status = input.status;
+      }
+      return;
+    }
+
+    units.push({ kind: "tool", key: `x${idx}`, part: tp });
+  });
+
+  // Snapshot the final plan into the placeholder unit
+  const planUnit = units.find((u) => u.kind === "plan");
+  if (planUnit && planUnit.kind === "plan") {
+    planUnit.snapshot = JSON.parse(JSON.stringify(plan)) as PlanTask[];
+    const allDone = plan.length > 0 && plan.every(
+      (t) => t.status === "done" || t.status === "warning",
+    );
+    planUnit.running = !allDone;
+  }
+
+  return (
+    <div className="flex gap-3">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
+        <Brain className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1 space-y-3">
+        {units.map((u) => {
+          if (u.kind === "text") {
+            return (
+              <div key={u.key} className="whitespace-pre-wrap rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-4 py-3 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur">
+                {u.text}
+              </div>
+            );
+          }
+          if (u.kind === "plan") {
+            return <PlanBlock key={u.key} tasks={u.snapshot} running={u.running} />;
+          }
+          return <ToolPart key={u.key} part={u.part} />;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StatusIcon({ status }: { status: StepStatus }) {
+  if (status === "done") {
+    return (
+      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600">
+        <Check className="h-3 w-3" strokeWidth={3} />
+      </span>
+    );
+  }
+  if (status === "warning") {
+    return (
+      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-600">
+        <AlertCircle className="h-3 w-3" />
+      </span>
+    );
+  }
+  if (status === "in-progress") {
+    return (
+      <span className="relative flex h-5 w-5 items-center justify-center">
+        <span className="absolute inset-0 animate-spin rounded-full border-2 border-dashed border-primary/70" style={{ animationDuration: "3s" }} />
+        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+      </span>
+    );
+  }
+  return (
+    <span className="flex h-5 w-5 items-center justify-center text-muted-foreground/50">
+      <Circle className="h-4 w-4" />
+    </span>
+  );
+}
+
+function StatusBadge({ status, count }: { status: StepStatus; count?: number }) {
+  const map: Record<StepStatus, string> = {
+    "in-progress": "bg-primary/10 text-primary border-primary/20",
+    done: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    warning: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    pending: "bg-muted text-muted-foreground border-border",
+  };
+  const label = status === "pending" ? "pending" : status;
+  return (
+    <span className="flex items-center gap-1.5">
+      {count !== undefined && count > 0 && (
+        <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+          {count}
+        </span>
+      )}
+      <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${map[status]}`}>
+        {label}
+      </span>
+    </span>
+  );
+}
+
+function PlanBlock({ tasks, running }: { tasks: PlanTask[]; running: boolean }) {
+  if (tasks.length === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <span className="shimmer-text">Drafting plan…</span>
+      </div>
+    );
+  }
+  return (
+    <div className="animate-pop overflow-hidden rounded-2xl border border-black/10 bg-white/90 p-2 shadow-sm backdrop-blur">
+      <div className="flex flex-col">
+        {tasks.map((task, ti) => {
+          const pendingSubs = task.subtasks.filter((s) => s.status === "pending").length;
+          return (
+            <div key={task.id} className={`group/row px-3 py-3 ${ti > 0 ? "border-t border-black/5" : ""}`}>
+              <div className="flex items-center gap-3">
+                <StatusIcon status={task.status} />
+                <span className={`flex-1 text-[15px] font-medium ${task.status === "done" ? "text-foreground/60" : "text-foreground"}`}>
+                  {task.title}
+                </span>
+                <StatusBadge status={task.status} count={task.status === "pending" ? pendingSubs : undefined} />
+              </div>
+              {task.subtasks.length > 0 && (task.status === "in-progress" || task.subtasks.some((s) => s.status !== "pending")) && (
+                <div className="relative mt-2.5 ml-2.5 space-y-2 border-l border-dashed border-black/15 pl-5">
+                  {task.subtasks.map((sub) => (
+                    <div key={sub.id} className="animate-[fadeInUp_240ms_ease-out] flex items-center gap-2.5">
+                      <StatusIcon status={sub.status} />
+                      <span className={`text-[14px] ${
+                        sub.status === "done"
+                          ? "text-muted-foreground line-through"
+                          : sub.status === "in-progress"
+                            ? "text-foreground"
+                            : "text-foreground/80"
+                      }`}>
+                        {sub.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {running && (
+        <div className="mt-1 flex items-center gap-2 border-t border-black/5 px-3 py-2 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span className="shimmer-text">Working through plan…</span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ToolPart({ part }: { part: ToolPartShape }) {
   const [open, setOpen] = useState(false);
@@ -321,26 +423,6 @@ function ToolPart({ part }: { part: ToolPartShape }) {
     part.state === "input-streaming" || part.state === "input-available";
   const isError = part.state === "output-error";
   const isDone = part.state === "output-available";
-
-  // Special inline rendering for "think" reasoning steps
-  if (toolName === "think") {
-    const thought =
-      (part.input as { thought?: string } | undefined)?.thought ?? "";
-    return (
-      <div className="animate-pop flex items-start gap-2 text-sm text-muted-foreground">
-        <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          {isRunning ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Sparkles className="h-3 w-3" />
-          )}
-        </span>
-        <span className={`italic leading-relaxed ${isRunning ? "shimmer-text" : ""}`}>
-          {thought || (isRunning ? "Thinking…" : "")}
-        </span>
-      </div>
-    );
-  }
 
   return (
     <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
