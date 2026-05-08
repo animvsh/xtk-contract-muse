@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -18,6 +18,7 @@ const navItems = [
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
   { label: "Access Keys", to: "/app/keys" as const, icon: KeyRound },
   { label: "Approvals", to: "/app/approvals" as const, icon: ShieldCheck },
+  { label: "Settings", to: "/app/settings" as const, icon: Settings },
 ];
 
 function AppLayout() {
