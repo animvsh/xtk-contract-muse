@@ -1,15 +1,25 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Sparkles, Bot, FileText, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Sparkles, Bot, FileText, Search, MessageSquare, Mail, GitBranch, Calendar, DollarSign, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/app/")({
   component: AppHome,
 });
 
-const SUGGESTIONS = [
-  { icon: Bot, label: "agent that posts a daily standup summary to #engineering", tag: "Build agent" },
-  { icon: FileText, label: "draft an offer letter for a senior PM in Berlin", tag: "Brain" },
-  { icon: Search, label: "what did Sarah ship last sprint?", tag: "Brain" },
+type Suggestion = { icon: typeof Bot; label: string; tag: "Build agent" | "Brain"; source: string };
+
+// Pool of "live" activity → questions you might want to ask about it
+const ACTIVITY_SUGGESTIONS: Suggestion[] = [
+  { icon: MessageSquare, source: "Slack", label: "summarize what happened in #engineering today", tag: "Brain" },
+  { icon: GitBranch, source: "GitHub", label: "what's in PR #482 that Sarah just merged?", tag: "Brain" },
+  { icon: Mail, source: "Gmail", label: "draft a reply to Maya's onboarding email", tag: "Brain" },
+  { icon: FileText, source: "Notion", label: "review the Q4 Hiring Plan Adithya just created", tag: "Brain" },
+  { icon: DollarSign, source: "Stripe", label: "agent that pings me when invoices over $1k are paid", tag: "Build agent" },
+  { icon: Calendar, source: "Calendar", label: "prep notes for the Design review starting soon", tag: "Brain" },
+  { icon: Zap, source: "Linear", label: "what's blocking BEE-218?", tag: "Brain" },
+  { icon: Bot, source: "Agent", label: "agent that triages new Gmail into Linear tickets", tag: "Build agent" },
+  { icon: FileText, source: "Drive", label: "summarize 'Investor Update Nov.pdf'", tag: "Brain" },
+  { icon: MessageSquare, source: "Slack", label: "agent that posts a daily standup digest to #engineering", tag: "Build agent" },
 ];
 
 function AppHome() {
