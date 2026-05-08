@@ -14,6 +14,9 @@ import {
   User,
   FileStack,
   AlertCircle,
+  Sparkles,
+  Inbox,
+  BookOpen,
 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -27,8 +30,11 @@ const TOOL_META: Record<
   string,
   { label: string; icon: typeof Search; verb: string }
 > = {
+  think: { label: "Thinking", icon: Sparkles, verb: "Thinking" },
   searchNotion: { label: "Notion", icon: FileStack, verb: "Searching Notion" },
   searchContacts: { label: "Contacts", icon: User, verb: "Looking up contact" },
+  searchEmails: { label: "Gmail", icon: Inbox, verb: "Searching inbox" },
+  summarizeDoc: { label: "Summarize", icon: BookOpen, verb: "Reading document" },
   draftDocument: { label: "Draft", icon: FileText, verb: "Drafting document" },
   sendEmail: { label: "Email", icon: Mail, verb: "Sending email" },
 };
