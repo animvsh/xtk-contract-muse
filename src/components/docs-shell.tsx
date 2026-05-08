@@ -28,6 +28,13 @@ const NAV: { group: string; items: { title: string; to: string }[] }[] = [
     ],
   },
   {
+    group: "Cloud Builds",
+    items: [
+      { title: "Overview", to: "/docs/cloud-builds" },
+      { title: "Build agents in cloud", to: "/docs/cloud-builds/agents" },
+    ],
+  },
+  {
     group: "Access & Safety",
     items: [
       { title: "Approvals", to: "/docs/approvals" },
@@ -36,7 +43,10 @@ const NAV: { group: string; items: { title: string; to: string }[] }[] = [
   },
   {
     group: "Examples",
-    items: [{ title: "Example library", to: "/docs/examples" }],
+    items: [
+      { title: "Example library", to: "/docs/examples" },
+      { title: "Bookstore sales agent", to: "/docs/examples/bookstore-sales-agent" },
+    ],
   },
 ];
 
