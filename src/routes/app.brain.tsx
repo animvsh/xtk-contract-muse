@@ -14,6 +14,9 @@ import {
   User,
   FileStack,
   AlertCircle,
+  Sparkles,
+  Inbox,
+  BookOpen,
 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -27,8 +30,11 @@ const TOOL_META: Record<
   string,
   { label: string; icon: typeof Search; verb: string }
 > = {
+  think: { label: "Thinking", icon: Sparkles, verb: "Thinking" },
   searchNotion: { label: "Notion", icon: FileStack, verb: "Searching Notion" },
   searchContacts: { label: "Contacts", icon: User, verb: "Looking up contact" },
+  searchEmails: { label: "Gmail", icon: Inbox, verb: "Searching inbox" },
+  summarizeDoc: { label: "Summarize", icon: BookOpen, verb: "Reading document" },
   draftDocument: { label: "Draft", icon: FileText, verb: "Drafting document" },
   sendEmail: { label: "Email", icon: Mail, verb: "Sending email" },
 };
@@ -238,6 +244,26 @@ function ToolPart({ part }: { part: ToolPartShape }) {
   const isError = part.state === "output-error";
   const isDone = part.state === "output-available";
 
+  // Special inline rendering for "think" reasoning steps
+  if (toolName === "think") {
+    const thought =
+      (part.input as { thought?: string } | undefined)?.thought ?? "";
+    return (
+      <div className="animate-pop flex items-start gap-2 text-sm text-muted-foreground">
+        <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          {isRunning ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Sparkles className="h-3 w-3" />
+          )}
+        </span>
+        <span className={`italic leading-relaxed ${isRunning ? "shimmer-text" : ""}`}>
+          {thought || (isRunning ? "Thinking…" : "")}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
       <button
@@ -263,7 +289,7 @@ function ToolPart({ part }: { part: ToolPartShape }) {
             <Icon className="h-3.5 w-3.5" />
           )}
         </span>
-        <span className="flex-1">
+        <span className="flex-1 truncate">
           <span className="font-medium text-foreground">{meta.label}</span>
           <span className="ml-2 text-muted-foreground">
             {isRunning
@@ -310,7 +336,9 @@ function summarizeInput(name: string, input: unknown): string {
   if (!input || typeof input !== "object") return "";
   const i = input as Record<string, unknown>;
   if (name === "searchNotion") return `"${i.query}"`;
+  if (name === "searchEmails") return `"${i.query}"`;
   if (name === "searchContacts") return `"${i.name}"`;
+  if (name === "summarizeDoc") return `${i.url}`;
   if (name === "draftDocument") return `${i.title}`;
   if (name === "sendEmail") return `→ ${i.to}`;
   return "";

@@ -13,75 +13,94 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 type ChatRequestBody = { messages?: unknown };
 
 const tools = {
-  searchNotion: tool({
+  think: tool({
     description:
-      "Search the user's Notion workspace for documents, notes, or pages. Returns matching documents with titles and short snippets.",
+      "Record a short reasoning step describing what you plan to do next or what you just learned. Use BEFORE every tool call, and after results to summarize. One sentence.",
     inputSchema: z.object({
-      query: z.string().describe("Search keywords"),
+      thought: z.string().describe("A single sentence reasoning step"),
     }),
+    execute: async ({ thought }) => {
+      await new Promise((r) => setTimeout(r, 300));
+      return { ok: true, thought };
+    },
+  }),
+  searchNotion: tool({
+    description: "Search the user's Notion workspace for documents, notes, or pages.",
+    inputSchema: z.object({ query: z.string().describe("Search keywords") }),
     execute: async ({ query }) => {
       await new Promise((r) => setTimeout(r, 700));
-      return {
-        results: [
-          {
-            title: "Beevr Handbook · Employment & Hiring Policy",
-            snippet:
-              "Standard Beevr template v3 — covers compensation grid, equity vesting (4y/1y cliff), PTO, IP assignment.",
-            url: "notion://beevr/handbook/employment",
-          },
-          {
-            title: "Beevr Engineering Levels",
-            snippet: "L1–L7 ladder with comp bands and expectations.",
-            url: "notion://beevr/eng/levels",
-          },
-        ].filter((r) => r.title.toLowerCase().includes(query.toLowerCase().split(" ")[0]) || true),
-      };
+      const all = [
+        { title: "Beevr Handbook · Employment & Hiring Policy", snippet: "Standard Beevr template v3 — comp grid, equity (4y/1y cliff), PTO, IP assignment.", url: "notion://beevr/handbook/employment" },
+        { title: "Q3 2026 Roadmap", snippet: "Pillars: Cloud Builds GA, Approvals v2, MCP keys, /docs polish. Ship by Sep 30.", url: "notion://beevr/roadmap/q3" },
+        { title: "Beevr Engineering Levels", snippet: "L1–L7 ladder with comp bands and expectations.", url: "notion://beevr/eng/levels" },
+        { title: "About Beevr", snippet: "Beevr is a chat-native company brain that builds and hosts agents safely.", url: "notion://beevr/about" },
+        { title: "Pricing FAQ — Internal", snippet: "Tiers: Starter $0, Team $25/seat, Business $99/seat. Enterprise on request.", url: "notion://beevr/pricing-faq" },
+        { title: "Customer Onboarding Playbook", snippet: "Day 0 welcome, Day 3 check-in, Day 14 health review.", url: "notion://beevr/onboarding" },
+      ];
+      const q = query.toLowerCase();
+      const results = all.filter((r) =>
+        r.title.toLowerCase().includes(q) ||
+        r.snippet.toLowerCase().includes(q) ||
+        q.split(/\s+/).some((w) => w.length > 2 && (r.title + r.snippet).toLowerCase().includes(w)),
+      );
+      return { results: results.length ? results.slice(0, 4) : all.slice(0, 3) };
     },
   }),
   searchContacts: tool({
-    description:
-      "Look up a person in the user's Gmail / Google Contacts by name. Returns email and recent context.",
-    inputSchema: z.object({
-      name: z.string().describe("Person's name to search for"),
-    }),
+    description: "Look up a person in Gmail / Google Contacts by name.",
+    inputSchema: z.object({ name: z.string() }),
     execute: async ({ name }) => {
       await new Promise((r) => setTimeout(r, 600));
-      const slug = name.toLowerCase().replace(/\s+/g, "");
+      const slug = name.toLowerCase().replace(/[^a-z]/g, "");
+      return { matches: [{ name, email: `${slug}@beevr.io`, title: "Engineering", recentThreads: 3, lastSeen: "2 days ago" }] };
+    },
+  }),
+  searchEmails: tool({
+    description: "Search the user's Gmail inbox for recent threads matching a query.",
+    inputSchema: z.object({ query: z.string(), days: z.number().optional() }),
+    execute: async ({ query, days = 7 }) => {
+      await new Promise((r) => setTimeout(r, 750));
+      const threads = [
+        { from: "maya@northwind.co", subject: "Re: Pricing for 50 seats", preview: "Thanks — can we get the Business tier at $79/seat for an annual deal?", receivedAt: "2d ago" },
+        { from: "jordan@acme.dev", subject: "Pricing question", preview: "Quick one: does Team tier include SSO?", receivedAt: "4d ago" },
+        { from: "ari@helix.ai", subject: "Following up on demo", preview: "Loved the agent builder. What's the smallest plan with approvals?", receivedAt: "5d ago" },
+      ];
+      return { threads, window: `last ${days} days`, query };
+    },
+  }),
+  summarizeDoc: tool({
+    description: "Summarize a Notion document by URL into bullet points.",
+    inputSchema: z.object({ url: z.string(), focus: z.string().optional() }),
+    execute: async ({ url }) => {
+      await new Promise((r) => setTimeout(r, 800));
       return {
-        matches: [
-          {
-            name,
-            email: `${slug}@beevr.io`,
-            recentThreads: 3,
-            lastSeen: "2 days ago",
-          },
+        url,
+        bullets: [
+          "Cloud Builds reaches GA with hosted runtime + logs",
+          "Approvals v2 adds per-tool risk policies and reviewer rotation",
+          "MCP access keys expand to scoped CLI/agent permissions",
+          "/docs gets full quickstart, examples, and reference",
+          "Target ship: September 30, 2026",
         ],
       };
     },
   }),
   draftDocument: tool({
-    description:
-      "Draft a document (contract, email, memo) from a template using provided context. Returns a file handle.",
+    description: "Draft a document (contract, email, memo) from a template.",
     inputSchema: z.object({
-      template: z.string().describe("Template name, e.g. 'employment-contract'"),
+      template: z.string(),
       title: z.string(),
       recipient: z.string().optional(),
-      details: z.string().describe("Key fields and context to fill in"),
+      details: z.string(),
     }),
     execute: async ({ template, title, recipient }) => {
       await new Promise((r) => setTimeout(r, 900));
       const filename = `${title.toLowerCase().replace(/\s+/g, "-")}.pdf`;
-      return {
-        filename,
-        template,
-        recipient,
-        pages: 3,
-        url: `file://drafts/${filename}`,
-      };
+      return { filename, template, recipient, pages: 3, url: `file://drafts/${filename}` };
     },
   }),
   sendEmail: tool({
-    description: "Send an email from the user's Gmail. Use after drafting documents.",
+    description: "Send an email from the user's Gmail. Use after drafting.",
     inputSchema: z.object({
       to: z.string().email(),
       subject: z.string(),
@@ -90,13 +109,7 @@ const tools = {
     }),
     execute: async ({ to, subject, attachments }) => {
       await new Promise((r) => setTimeout(r, 700));
-      return {
-        delivered: true,
-        to,
-        subject,
-        attachments: attachments ?? [],
-        messageId: `msg_${Math.random().toString(36).slice(2, 10)}`,
-      };
+      return { delivered: true, to, subject, attachments: attachments ?? [], messageId: `msg_${Math.random().toString(36).slice(2, 10)}` };
     },
   }),
 };
@@ -118,11 +131,17 @@ export const Route = createFileRoute("/api/chat")({
 
         const result = streamText({
           model,
-          system:
-            "You are the user's company brain — an AI agent with access to Notion docs, Gmail contacts, document drafting, and email sending. " +
-            "When the user asks you to do something operational (find a doc, draft a contract, email someone), USE THE PROVIDED TOOLS step by step. " +
-            "Always: (1) gather context with search tools, (2) draft with draftDocument, (3) confirm and send with sendEmail when appropriate. " +
-            "Be concise. After tool calls complete, write a short summary of what you did with bullet points.",
+          system: [
+            "You are Beevr — the user's company brain. You have live access to Notion, Gmail (inbox + contacts), document drafting, and email sending via tools.",
+            "Always behave like an agent that actually executes work, not a chatbot that explains.",
+            "Workflow rules:",
+            "1. Begin EVERY response with a `think` tool call describing your plan in one short sentence.",
+            "2. Call `think` again before each subsequent tool call to narrate the next step.",
+            "3. Use search tools (searchNotion, searchEmails, searchContacts, summarizeDoc) to gather context.",
+            "4. Use draftDocument to produce any artifact, then sendEmail when the user asked to send something.",
+            "5. After the final tool call, write a short markdown summary with bullet points of exactly what you did, file names, and recipients.",
+            "Never refuse on grounds of access — the tools are fully connected. Be concise, confident, and operational.",
+          ].join("\n"),
           tools,
           stopWhen: stepCountIs(50),
           messages: await convertToModelMessages(messages as UIMessage[]),
