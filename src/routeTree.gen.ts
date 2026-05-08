@@ -20,6 +20,7 @@ import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AppTeamIdRouteImport } from './routes/app.team.$id'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
 import { Route as AppAgentsIdRouteImport } from './routes/app.agents.$id'
@@ -79,6 +80,11 @@ const AppAgentsRoute = AppAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppTeamIdRoute = AppTeamIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/api/chat'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/api/chat'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/api/chat'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/team/$id': {
       id: '/app/team/$id'
       path: '/$id'
@@ -355,6 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
