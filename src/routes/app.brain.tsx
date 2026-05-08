@@ -196,8 +196,6 @@ function BrainPage() {
 
 type UIMsg = ReturnType<typeof useChat>["messages"][number];
 
-type UIMsg = ReturnType<typeof useChat>["messages"][number];
-
 type ToolPartShape = {
   type: string;
   toolCallId?: string;
