@@ -336,7 +336,9 @@ function summarizeInput(name: string, input: unknown): string {
   if (!input || typeof input !== "object") return "";
   const i = input as Record<string, unknown>;
   if (name === "searchNotion") return `"${i.query}"`;
+  if (name === "searchEmails") return `"${i.query}"`;
   if (name === "searchContacts") return `"${i.name}"`;
+  if (name === "summarizeDoc") return `${i.url}`;
   if (name === "draftDocument") return `${i.title}`;
   if (name === "sendEmail") return `→ ${i.to}`;
   return "";
