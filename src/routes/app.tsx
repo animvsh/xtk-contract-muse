@@ -21,6 +21,23 @@ const navItems = [
 
 function AppLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/auth" });
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[oklch(0.04_0_0)] text-sm text-white/70">
+        Loading…
+      </div>
+    );
+  }
+
+  const displayName = (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-[oklch(0.04_0_0)] p-3 text-foreground">
