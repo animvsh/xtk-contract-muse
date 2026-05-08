@@ -26,6 +26,17 @@ function AppHome() {
   const [q, setQ] = useState("");
   const navigate = useNavigate();
 
+  // Rotating "based on live activity" suggestions
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(() =>
+    [...ACTIVITY_SUGGESTIONS].sort(() => Math.random() - 0.5).slice(0, 4),
+  );
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSuggestions(([...ACTIVITY_SUGGESTIONS].sort(() => Math.random() - 0.5)).slice(0, 4));
+    }, 6000);
+    return () => clearInterval(id);
+  }, []);
+
   const submit = (text: string) => {
     const t = text.trim();
     if (!t) return;
