@@ -12,7 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
+import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
+import { Route as DocsBuildingToolsRouteImport } from './routes/docs.building-tools'
+import { Route as DocsApprovalsRouteImport } from './routes/docs.approvals'
+import { Route as DocsAgentsRouteImport } from './routes/docs.agents'
+import { Route as DocsActivityLogsRouteImport } from './routes/docs.activity-logs'
+import { Route as DocsAccessKeysRouteImport } from './routes/docs.access-keys'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppKeysRouteImport } from './routes/app.keys'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
@@ -21,6 +29,10 @@ import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as DocsCliOpencodeRouteImport } from './routes/docs.cli.opencode'
+import { Route as DocsCliCursorRouteImport } from './routes/docs.cli.cursor'
+import { Route as DocsCliClaudeCodeRouteImport } from './routes/docs.cli.claude-code'
+import { Route as DocsBuildingToolsCustomerHealthDashboardRouteImport } from './routes/docs.building-tools.customer-health-dashboard'
 import { Route as AppTeamIdRouteImport } from './routes/app.team.$id'
 import { Route as AppKeysIdRouteImport } from './routes/app.keys.$id'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
@@ -41,10 +53,50 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const DocsQuickstartRoute = DocsQuickstartRouteImport.update({
+  id: '/docs/quickstart',
+  path: '/docs/quickstart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsExamplesRoute = DocsExamplesRouteImport.update({
+  id: '/docs/examples',
+  path: '/docs/examples',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsBuildingToolsRoute = DocsBuildingToolsRouteImport.update({
+  id: '/docs/building-tools',
+  path: '/docs/building-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsApprovalsRoute = DocsApprovalsRouteImport.update({
+  id: '/docs/approvals',
+  path: '/docs/approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsAgentsRoute = DocsAgentsRouteImport.update({
+  id: '/docs/agents',
+  path: '/docs/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsActivityLogsRoute = DocsActivityLogsRouteImport.update({
+  id: '/docs/activity-logs',
+  path: '/docs/activity-logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsAccessKeysRoute = DocsAccessKeysRouteImport.update({
+  id: '/docs/access-keys',
+  path: '/docs/access-keys',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
@@ -86,6 +138,27 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsCliOpencodeRoute = DocsCliOpencodeRouteImport.update({
+  id: '/docs/cli/opencode',
+  path: '/docs/cli/opencode',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsCliCursorRoute = DocsCliCursorRouteImport.update({
+  id: '/docs/cli/cursor',
+  path: '/docs/cli/cursor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsCliClaudeCodeRoute = DocsCliClaudeCodeRouteImport.update({
+  id: '/docs/cli/claude-code',
+  path: '/docs/cli/claude-code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsBuildingToolsCustomerHealthDashboardRoute =
+  DocsBuildingToolsCustomerHealthDashboardRouteImport.update({
+    id: '/customer-health-dashboard',
+    path: '/customer-health-dashboard',
+    getParentRoute: () => DocsBuildingToolsRoute,
+  } as any)
 const AppTeamIdRoute = AppTeamIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -119,11 +192,23 @@ export interface FileRoutesByFullPath {
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
+  '/docs/access-keys': typeof DocsAccessKeysRoute
+  '/docs/activity-logs': typeof DocsActivityLogsRoute
+  '/docs/agents': typeof DocsAgentsRoute
+  '/docs/approvals': typeof DocsApprovalsRoute
+  '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
   '/app/': typeof AppIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
+  '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
+  '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
+  '/docs/cli/cursor': typeof DocsCliCursorRoute
+  '/docs/cli/opencode': typeof DocsCliOpencodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -136,11 +221,23 @@ export interface FileRoutesByTo {
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
+  '/docs/access-keys': typeof DocsAccessKeysRoute
+  '/docs/activity-logs': typeof DocsActivityLogsRoute
+  '/docs/agents': typeof DocsAgentsRoute
+  '/docs/approvals': typeof DocsApprovalsRoute
+  '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
   '/app': typeof AppIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
+  '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
+  '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
+  '/docs/cli/cursor': typeof DocsCliCursorRoute
+  '/docs/cli/opencode': typeof DocsCliOpencodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -155,11 +252,23 @@ export interface FileRoutesById {
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
+  '/docs/access-keys': typeof DocsAccessKeysRoute
+  '/docs/activity-logs': typeof DocsActivityLogsRoute
+  '/docs/agents': typeof DocsAgentsRoute
+  '/docs/approvals': typeof DocsApprovalsRoute
+  '/docs/building-tools': typeof DocsBuildingToolsRouteWithChildren
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
   '/app/': typeof AppIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
+  '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
+  '/docs/cli/claude-code': typeof DocsCliClaudeCodeRoute
+  '/docs/cli/cursor': typeof DocsCliCursorRoute
+  '/docs/cli/opencode': typeof DocsCliOpencodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,11 +284,23 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/keys'
     | '/app/team'
+    | '/docs/access-keys'
+    | '/docs/activity-logs'
+    | '/docs/agents'
+    | '/docs/approvals'
+    | '/docs/building-tools'
+    | '/docs/examples'
+    | '/docs/quickstart'
     | '/app/'
+    | '/docs/'
     | '/app/agents/$id'
     | '/app/agents/new'
     | '/app/keys/$id'
     | '/app/team/$id'
+    | '/docs/building-tools/customer-health-dashboard'
+    | '/docs/cli/claude-code'
+    | '/docs/cli/cursor'
+    | '/docs/cli/opencode'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -192,11 +313,23 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/keys'
     | '/app/team'
+    | '/docs/access-keys'
+    | '/docs/activity-logs'
+    | '/docs/agents'
+    | '/docs/approvals'
+    | '/docs/building-tools'
+    | '/docs/examples'
+    | '/docs/quickstart'
     | '/app'
+    | '/docs'
     | '/app/agents/$id'
     | '/app/agents/new'
     | '/app/keys/$id'
     | '/app/team/$id'
+    | '/docs/building-tools/customer-health-dashboard'
+    | '/docs/cli/claude-code'
+    | '/docs/cli/cursor'
+    | '/docs/cli/opencode'
   id:
     | '__root__'
     | '/'
@@ -210,11 +343,23 @@ export interface FileRouteTypes {
     | '/app/docs'
     | '/app/keys'
     | '/app/team'
+    | '/docs/access-keys'
+    | '/docs/activity-logs'
+    | '/docs/agents'
+    | '/docs/approvals'
+    | '/docs/building-tools'
+    | '/docs/examples'
+    | '/docs/quickstart'
     | '/app/'
+    | '/docs/'
     | '/app/agents/$id'
     | '/app/agents/new'
     | '/app/keys/$id'
     | '/app/team/$id'
+    | '/docs/building-tools/customer-health-dashboard'
+    | '/docs/cli/claude-code'
+    | '/docs/cli/cursor'
+    | '/docs/cli/opencode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +367,17 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiChatRoute: typeof ApiChatRoute
+  DocsAccessKeysRoute: typeof DocsAccessKeysRoute
+  DocsActivityLogsRoute: typeof DocsActivityLogsRoute
+  DocsAgentsRoute: typeof DocsAgentsRoute
+  DocsApprovalsRoute: typeof DocsApprovalsRoute
+  DocsBuildingToolsRoute: typeof DocsBuildingToolsRouteWithChildren
+  DocsExamplesRoute: typeof DocsExamplesRoute
+  DocsQuickstartRoute: typeof DocsQuickstartRoute
+  DocsIndexRoute: typeof DocsIndexRoute
+  DocsCliClaudeCodeRoute: typeof DocsCliClaudeCodeRoute
+  DocsCliCursorRoute: typeof DocsCliCursorRoute
+  DocsCliOpencodeRoute: typeof DocsCliOpencodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -247,12 +403,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs/': {
+      id: '/docs/'
+      path: '/docs'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/docs/quickstart': {
+      id: '/docs/quickstart'
+      path: '/docs/quickstart'
+      fullPath: '/docs/quickstart'
+      preLoaderRoute: typeof DocsQuickstartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/examples': {
+      id: '/docs/examples'
+      path: '/docs/examples'
+      fullPath: '/docs/examples'
+      preLoaderRoute: typeof DocsExamplesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/building-tools': {
+      id: '/docs/building-tools'
+      path: '/docs/building-tools'
+      fullPath: '/docs/building-tools'
+      preLoaderRoute: typeof DocsBuildingToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/approvals': {
+      id: '/docs/approvals'
+      path: '/docs/approvals'
+      fullPath: '/docs/approvals'
+      preLoaderRoute: typeof DocsApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/agents': {
+      id: '/docs/agents'
+      path: '/docs/agents'
+      fullPath: '/docs/agents'
+      preLoaderRoute: typeof DocsAgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/activity-logs': {
+      id: '/docs/activity-logs'
+      path: '/docs/activity-logs'
+      fullPath: '/docs/activity-logs'
+      preLoaderRoute: typeof DocsActivityLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/access-keys': {
+      id: '/docs/access-keys'
+      path: '/docs/access-keys'
+      fullPath: '/docs/access-keys'
+      preLoaderRoute: typeof DocsAccessKeysRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/team': {
       id: '/app/team'
@@ -309,6 +521,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/cli/opencode': {
+      id: '/docs/cli/opencode'
+      path: '/docs/cli/opencode'
+      fullPath: '/docs/cli/opencode'
+      preLoaderRoute: typeof DocsCliOpencodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/cli/cursor': {
+      id: '/docs/cli/cursor'
+      path: '/docs/cli/cursor'
+      fullPath: '/docs/cli/cursor'
+      preLoaderRoute: typeof DocsCliCursorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/cli/claude-code': {
+      id: '/docs/cli/claude-code'
+      path: '/docs/cli/claude-code'
+      fullPath: '/docs/cli/claude-code'
+      preLoaderRoute: typeof DocsCliClaudeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/building-tools/customer-health-dashboard': {
+      id: '/docs/building-tools/customer-health-dashboard'
+      path: '/customer-health-dashboard'
+      fullPath: '/docs/building-tools/customer-health-dashboard'
+      preLoaderRoute: typeof DocsBuildingToolsCustomerHealthDashboardRouteImport
+      parentRoute: typeof DocsBuildingToolsRoute
     }
     '/app/team/$id': {
       id: '/app/team/$id'
@@ -401,11 +641,34 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface DocsBuildingToolsRouteChildren {
+  DocsBuildingToolsCustomerHealthDashboardRoute: typeof DocsBuildingToolsCustomerHealthDashboardRoute
+}
+
+const DocsBuildingToolsRouteChildren: DocsBuildingToolsRouteChildren = {
+  DocsBuildingToolsCustomerHealthDashboardRoute:
+    DocsBuildingToolsCustomerHealthDashboardRoute,
+}
+
+const DocsBuildingToolsRouteWithChildren =
+  DocsBuildingToolsRoute._addFileChildren(DocsBuildingToolsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiChatRoute: ApiChatRoute,
+  DocsAccessKeysRoute: DocsAccessKeysRoute,
+  DocsActivityLogsRoute: DocsActivityLogsRoute,
+  DocsAgentsRoute: DocsAgentsRoute,
+  DocsApprovalsRoute: DocsApprovalsRoute,
+  DocsBuildingToolsRoute: DocsBuildingToolsRouteWithChildren,
+  DocsExamplesRoute: DocsExamplesRoute,
+  DocsQuickstartRoute: DocsQuickstartRoute,
+  DocsIndexRoute: DocsIndexRoute,
+  DocsCliClaudeCodeRoute: DocsCliClaudeCodeRoute,
+  DocsCliCursorRoute: DocsCliCursorRoute,
+  DocsCliOpencodeRoute: DocsCliOpencodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

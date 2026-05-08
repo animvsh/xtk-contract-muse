@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DocsShell, DocsHero, DocsCard, DocsSection } from "@/components/docs-shell";
 
-export const Route = createFileRoute("/docs")({
+export const Route = createFileRoute("/docs/")({
   head: () => ({
     meta: [
       { title: "Beevr Docs — Build on top of your company brain" },
