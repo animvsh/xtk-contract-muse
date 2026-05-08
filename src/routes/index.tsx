@@ -42,11 +42,11 @@ function Landing() {
               <a href="#contacts" className="hover:text-black">Contacts</a>
             </nav>
             <div className="flex items-center gap-6">
-              <Link to="/app/brain" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+              <Link to="/auth" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
                 Get Started
               </Link>
               <Link
-                to="/app/brain"
+                to="/auth"
                 className="rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
               >
                 Learn More
@@ -75,7 +75,7 @@ function Landing() {
 
             <div className="mt-10 flex items-center justify-center gap-3">
               <Link
-                to="/app/brain"
+                to="/auth"
                 className="inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
               >
                 <Phone className="h-4 w-4" /> Talk to sales
@@ -144,7 +144,7 @@ function Landing() {
                     ))}
                   </ul>
                   <Link
-                    to="/app/brain"
+                    to="/auth"
                     className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold ${
                       p.featured
                         ? "bg-[oklch(0.68_0.22_40)] text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
