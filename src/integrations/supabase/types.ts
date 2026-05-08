@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_key_events: {
+        Row: {
+          access_key_id: string
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          access_key_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          access_key_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_key_events_access_key_id_fkey"
+            columns: ["access_key_id"]
+            isOneToOne: false
+            referencedRelation: "access_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      access_keys: {
+        Row: {
+          client: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          key_hash: string
+          key_plaintext: string | null
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          permission: string
+          safety: string
+          scope: string
+          scope_label: string | null
+          status: string
+          updated_at: string
+          usage_count: number
+          user_id: string
+        }
+        Insert: {
+          client?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          key_plaintext?: string | null
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          permission?: string
+          safety?: string
+          scope?: string
+          scope_label?: string | null
+          status?: string
+          updated_at?: string
+          usage_count?: number
+          user_id: string
+        }
+        Update: {
+          client?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          key_plaintext?: string | null
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          permission?: string
+          safety?: string
+          scope?: string
+          scope_label?: string | null
+          status?: string
+          updated_at?: string
+          usage_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       agent_runs: {
         Row: {
           agent_id: string
