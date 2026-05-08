@@ -14,7 +14,172 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agent_runs: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          log: string
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          log?: string
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          log?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_runs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          runs_count: number
+          spec: Json
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          runs_count?: number
+          spec?: Json
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          runs_count?: number
+          spec?: Json
+          status?: string
+        }
+        Relationships: []
+      }
+      connections: {
+        Row: {
+          connected: boolean
+          created_at: string
+          id: string
+          service_id: string
+          service_name: string
+        }
+        Insert: {
+          connected?: boolean
+          created_at?: string
+          id?: string
+          service_id: string
+          service_name: string
+        }
+        Update: {
+          connected?: boolean
+          created_at?: string
+          id?: string
+          service_id?: string
+          service_name?: string
+        }
+        Relationships: []
+      }
+      mcp_servers: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          name: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      space_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          role: string
+          space_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          role?: string
+          space_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_members_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "team_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_spaces: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
