@@ -13,16 +13,35 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 type ChatRequestBody = { messages?: unknown };
 
 const tools = {
-  think: tool({
+  createPlan: tool({
     description:
-      "Record ONE short reasoning step (a single sentence) describing what you plan to do next, what you just learned, or how pieces connect. Call this MULTIPLE times throughout a response — at least 3-5 times for any non-trivial request — to walk the user through your reasoning.",
+      "FIRST tool call of every response. Lay out a plan as 3-5 high-level parent tasks, each with 1-3 short sub-tasks. Use kebab-case unique IDs. After this, call updateStep to move tasks through 'in-progress' → 'done' (or 'warning') as you actually work.",
     inputSchema: z.object({
-      thought: z.string().describe("A single concise sentence reasoning step, written in first person ('I'll…', 'Now I…', 'Looks like…')."),
+      tasks: z.array(z.object({
+        id: z.string().describe("Unique kebab-case id, e.g. 'research-docs'"),
+        title: z.string().describe("Short parent task title (3-6 words)"),
+        subtasks: z.array(z.object({
+          id: z.string(),
+          title: z.string().describe("Short sub-task title (3-6 words)"),
+        })).min(1).max(4),
+      })).min(3).max(6),
     }),
-    execute: async ({ thought }) => {
-      // Slight delay so reasoning steps feel deliberate as they stream in
-      await new Promise((r) => setTimeout(r, 550));
-      return { ok: true, thought };
+    execute: async ({ tasks }) => {
+      await new Promise((r) => setTimeout(r, 400));
+      return { ok: true, count: tasks.length };
+    },
+  }),
+  updateStep: tool({
+    description:
+      "Update the status of one plan task or sub-task. Call this BEFORE starting work on a step (status: 'in-progress'), and AFTER finishing it (status: 'done' or 'warning'). One step at a time.",
+    inputSchema: z.object({
+      id: z.string().describe("The task or sub-task id from the plan"),
+      status: z.enum(["pending", "in-progress", "done", "warning"]),
+      note: z.string().optional().describe("Optional one-sentence note about what happened"),
+    }),
+    execute: async ({ id, status, note }) => {
+      await new Promise((r) => setTimeout(r, 350));
+      return { ok: true, id, status, note };
     },
   }),
   searchNotion: tool({
