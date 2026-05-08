@@ -14,7 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppTeamRouteImport } from './routes/app.team'
-import { Route as AppMcpRouteImport } from './routes/app.mcp'
+import { Route as AppKeysRouteImport } from './routes/app.keys'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
@@ -22,6 +22,7 @@ import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AppTeamIdRouteImport } from './routes/app.team.$id'
+import { Route as AppKeysIdRouteImport } from './routes/app.keys.$id'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
 import { Route as AppAgentsIdRouteImport } from './routes/app.agents.$id'
 
@@ -50,9 +51,9 @@ const AppTeamRoute = AppTeamRouteImport.update({
   path: '/team',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMcpRoute = AppMcpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
+const AppKeysRoute = AppKeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDocsRoute = AppDocsRouteImport.update({
@@ -90,6 +91,11 @@ const AppTeamIdRoute = AppTeamIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppTeamRoute,
 } as any)
+const AppKeysIdRoute = AppKeysIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppKeysRoute,
+} as any)
 const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -111,11 +117,12 @@ export interface FileRoutesByFullPath {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/mcp': typeof AppMcpRoute
+  '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRoutesByTo {
@@ -127,11 +134,12 @@ export interface FileRoutesByTo {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/mcp': typeof AppMcpRoute
+  '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRoutesById {
@@ -145,11 +153,12 @@ export interface FileRoutesById {
   '/app/brain': typeof AppBrainRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
-  '/app/mcp': typeof AppMcpRoute
+  '/app/keys': typeof AppKeysRouteWithChildren
   '/app/team': typeof AppTeamRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
 }
 export interface FileRouteTypes {
@@ -164,11 +173,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
-    | '/app/mcp'
+    | '/app/keys'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/keys/$id'
     | '/app/team/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -180,11 +190,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
-    | '/app/mcp'
+    | '/app/keys'
     | '/app/team'
     | '/app'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/keys/$id'
     | '/app/team/$id'
   id:
     | '__root__'
@@ -197,11 +208,12 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/connections'
     | '/app/docs'
-    | '/app/mcp'
+    | '/app/keys'
     | '/app/team'
     | '/app/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/keys/$id'
     | '/app/team/$id'
   fileRoutesById: FileRoutesById
 }
@@ -249,11 +261,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/mcp': {
-      id: '/app/mcp'
-      path: '/mcp'
-      fullPath: '/app/mcp'
-      preLoaderRoute: typeof AppMcpRouteImport
+    '/app/keys': {
+      id: '/app/keys'
+      path: '/keys'
+      fullPath: '/app/keys'
+      preLoaderRoute: typeof AppKeysRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/docs': {
@@ -305,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamIdRouteImport
       parentRoute: typeof AppTeamRoute
     }
+    '/app/keys/$id': {
+      id: '/app/keys/$id'
+      path: '/$id'
+      fullPath: '/app/keys/$id'
+      preLoaderRoute: typeof AppKeysIdRouteImport
+      parentRoute: typeof AppKeysRoute
+    }
     '/app/agents/new': {
       id: '/app/agents/new'
       path: '/new'
@@ -336,6 +355,17 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
   AppAgentsRouteChildren,
 )
 
+interface AppKeysRouteChildren {
+  AppKeysIdRoute: typeof AppKeysIdRoute
+}
+
+const AppKeysRouteChildren: AppKeysRouteChildren = {
+  AppKeysIdRoute: AppKeysIdRoute,
+}
+
+const AppKeysRouteWithChildren =
+  AppKeysRoute._addFileChildren(AppKeysRouteChildren)
+
 interface AppTeamRouteChildren {
   AppTeamIdRoute: typeof AppTeamIdRoute
 }
@@ -353,7 +383,7 @@ interface AppRouteChildren {
   AppBrainRoute: typeof AppBrainRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
-  AppMcpRoute: typeof AppMcpRoute
+  AppKeysRoute: typeof AppKeysRouteWithChildren
   AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -364,7 +394,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBrainRoute: AppBrainRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
-  AppMcpRoute: AppMcpRoute,
+  AppKeysRoute: AppKeysRouteWithChildren,
   AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
@@ -380,3 +410,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

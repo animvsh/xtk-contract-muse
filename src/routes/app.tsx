@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, Network, LogOut } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,7 +15,7 @@ const navItems = [
   { label: "Team Spaces", to: "/app/team" as const, icon: Users },
   { label: "Docs", to: "/app/docs" as const, icon: FileStack },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
-  { label: "MCP", to: "/app/mcp" as const, icon: Network },
+  { label: "Access Keys", to: "/app/keys" as const, icon: KeyRound },
   { label: "Approvals", to: "/app/approvals" as const, icon: ShieldCheck },
 ];
 
