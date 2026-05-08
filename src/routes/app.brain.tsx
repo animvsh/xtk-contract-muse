@@ -14,9 +14,9 @@ import {
   User,
   FileStack,
   AlertCircle,
-  Sparkles,
   Inbox,
   BookOpen,
+  Circle,
 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -30,7 +30,6 @@ const TOOL_META: Record<
   string,
   { label: string; icon: typeof Search; verb: string }
 > = {
-  think: { label: "Thinking", icon: Sparkles, verb: "Thinking" },
   searchNotion: { label: "Notion", icon: FileStack, verb: "Searching Notion" },
   searchContacts: { label: "Contacts", icon: User, verb: "Looking up contact" },
   searchEmails: { label: "Gmail", icon: Inbox, verb: "Searching inbox" },
@@ -38,6 +37,10 @@ const TOOL_META: Record<
   draftDocument: { label: "Draft", icon: FileText, verb: "Drafting document" },
   sendEmail: { label: "Email", icon: Mail, verb: "Sending email" },
 };
+
+type StepStatus = "pending" | "in-progress" | "done" | "warning";
+type PlanSubtask = { id: string; title: string; status: StepStatus };
+type PlanTask = { id: string; title: string; status: StepStatus; subtasks: PlanSubtask[] };
 
 function BrainPage() {
   const { q } = Route.useSearch();
