@@ -87,9 +87,9 @@ function AuthPage() {
 
   const google = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/app` });
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) {
-      toast.error("Google sign-in failed");
+      toast.error(result.error.message || "Google sign-in failed");
       setBusy(false);
       return;
     }
