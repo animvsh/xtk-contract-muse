@@ -1,75 +1,108 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/app/connections")({
   component: Connections,
 });
 
-const ALL = [
-  { id: "notion", name: "Notion", desc: "Docs, wikis, projects", color: "oklch(0.95 0 0)" },
-  { id: "slack", name: "Slack", desc: "Team chat & channels", color: "oklch(0.7 0.18 320)" },
-  { id: "gmail", name: "Gmail", desc: "Email & contacts", color: "oklch(0.65 0.22 25)" },
-  { id: "drive", name: "Google Drive", desc: "Files & folders", color: "oklch(0.7 0.18 145)" },
-  { id: "linear", name: "Linear", desc: "Issues & projects", color: "oklch(0.6 0.2 280)" },
-  { id: "github", name: "GitHub", desc: "Code & PRs", color: "oklch(0.95 0 0)" },
-  { id: "hubspot", name: "HubSpot", desc: "CRM & deals", color: "oklch(0.7 0.2 35)" },
-  { id: "figma", name: "Figma", desc: "Designs & files", color: "oklch(0.7 0.2 25)" },
-  { id: "zoom", name: "Zoom", desc: "Meeting transcripts", color: "oklch(0.6 0.2 250)" },
-  { id: "stripe", name: "Stripe", desc: "Payments & invoices", color: "oklch(0.7 0.18 280)" },
-  { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM", color: "oklch(0.7 0.18 230)" },
-  { id: "jira", name: "Jira", desc: "Tickets & sprints", color: "oklch(0.65 0.2 250)" },
-];
+type Conn = { id: string; service_id: string; service_name: string; connected: boolean };
+
+const ACCENTS: Record<string, string> = {
+  notion: "oklch(0.5 0 0)",
+  slack: "oklch(0.7 0.18 320)",
+  gmail: "oklch(0.65 0.22 25)",
+  drive: "oklch(0.7 0.18 145)",
+  linear: "oklch(0.55 0.2 280)",
+  github: "oklch(0.5 0 0)",
+  hubspot: "oklch(0.7 0.2 35)",
+  figma: "oklch(0.7 0.2 25)",
+  zoom: "oklch(0.6 0.2 250)",
+  stripe: "oklch(0.55 0.2 280)",
+  salesforce: "oklch(0.7 0.18 230)",
+  jira: "oklch(0.65 0.2 250)",
+};
 
 function Connections() {
-  const [connected, setConnected] = useState<Set<string>>(new Set(["notion", "slack", "gmail", "drive"]));
+  const [conns, setConns] = useState<Conn[]>([]);
 
-  const toggle = (id: string) => {
-    setConnected((s) => {
-      const n = new Set(s);
-      if (n.has(id)) n.delete(id); else n.add(id);
-      return n;
-    });
+  const load = async () => {
+    const { data } = await supabase.from("connections").select("*").order("service_name");
+    setConns((data as Conn[] | null) ?? []);
   };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const toggle = async (c: Conn) => {
+    await supabase.from("connections").update({ connected: !c.connected }).eq("id", c.id);
+    load();
+  };
+
+  const { connected, available } = useMemo(() => {
+    return {
+      connected: conns.filter((c) => c.connected),
+      available: conns.filter((c) => !c.connected),
+    };
+  }, [conns]);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-10">
-      <h1 className="text-3xl font-bold">Connections</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {connected.size} of {ALL.length} services connected to your workspace.
-      </p>
+      <PageHeader
+        title="Connections"
+        subtitle={`${connected.length} of ${conns.length} services connected`}
+      />
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {ALL.map((c) => {
-          const isOn = connected.has(c.id);
-          return (
-            <div key={c.id} className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-start gap-3">
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-background"
-                  style={{ backgroundColor: c.color }}
-                >
-                  {c.name[0]}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold">{c.name}</h3>
-                  <p className="text-xs text-muted-foreground">{c.desc}</p>
-                </div>
+      {connected.length > 0 && (
+        <>
+          <SectionLabel>Connected</SectionLabel>
+          <Grid items={connected} toggle={toggle} />
+        </>
+      )}
+
+      <SectionLabel className="mt-10">Available</SectionLabel>
+      <Grid items={available} toggle={toggle} />
+    </div>
+  );
+}
+
+function SectionLabel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`mb-3 text-xs uppercase tracking-wider text-muted-foreground ${className}`}>{children}</div>;
+}
+
+function Grid({ items, toggle }: { items: Conn[]; toggle: (c: Conn) => void }) {
+  return (
+    <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((c) => {
+        const accent = ACCENTS[c.service_id] ?? "oklch(0.5 0 0)";
+        return (
+          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur">
+            <div className="relative">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-foreground">
+                {c.service_name[0]}
               </div>
-              <button
-                onClick={() => toggle(c.id)}
-                className={`mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isOn
-                    ? "border border-primary/40 bg-accent text-primary"
-                    : "bg-primary text-primary-foreground hover:opacity-90"
-                }`}
-              >
-                {isOn ? (<><Check className="h-4 w-4" /> Connected</>) : (<><Plus className="h-4 w-4" /> Connect</>)}
-              </button>
+              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white" style={{ background: accent }} />
             </div>
-          );
-        })}
-      </div>
+            <div className="flex-1 min-w-0">
+              <div className="truncate text-sm font-medium">{c.service_name}</div>
+              <div className="text-[11px] text-muted-foreground">{c.connected ? "Connected" : "Not connected"}</div>
+            </div>
+            <button
+              onClick={() => toggle(c)}
+              className={`flex h-7 items-center gap-1 rounded-md px-2.5 text-xs font-medium transition-colors ${
+                c.connected
+                  ? "bg-primary/10 text-primary"
+                  : "bg-primary text-primary-foreground hover:opacity-90"
+              }`}
+            >
+              {c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }
