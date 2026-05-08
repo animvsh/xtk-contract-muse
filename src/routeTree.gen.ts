@@ -25,6 +25,7 @@ import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppKeysRouteImport } from './routes/app.keys'
 import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
@@ -118,6 +119,11 @@ const AppConnectionsRoute = AppConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBuildsRoute = AppBuildsRouteImport.update({
+  id: '/builds',
+  path: '/builds',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppBrainRoute = AppBrainRouteImport.update({
   id: '/brain',
   path: '/brain',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/docs': typeof AppDocsRoute
   '/app/keys': typeof AppKeysRouteWithChildren
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
+    | '/app/builds'
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
+    | '/app/builds'
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
+    | '/app/builds'
     | '/app/connections'
     | '/app/docs'
     | '/app/keys'
@@ -494,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/builds': {
+      id: '/app/builds'
+      path: '/builds'
+      fullPath: '/app/builds'
+      preLoaderRoute: typeof AppBuildsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/brain': {
       id: '/app/brain'
       path: '/brain'
@@ -621,6 +640,7 @@ interface AppRouteChildren {
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
+  AppBuildsRoute: typeof AppBuildsRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocsRoute: typeof AppDocsRoute
   AppKeysRoute: typeof AppKeysRouteWithChildren
@@ -632,6 +652,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAgentsRoute: AppAgentsRouteWithChildren,
   AppApprovalsRoute: AppApprovalsRoute,
   AppBrainRoute: AppBrainRoute,
+  AppBuildsRoute: AppBuildsRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocsRoute: AppDocsRoute,
   AppKeysRoute: AppKeysRouteWithChildren,
@@ -673,3 +694,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

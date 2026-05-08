@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -12,6 +12,7 @@ const navItems = [
   { label: "Home", to: "/app" as const, icon: Home, exact: true },
   { label: "Brain", to: "/app/brain" as const, icon: Brain },
   { label: "Agents", to: "/app/agents" as const, icon: Bot },
+  { label: "Builds", to: "/app/builds" as const, icon: Cloud },
   { label: "Team Spaces", to: "/app/team" as const, icon: Users },
   { label: "Docs", to: "/app/docs" as const, icon: FileStack },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
