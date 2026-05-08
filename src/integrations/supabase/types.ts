@@ -21,6 +21,7 @@ export type Database = {
           id: string
           log: string
           status: string
+          user_id: string | null
         }
         Insert: {
           agent_id: string
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           log?: string
           status?: string
+          user_id?: string | null
         }
         Update: {
           agent_id?: string
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           log?: string
           status?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -55,6 +58,7 @@ export type Database = {
           runs_count: number
           spec: Json
           status: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -64,6 +68,7 @@ export type Database = {
           runs_count?: number
           spec?: Json
           status?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -73,6 +78,7 @@ export type Database = {
           runs_count?: number
           spec?: Json
           status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -83,6 +89,7 @@ export type Database = {
           id: string
           service_id: string
           service_name: string
+          user_id: string | null
         }
         Insert: {
           connected?: boolean
@@ -90,6 +97,7 @@ export type Database = {
           id?: string
           service_id: string
           service_name: string
+          user_id?: string | null
         }
         Update: {
           connected?: boolean
@@ -97,6 +105,7 @@ export type Database = {
           id?: string
           service_id?: string
           service_name?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -108,6 +117,7 @@ export type Database = {
           id: string
           name: string
           url: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -116,6 +126,7 @@ export type Database = {
           id?: string
           name: string
           url: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -124,6 +135,31 @@ export type Database = {
           id?: string
           name?: string
           url?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -134,6 +170,7 @@ export type Database = {
           id: string
           role: string
           space_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -141,6 +178,7 @@ export type Database = {
           id?: string
           role?: string
           space_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -148,6 +186,7 @@ export type Database = {
           id?: string
           role?: string
           space_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -165,18 +204,21 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          user_id: string | null
         }
         Insert: {
           color?: string
           created_at?: string
           id?: string
           name: string
+          user_id?: string | null
         }
         Update: {
           color?: string
           created_at?: string
           id?: string
           name?: string
+          user_id?: string | null
         }
         Relationships: []
       }
