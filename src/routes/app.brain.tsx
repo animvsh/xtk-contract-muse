@@ -227,10 +227,10 @@ function ToolPart({ part }: { part: ToolPartShape }) {
   const isDone = part.state === "output-available";
 
   return (
-    <div className="rounded-lg border border-border bg-muted/40">
+    <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/60"
+        className="clicky-sm flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors hover:bg-muted/70 active:bg-muted"
       >
         <span
           className={`flex h-6 w-6 items-center justify-center rounded-md ${
