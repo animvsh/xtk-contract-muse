@@ -90,7 +90,7 @@ function BrainPage() {
                   <button
                     key={s}
                     onClick={() => sendMessage({ text: s })}
-                    className="rounded-lg border border-border bg-card px-3 py-2 text-left hover:bg-accent"
+                    className="clicky rounded-lg border border-border bg-card px-3 py-2 text-left hover:border-primary/40 hover:bg-accent hover:shadow-sm"
                   >
                     {s}
                   </button>
@@ -103,7 +103,7 @@ function BrainPage() {
             {messages.map((msg) =>
               msg.role === "user" ? (
                 <div key={msg.id} className="flex justify-end">
-                  <div className="max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground">
+                  <div className="animate-pop max-w-[80%] rounded-xl bg-primary px-5 py-3 text-base text-primary-foreground shadow-sm">
                     {msg.parts
                       .map((p) => (p.type === "text" ? p.text : ""))
                       .join("")}
@@ -114,13 +114,17 @@ function BrainPage() {
               ),
             )}
             {status === "submitted" && (
-              <div className="flex gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+              <div className="animate-pop flex gap-3">
+                <div className="ring-pulse flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
                   <Brain className="h-4 w-4" />
                 </div>
-                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                  Thinking…
+                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+                  <span className="flex gap-1">
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary" />
+                  </span>
+                  <span className="shimmer-text">Thinking…</span>
                 </div>
               </div>
             )}
@@ -135,7 +139,7 @@ function BrainPage() {
       </div>
 
       <div className="shrink-0 border-t border-black/5 bg-white/70 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-black/10 bg-white p-2 shadow-sm focus-within:border-primary">
+        <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-xl border border-black/10 bg-white p-2 shadow-sm transition-all focus-within:border-primary focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
           <textarea
             ref={inputRef}
             value={input}
@@ -154,7 +158,7 @@ function BrainPage() {
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="clicky clicky-sm flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm hover:shadow-md disabled:opacity-40"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -164,6 +168,7 @@ function BrainPage() {
           </button>
         </div>
       </div>
+
     </div>
   );
 }
@@ -222,10 +227,10 @@ function ToolPart({ part }: { part: ToolPartShape }) {
   const isDone = part.state === "output-available";
 
   return (
-    <div className="rounded-lg border border-border bg-muted/40">
+    <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/60"
+        className="clicky-sm flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors hover:bg-muted/70 active:bg-muted"
       >
         <span
           className={`flex h-6 w-6 items-center justify-center rounded-md ${
