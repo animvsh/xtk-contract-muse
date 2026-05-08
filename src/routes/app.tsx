@@ -99,7 +99,12 @@ function AppLayout() {
 
         </aside>
 
-        <main className="flex flex-1 flex-col overflow-hidden border-l border-black/5 bg-white/40 backdrop-blur-sm">
+        <main className="relative flex flex-1 flex-col overflow-hidden border-l border-black/5 bg-white/40 backdrop-blur-sm">
+          <div
+            className={`pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden transition-opacity duration-200 ${isNavigating ? "opacity-100" : "opacity-0"}`}
+          >
+            <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[oklch(0.68_0.22_40)] to-transparent" />
+          </div>
           <div className="flex items-center gap-2 border-b border-black/5 bg-white/60 px-6 py-3">
             <div className="flex gap-1.5">
               <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
@@ -111,7 +116,7 @@ function AppLayout() {
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div key={pathname} className="flex min-h-0 flex-1 flex-col overflow-hidden animate-[fadeInUp_180ms_ease-out]">
               <Outlet />
             </div>
             <LiveFeed />
