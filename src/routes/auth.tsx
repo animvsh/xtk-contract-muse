@@ -16,6 +16,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const { session, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setNotice(null);
     setBusy(true);
     try {
       if (mode === "signup") {
@@ -37,6 +39,8 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        setMode("signin");
+        setNotice("Account created. Check your email to confirm it, then sign in here.");
         toast.success("Check your email to confirm your account");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -49,6 +53,12 @@ function AuthPage() {
         toast.error("No account found, or wrong password. Try creating an account.", {
           action: { label: "Sign up", onClick: () => setMode("signup") },
         });
+      } else if (/email not confirmed/i.test(msg)) {
+        setNotice("Please confirm your email first, then sign in again.");
+        toast.error("Please confirm your email first");
+      } else if (/already registered|already exists|user already/i.test(msg)) {
+        setMode("signin");
+        setNotice("That email already has an account. Sign in instead, or reset your password.");
       } else {
         toast.error(msg);
       }
@@ -57,11 +67,29 @@ function AuthPage() {
     }
   };
 
+  const resetPassword = async () => {
+    if (!email) {
+      toast.error("Enter your email first");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setNotice("Password reset email sent. Open it, set a new password, then sign in.");
+    toast.success("Password reset email sent");
+  };
+
   const google = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/app` });
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) {
-      toast.error("Google sign-in failed");
+      toast.error(result.error.message || "Google sign-in failed");
       setBusy(false);
       return;
     }
@@ -92,6 +120,11 @@ function AuthPage() {
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
             {mode === "signin" ? "Sign in to your second brain" : "Get started with Beevr"}
           </p>
+          {notice && (
+            <div className="mt-4 rounded-xl border border-[oklch(0.82_0.12_75)] bg-[oklch(0.98_0.04_85)] px-4 py-3 text-sm text-[oklch(0.32_0.04_55)]">
+              {notice}
+            </div>
+          )}
 
           <button
             onClick={google}
@@ -141,6 +174,16 @@ function AuthPage() {
               {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
             </button>
           </form>
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={resetPassword}
+              disabled={busy}
+              className="mt-3 w-full text-center text-xs font-semibold text-[oklch(0.55_0.2_40)] hover:underline disabled:opacity-50"
+            >
+              Forgot password?
+            </button>
+          )}
 
           <p className="mt-4 text-center text-xs text-[oklch(0.45_0_0)]">
             {mode === "signin" ? "New to Beevr?" : "Already have an account?"}{" "}
