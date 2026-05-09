@@ -113,8 +113,8 @@ function Onboarding() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[oklch(0.985_0.012_85)] text-[oklch(0.15_0_0)]">
-      <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-25 blur-[140px]" />
-      <div className="pointer-events-none absolute -right-40 top-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-20 blur-[140px]" />
+      <div className="float-slow pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-25 blur-[140px]" />
+      <div className="float-slow pointer-events-none absolute -right-40 top-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-20 blur-[140px]" style={{ animationDelay: "1.5s" }} />
 
       <div className="relative mx-auto flex min-h-screen max-w-[1080px] flex-col px-4 py-6 md:px-8 md:py-10">
         <header className="flex items-center justify-between">
@@ -122,21 +122,26 @@ function Onboarding() {
             <BrandLogo className="h-9 w-9 object-contain" />
             <span className="text-lg font-bold tracking-tight">Beevr</span>
           </Link>
-          <Link to="/auth" className="text-sm font-medium text-[oklch(0.45_0_0)] hover:text-[oklch(0.62_0.22_40)]">
+          <Link to="/auth" className="text-sm font-medium text-[oklch(0.45_0_0)] transition-colors hover:text-[oklch(0.62_0.22_40)]">
             Have an account? <span className="font-semibold text-[oklch(0.62_0.22_40)]">Sign in</span>
           </Link>
         </header>
 
         <div className="mx-auto mt-10 w-full max-w-xl">
-          <div className="flex items-center justify-between gap-2">
-            {steps.map((label, i) => {
-              const done = i < step;
-              const active = i === step;
-              return (
-                <div key={label} className="flex flex-1 items-center gap-2 last:flex-none">
-                  <div className="flex items-center gap-2">
+          <div className="relative px-3">
+            <div className="absolute left-6 right-6 top-[14px] h-0.5 rounded-full bg-[oklch(0.92_0_0)]" />
+            <div
+              className="absolute left-6 top-[14px] h-0.5 rounded-full bg-[oklch(0.68_0.22_40)] transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{ width: `calc((100% - 3rem) * ${step / (steps.length - 1)})` }}
+            />
+            <div className="relative flex items-start justify-between">
+              {steps.map((label, i) => {
+                const done = i < step;
+                const active = i === step;
+                return (
+                  <div key={label} className="flex flex-col items-center gap-2">
                     <div
-                      className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
+                      className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold ring-4 ring-[oklch(0.985_0.012_85)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                         done
                           ? "bg-[oklch(0.68_0.22_40)] text-white"
                           : active
@@ -146,19 +151,11 @@ function Onboarding() {
                     >
                       {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
                     </div>
-                    <span className={`hidden text-xs font-medium md:inline ${active ? "text-[oklch(0.15_0_0)]" : "text-[oklch(0.55_0_0)]"}`}>{label}</span>
+                    <span className={`hidden text-[11px] font-medium transition-colors duration-300 md:inline ${active ? "text-[oklch(0.15_0_0)]" : "text-[oklch(0.55_0_0)]"}`}>{label}</span>
                   </div>
-                  {i < steps.length - 1 && (
-                    <div className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-[oklch(0.92_0_0)]">
-                      <div
-                        className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500 ease-out"
-                        style={{ width: i < step ? "100%" : "0%" }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
