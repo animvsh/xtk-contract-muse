@@ -1,6 +1,14 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X, ChevronUp } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
