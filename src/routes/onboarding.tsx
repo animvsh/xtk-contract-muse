@@ -112,22 +112,20 @@ function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-[oklch(0.04_0_0)] p-3 text-[oklch(0.15_0_0)]">
-      <div className="relative overflow-hidden rounded-[24px]">
-        <div className="pointer-events-none absolute -left-32 top-20 h-[500px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-50 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-32 top-60 h-[500px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-50 blur-[120px]" />
+    <div className="relative min-h-screen overflow-hidden bg-[oklch(0.985_0.012_85)] text-[oklch(0.15_0_0)]">
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-25 blur-[140px]" />
+      <div className="pointer-events-none absolute -right-40 top-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-20 blur-[140px]" />
 
-        <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1100px] items-center justify-center">
-          <div className="w-full overflow-hidden rounded-[28px] bg-white ring-1 ring-black/5">
-            <div className="flex items-center justify-between border-b border-black/5 px-6 py-4 md:px-10">
-              <Link to="/" className="flex items-center gap-2.5">
-                <BrandLogo className="h-8 w-8 object-contain" />
-                <span className="text-lg font-bold tracking-tight">Beevr</span>
-              </Link>
-              <Link to="/auth" className="text-sm font-medium text-[oklch(0.4_0_0)] hover:text-black">
-                Already have an account? <span className="font-semibold text-[oklch(0.62_0.22_40)]">Sign in</span>
-              </Link>
-            </div>
+      <div className="relative mx-auto flex min-h-screen max-w-[1080px] flex-col px-4 py-6 md:px-8 md:py-10">
+        <header className="flex items-center justify-between">
+          <Link to="/" className="clicky-sm flex items-center gap-2.5">
+            <BrandLogo className="h-9 w-9 object-contain" />
+            <span className="text-lg font-bold tracking-tight">Beevr</span>
+          </Link>
+          <Link to="/auth" className="text-sm font-medium text-[oklch(0.45_0_0)] hover:text-[oklch(0.62_0.22_40)]">
+            Have an account? <span className="font-semibold text-[oklch(0.62_0.22_40)]">Sign in</span>
+          </Link>
+        </header>
 
             <div className="px-6 pt-6 md:px-10">
               <div className="flex items-center justify-between gap-2">
