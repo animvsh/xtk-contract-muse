@@ -87,17 +87,15 @@ export function WorkspaceSwitcher() {
                     }`}
                   >
                     <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-semibold text-white"
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ background: w.color }}
-                    >
-                      {initials(w.name)}
-                    </span>
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-[oklch(0.2_0_0)]">
                         {w.name}
                       </span>
                       <span className="block truncate text-[11px] text-[oklch(0.5_0_0)]">
-                        {w.company} · {w.industry}
+                        {w.company}
                       </span>
                     </span>
                     {active && <Check className="h-4 w-4 text-[oklch(0.55_0.18_145)]" />}
