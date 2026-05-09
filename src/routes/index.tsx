@@ -58,7 +58,7 @@ function Landing() {
                 <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.6_0.2_30)]" />
                 <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.75_0.15_70)]" />
               </div>
-              Trusted by 500+ teams
+              Not backed by Y Combinator (yet)
             </div>
 
             <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
