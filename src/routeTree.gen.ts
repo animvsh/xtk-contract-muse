@@ -26,7 +26,7 @@ import { Route as DocsAccessKeysRouteImport } from './routes/docs.access-keys'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppKeysRouteImport } from './routes/app.keys'
-import { Route as AppDocsRouteImport } from './routes/app.docs'
+import { Route as AppFilesRouteImport } from './routes/app.files'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
@@ -129,9 +129,9 @@ const AppKeysRoute = AppKeysRouteImport.update({
   path: '/keys',
   getParentRoute: () => AppRoute,
 } as any)
-const AppDocsRoute = AppDocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
+const AppFilesRoute = AppFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
   getParentRoute: () => AppRoute,
 } as any)
 const AppConnectionsRoute = AppConnectionsRouteImport.update({
@@ -228,7 +228,7 @@ export interface FileRoutesByFullPath {
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/docs': typeof AppDocsRoute
+  '/app/files': typeof AppFilesRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
@@ -263,7 +263,7 @@ export interface FileRoutesByTo {
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/docs': typeof AppDocsRoute
+  '/app/files': typeof AppFilesRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
@@ -300,7 +300,7 @@ export interface FileRoutesById {
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/docs': typeof AppDocsRoute
+  '/app/files': typeof AppFilesRoute
   '/app/keys': typeof AppKeysRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRouteWithChildren
@@ -338,7 +338,7 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/builds'
     | '/app/connections'
-    | '/app/docs'
+    | '/app/files'
     | '/app/keys'
     | '/app/settings'
     | '/app/team'
@@ -373,7 +373,7 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/builds'
     | '/app/connections'
-    | '/app/docs'
+    | '/app/files'
     | '/app/keys'
     | '/app/settings'
     | '/app/team'
@@ -409,7 +409,7 @@ export interface FileRouteTypes {
     | '/app/brain'
     | '/app/builds'
     | '/app/connections'
-    | '/app/docs'
+    | '/app/files'
     | '/app/keys'
     | '/app/settings'
     | '/app/team'
@@ -576,11 +576,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppKeysRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/docs': {
-      id: '/app/docs'
-      path: '/docs'
-      fullPath: '/app/docs'
-      preLoaderRoute: typeof AppDocsRouteImport
+    '/app/files': {
+      id: '/app/files'
+      path: '/files'
+      fullPath: '/app/files'
+      preLoaderRoute: typeof AppFilesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/connections': {
@@ -740,7 +740,7 @@ interface AppRouteChildren {
   AppBrainRoute: typeof AppBrainRoute
   AppBuildsRoute: typeof AppBuildsRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
-  AppDocsRoute: typeof AppDocsRoute
+  AppFilesRoute: typeof AppFilesRoute
   AppKeysRoute: typeof AppKeysRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRouteWithChildren
@@ -753,7 +753,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBrainRoute: AppBrainRoute,
   AppBuildsRoute: AppBuildsRoute,
   AppConnectionsRoute: AppConnectionsRoute,
-  AppDocsRoute: AppDocsRoute,
+  AppFilesRoute: AppFilesRoute,
   AppKeysRoute: AppKeysRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRouteWithChildren,
