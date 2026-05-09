@@ -97,7 +97,7 @@ function AppLayout() {
               key={item.to}
               to={item.to}
               title={mini ? item.label : undefined}
-              className={`flex w-full items-center rounded-xl text-sm transition-colors ${
+              className={`clicky-sm flex w-full items-center rounded-xl text-sm transition-all duration-100 ${
                 mini ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 active
