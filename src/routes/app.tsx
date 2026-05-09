@@ -1,6 +1,14 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X } from "lucide-react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X, ChevronUp } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
@@ -19,8 +27,6 @@ const navItems = [
   { label: "Files", to: "/app/files" as const, icon: FileStack },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
   { label: "Access Keys", to: "/app/keys" as const, icon: KeyRound },
-  { label: "Approvals", to: "/app/approvals" as const, icon: ShieldCheck },
-  { label: "Settings", to: "/app/settings" as const, icon: Settings },
 ];
 
 function AppLayout() {
@@ -86,24 +92,43 @@ function AppLayout() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-2xl border border-black/5 bg-white/60 p-3 backdrop-blur">
-        <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)] text-sm font-semibold text-white">
-            {initial}
-          </div>
-          <div className="min-w-0 flex-1 text-xs">
-            <div className="truncate font-semibold">{displayName}</div>
-            <div className="truncate text-[oklch(0.45_0_0)]">{user.email}</div>
-          </div>
-          <button
-            onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
-            className="rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
-            title="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="clicky mt-auto flex w-full items-center gap-2.5 rounded-2xl border border-black/5 bg-white/60 p-3 text-left backdrop-blur transition-colors hover:bg-white/80">
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)] text-sm font-semibold text-white">
+              {initial}
+            </div>
+            <div className="min-w-0 flex-1 text-xs">
+              <div className="truncate font-semibold">{displayName}</div>
+              <div className="truncate text-[oklch(0.45_0_0)]">{user.email}</div>
+            </div>
+            <ChevronUp className="h-4 w-4 shrink-0 text-[oklch(0.45_0_0)]" />
           </button>
-        </div>
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top" align="start" className="w-56">
+          <DropdownMenuLabel className="font-normal">
+            <div className="text-xs font-semibold">{displayName}</div>
+            <div className="truncate text-[10px] font-normal text-muted-foreground">{user.email}</div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => navigate({ to: "/app/settings" })}>
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => navigate({ to: "/app/approvals" })}>
+            <ShieldCheck className="mr-2 h-4 w-4" />
+            Approvals
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => signOut().then(() => navigate({ to: "/auth" }))}
+            className="text-destructive focus:text-destructive"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 
