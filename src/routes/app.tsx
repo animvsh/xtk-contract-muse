@@ -118,8 +118,10 @@ function AppLayout() {
               <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
               <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
             </div>
-            <div className="mx-auto rounded-md border border-black/5 bg-white px-4 py-1 text-xs text-[oklch(0.4_0_0)]">
-              app.beevr.io{pathname.replace(/^\/app/, "") || "/home"}
+            <div className="mx-auto flex items-center gap-2 rounded-md border border-black/5 bg-white px-4 py-1 text-xs text-[oklch(0.4_0_0)]">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: workspace.color }} />
+              <span className="font-medium text-[oklch(0.25_0_0)]">{workspace.name.toLowerCase().replace(/\s+/g, "-")}</span>
+              <span className="text-[oklch(0.55_0_0)]">.beevr.io{pathname.replace(/^\/app/, "") || "/home"}</span>
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">
