@@ -264,7 +264,9 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
     | { kind: "text"; key: string; text: string }
     | { kind: "tool"; key: string; part: ToolPartShape }
     | { kind: "agent"; key: string; draft: AgentDraft }
+    | { kind: "api"; key: string; draft: ApiDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
+
 
   const units: Unit[] = [];
   let planIntroduced = false;
@@ -282,6 +284,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
       const input = tp.input as AgentDraft | undefined;
       if (input && input.name) {
         units.push({ kind: "agent", key: `a${idx}`, draft: input });
+      }
+      return;
+    }
+
+    if (name === "proposeApi") {
+      const input = tp.input as ApiDraft | undefined;
+      if (input && input.name) {
+        units.push({ kind: "api", key: `api${idx}`, draft: input });
       }
       return;
     }
