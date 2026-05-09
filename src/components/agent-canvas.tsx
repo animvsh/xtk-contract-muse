@@ -98,7 +98,7 @@ function Node({
 
   return (
     <div
-      className={`group relative w-56 shrink-0 rounded-xl bg-white p-3.5 transition-all duration-500 ${ring}`}
+      className={`group relative w-56 shrink-0 rounded-xl bg-white p-3.5 transition-all duration-500 alive ${ring} ${status === "active" ? "glow-pulse" : ""}`}
       style={{ animation: `fade-in 0.4s ease-out ${index * 60}ms both` }}
     >
       {status === "active" && (
