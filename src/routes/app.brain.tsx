@@ -140,7 +140,7 @@ function BrainPage() {
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary" />
                   </span>
-                  <span className="shimmer-text">Thinking…</span>
+                  <span className="shimmer-text caret">Thinking</span>
                 </div>
               </div>
             )}
