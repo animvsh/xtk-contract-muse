@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,12 +28,7 @@ function Landing() {
           {/* Nav */}
           <header className="flex items-center justify-between px-10 py-8">
             <div className="flex items-center gap-2.5">
-              <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
-                <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              </div>
+              <BrandLogo className="h-9 w-9 object-contain" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
             </div>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">

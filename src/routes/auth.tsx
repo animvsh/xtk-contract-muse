@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
@@ -129,12 +130,7 @@ function AuthPage() {
             to="/"
             className="clicky mb-6 flex w-fit items-center gap-2.5 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/15"
           >
-            <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
-              <span className="rounded-full bg-primary" />
-              <span className="rounded-full bg-primary" />
-              <span className="rounded-full bg-primary" />
-              <span className="rounded-full bg-primary" />
-            </div>
+            <BrandLogo className="h-8 w-8 object-contain" />
             <span className="text-lg font-bold tracking-tight">Beevr</span>
           </Link>
 

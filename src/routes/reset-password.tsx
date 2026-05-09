@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -36,12 +37,7 @@ function ResetPasswordPage() {
       <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] bg-white p-6 shadow-2xl">
         <form onSubmit={submit} className="w-full max-w-sm rounded-3xl border border-black/5 bg-white/80 p-8 backdrop-blur">
           <Link to="/" className="mb-6 flex items-center gap-2.5">
-            <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-            </div>
+            <BrandLogo className="h-8 w-8 object-contain" />
             <span className="text-lg font-bold tracking-tight">Beevr</span>
           </Link>
           <h1 className="text-2xl font-bold tracking-tight">Reset password</h1>
