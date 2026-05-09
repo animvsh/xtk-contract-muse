@@ -78,8 +78,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster position="bottom-right" />
+        <WorkspaceProvider>
+          <Outlet />
+          <Toaster position="bottom-right" />
+        </WorkspaceProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
