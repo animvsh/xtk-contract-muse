@@ -197,7 +197,7 @@ function AppLayout() {
           >
             <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[oklch(0.68_0.22_40)] to-transparent" />
           </div>
-          <div className="flex items-center gap-2 border-b border-black/5 bg-white/60 px-3 py-3 md:px-6">
+          <div className="flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 md:px-6">
             <button
               onClick={() => setMobileNavOpen(true)}
               className="clicky-sm -ml-1 rounded-lg p-1.5 text-[oklch(0.3_0_0)] hover:bg-black/5 md:hidden"
