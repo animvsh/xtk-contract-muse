@@ -16,15 +16,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    let resolved = false;
+    const finish = (s: Session | null) => {
+      resolved = true;
       setSession(s);
       setLoading(false);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => finish(s));
+
+    supabase.auth.getSession()
+      .then(({ data }) => finish(data.session))
+      .catch(() => finish(null));
+
+    // Safety net: if Supabase hangs (e.g. stale refresh token), don't block UI forever
+    const t = window.setTimeout(() => {
+      if (!resolved) finish(null);
+    }, 3000);
+
+    return () => {
+      sub.subscription.unsubscribe();
+      window.clearTimeout(t);
+    };
   }, []);
 
   return (
