@@ -280,14 +280,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
 
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+      <div className="wobble-hover flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
         <Brain className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1 space-y-3">
         {units.map((u) => {
           if (u.kind === "text") {
             return (
-              <div key={u.key} className="whitespace-pre-wrap rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-4 py-3 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur">
+              <div key={u.key} className="slide-in-left whitespace-pre-wrap rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-4 py-3 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur">
                 {u.text}
               </div>
             );
