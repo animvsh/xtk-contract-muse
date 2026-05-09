@@ -24,7 +24,11 @@ import {
   Hash,
   Phone,
   Plug,
+  Server,
+  Code2,
+  PlayCircle,
 } from "lucide-react";
+
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,6 +67,28 @@ type AgentDraft = {
   recipient?: string;
   tools: string[];
 };
+
+type ApiParam = {
+  name: string;
+  in: "query" | "body" | "path";
+  type: "string" | "number" | "boolean" | "array" | "object";
+  required: boolean;
+  description: string;
+  example?: string;
+};
+type ApiEndpoint = { method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; path: string; summary: string };
+type ApiDraft = {
+  name: string;
+  description: string;
+  emoji: string;
+  kind: "rest" | "function";
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  path: string;
+  params: ApiParam[];
+  sampleResponse: string;
+  endpoints: ApiEndpoint[];
+};
+
 
 function BrainPage() {
   const { q } = Route.useSearch();
