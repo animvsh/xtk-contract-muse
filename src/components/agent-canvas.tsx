@@ -27,8 +27,6 @@ export function AgentCanvas({
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm backdrop-blur">
-      {/* Subtle animated grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, oklch(0.2 0 0) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
       {activeIndex !== undefined && activeIndex !== -1 && (
         <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-[60%] -translate-x-1/2 rounded-full bg-[oklch(0.72_0.21_45)]/20 blur-3xl" />
       )}
