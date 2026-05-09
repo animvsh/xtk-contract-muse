@@ -304,6 +304,9 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
           if (u.kind === "plan") {
             return <PlanBlock key={u.key} tasks={u.snapshot} running={u.running} />;
           }
+          if (u.kind === "agent") {
+            return <AgentProposalCard key={u.key} draft={u.draft} />;
+          }
           return <ToolPart key={u.key} part={u.part} />;
         })}
       </div>
