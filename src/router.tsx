@@ -62,9 +62,9 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPreloadStaleTime: 30_000,
     defaultPreloadGcTime: 5 * 60_000,
-    defaultPendingMs: 150,
+    defaultPendingMs: 0,
     defaultPendingMinMs: 0,
-    defaultViewTransition: true,
+    defaultViewTransition: false,
     defaultErrorComponent: DefaultErrorComponent,
   });
 
