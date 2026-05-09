@@ -317,6 +317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_submissions: {
+        Row: {
+          business: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          goal: string | null
+          id: string
+          linkedin: string | null
+          phone: string | null
+          referral_source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          business?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          goal?: string | null
+          id?: string
+          linkedin?: string | null
+          phone?: string | null
+          referral_source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          business?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          goal?: string | null
+          id?: string
+          linkedin?: string | null
+          phone?: string | null
+          referral_source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
