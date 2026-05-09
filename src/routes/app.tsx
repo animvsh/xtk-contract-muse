@@ -94,12 +94,7 @@ function AppLayout() {
         <div className="pointer-events-none absolute -right-32 top-60 h-[500px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-50 blur-[120px]" />
         <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-xl items-center justify-center">
           <div className="w-full rounded-[28px] bg-white p-10 text-center text-[oklch(0.15_0_0)] ring-1 ring-black/5">
-            <div className="mx-auto mb-5 grid h-12 w-12 grid-cols-2 gap-0.5">
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-            </div>
+            <BrandLogo className="mx-auto mb-5 h-14 w-14 object-contain" />
             <h1 className="text-3xl font-bold tracking-tight">You're on the list 🐝</h1>
             <p className="mt-3 text-[oklch(0.4_0_0)]">
               Beevr is still in private beta. We've saved your application and we'll reach out personally as soon as a spot opens for {user.email}.
@@ -121,12 +116,7 @@ function AppLayout() {
   const renderSidebar = (mini: boolean) => (
     <>
       <Link to="/" className={`mb-4 flex items-center gap-2.5 ${mini ? "justify-center" : ""}`}>
-        <div className="grid h-7 w-7 shrink-0 grid-cols-2 gap-0.5">
-          <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-          <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-          <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-          <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-        </div>
+        <BrandLogo className="h-7 w-7 shrink-0 object-contain" />
         {!mini && <span className="text-lg font-bold tracking-tight">Beevr</span>}
       </Link>
       {!mini && (

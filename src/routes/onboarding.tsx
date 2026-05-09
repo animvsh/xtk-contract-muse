@@ -121,12 +121,7 @@ function Onboarding() {
           <div className="w-full overflow-hidden rounded-[28px] bg-white ring-1 ring-black/5">
             <div className="flex items-center justify-between border-b border-black/5 px-6 py-4 md:px-10">
               <Link to="/" className="flex items-center gap-2.5">
-                <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
-                  <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                  <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                  <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                  <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-                </div>
+                <BrandLogo className="h-8 w-8 object-contain" />
                 <span className="text-lg font-bold tracking-tight">Beevr</span>
               </Link>
               <Link to="/auth" className="text-sm font-medium text-[oklch(0.4_0_0)] hover:text-black">
