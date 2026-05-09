@@ -95,6 +95,28 @@
 .step-in-right { animation: stepInRight 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .step-in-left  { animation: stepInLeft 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 
+/* Field focus glow for premium-feeling inputs */
+.field {
+  transition:
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    background-color 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.field:hover { border-color: oklch(0.78 0.04 60); }
+.field:focus {
+  border-color: oklch(0.68 0.22 40);
+  box-shadow: 0 0 0 4px oklch(0.68 0.22 40 / 0.14);
+  background-color: oklch(0.995 0.008 70);
+}
+
+/* Soft floating ambient orb */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.float-slow { animation: floatY 6s ease-in-out infinite; }
+
 /* Staggered child rise — apply to a parent, children get a delayed fadeInUp */
 .stagger > * { opacity: 0; animation: fadeInUp 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 .stagger > *:nth-child(1) { animation-delay: 60ms; }

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ArrowRight, ArrowLeft, Briefcase, Sparkles, Phone, Linkedin, Mail, Lock, Loader2, Check, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,6 @@ function Onboarding() {
   }, [session, loading, navigate]);
 
   const steps = ["About you", "Your business", "Contact", "Create account"];
-  const progress = useMemo(() => ((step + 1) / steps.length) * 100, [step, steps.length]);
 
   const next = () => { setDir(1); setStep((s) => Math.min(s + 1, steps.length - 1)); };
   const back = () => { setDir(-1); setStep((s) => Math.max(s - 1, 0)); };
@@ -131,12 +130,37 @@ function Onboarding() {
             </div>
 
             <div className="px-6 pt-6 md:px-10">
-              <div className="mb-2 flex items-center justify-between text-xs font-medium text-[oklch(0.45_0_0)]">
-                <span>Step {step + 1} of {steps.length} — {steps[step]}</span>
-                <span>{Math.round(progress)}%</span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[oklch(0.94_0_0)]">
-                <div className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-[width] duration-500 ease-out" style={{ width: `${progress}%` }} />
+              <div className="flex items-center justify-between gap-2">
+                {steps.map((label, i) => {
+                  const done = i < step;
+                  const active = i === step;
+                  return (
+                    <div key={label} className="flex flex-1 items-center gap-2 last:flex-none">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
+                            done
+                              ? "bg-[oklch(0.68_0.22_40)] text-white"
+                              : active
+                                ? "ring-2 ring-[oklch(0.68_0.22_40)] ring-offset-2 ring-offset-white bg-[oklch(0.68_0.22_40)] text-white scale-105"
+                                : "bg-[oklch(0.94_0_0)] text-[oklch(0.5_0_0)]"
+                          }`}
+                        >
+                          {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                        </div>
+                        <span className={`hidden text-xs font-medium md:inline ${active ? "text-[oklch(0.15_0_0)]" : "text-[oklch(0.5_0_0)]"}`}>{label}</span>
+                      </div>
+                      {i < steps.length - 1 && (
+                        <div className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-[oklch(0.94_0_0)]">
+                          <div
+                            className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500 ease-out"
+                            style={{ width: i < step ? "100%" : "0%" }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -155,7 +179,7 @@ function Onboarding() {
                     </p>
                     <div className="mt-8 space-y-3">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">Your name</label>
-                      <input autoFocus type="text" placeholder="Ada Lovelace" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && next()} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                      <input autoFocus type="text" placeholder="Ada Lovelace" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && next()} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                     </div>
                   </>
                 )}
@@ -169,11 +193,11 @@ function Onboarding() {
                     <div className="mt-8 space-y-5">
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">What business do you run?</label>
-                        <input autoFocus type="text" placeholder="e.g. SaaS for dentists" value={business} onChange={(e) => setBusiness(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input autoFocus type="text" placeholder="e.g. SaaS for dentists" value={business} onChange={(e) => setBusiness(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">What do you want to do with Beevr?</label>
-                        <textarea rows={4} placeholder="Automate revenue reports, build internal agents, …" value={goal} onChange={(e) => setGoal(e.target.value)} className="w-full resize-none rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <textarea rows={4} placeholder="Automate revenue reports, build internal agents, …" value={goal} onChange={(e) => setGoal(e.target.value)} className="field w-full resize-none rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                     </div>
                   </>
@@ -188,13 +212,13 @@ function Onboarding() {
                     <div className="mt-8 space-y-4">
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">Phone number</label>
-                        <input autoFocus type="tel" placeholder="+1 555 123 4567" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input autoFocus type="tel" placeholder="+1 555 123 4567" value={phone} onChange={(e) => setPhone(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">LinkedIn (optional)</label>
                         <div className="relative">
                           <Linkedin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                          <input type="url" placeholder="linkedin.com/in/you" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                          <input type="url" placeholder="linkedin.com/in/you" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-base outline-none" />
                         </div>
                       </div>
                       <div>
@@ -242,11 +266,11 @@ function Onboarding() {
                     <div className="space-y-3">
                       <div className="relative">
                         <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                        <input type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none" />
                       </div>
                       <div className="relative">
                         <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                        <input type="password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && createAccount()} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input type="password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && createAccount()} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none" />
                       </div>
                     </div>
                   </>
