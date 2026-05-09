@@ -51,6 +51,27 @@ function AppLayout() {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [user, loading, navigate]);
 
+  // Flush any waitlist draft saved before OAuth redirect
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = sessionStorage.getItem("beevr-waitlist-draft");
+      if (!raw) return;
+      const d = JSON.parse(raw) as Record<string, string>;
+      sessionStorage.removeItem("beevr-waitlist-draft");
+      void supabase.from("waitlist_submissions").insert({
+        user_id: user.id,
+        email: user.email ?? "",
+        full_name: d.name || (user.user_metadata?.display_name as string) || null,
+        business: d.business || null,
+        goal: d.goal || null,
+        phone: d.phone || null,
+        linkedin: d.linkedin || null,
+        referral_source: d.referral || null,
+      });
+    } catch {}
+  }, [user]);
+
   // Close mobile nav on route change
   useEffect(() => {
     setMobileNavOpen(false);
