@@ -15,6 +15,7 @@ const REFERRALS = ["Twitter / X", "LinkedIn", "Friend", "Google", "Other"];
 
 function Onboarding() {
   const [step, setStep] = useState(0);
+  const [dir, setDir] = useState<1 | -1>(1);
   const [name, setName] = useState("");
   const [business, setBusiness] = useState("");
   const [goal, setGoal] = useState("");
@@ -34,8 +35,8 @@ function Onboarding() {
   const steps = ["About you", "Your business", "Contact", "Create account"];
   const progress = useMemo(() => ((step + 1) / steps.length) * 100, [step, steps.length]);
 
-  const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const next = () => { setDir(1); setStep((s) => Math.min(s + 1, steps.length - 1)); };
+  const back = () => { setDir(-1); setStep((s) => Math.max(s - 1, 0)); };
 
   const canProceed = () => {
     if (step === 0) return name.trim().length > 0;
