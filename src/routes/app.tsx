@@ -28,6 +28,7 @@ function AppLayout() {
   const isNavigating = useRouterState({ select: (s) => s.isLoading || s.isTransitioning });
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { current: workspace } = useWorkspaces();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
