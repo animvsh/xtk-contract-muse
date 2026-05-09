@@ -52,21 +52,24 @@ function Landing() {
 
           {/* Hero */}
           <section className="px-10 pb-20 pt-12 text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/60 px-4 py-1.5 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
-              <div className="flex -space-x-1.5">
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.7_0.18_50)]" />
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.6_0.2_30)]" />
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.75_0.15_70)]" />
-              </div>
+            <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
+              <img
+                src={ycLogo}
+                alt="Y Combinator"
+                width={20}
+                height={20}
+                className="h-5 w-5 rounded-[4px] object-contain"
+                loading="eager"
+                decoding="sync"
+              />
               Not backed by Y Combinator (yet)
             </div>
 
             <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
-              Beevr Makes Your Company<br />Brain Feel Effortless
+              Talk to your business.
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-[oklch(0.4_0_0)]">
-              Take charge of your company's knowledge with Beevr — the
-              AI workspace built to scale with your team.
+              With intelligent AI that knows everything about your business — from your docs and emails to your customers and revenue.
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-3">
