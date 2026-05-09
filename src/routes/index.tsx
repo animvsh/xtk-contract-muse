@@ -174,7 +174,7 @@ function DashboardPreview() {
           <span className="h-3 w-3 rounded-full bg-[oklch(0.85_0.18_85)]" />
           <span className="h-3 w-3 rounded-full bg-[oklch(0.75_0.18_145)]" />
         </div>
-        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)]">app.beevr.io</div>
+        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)]">app.beevr.dev</div>
       </div>
 
       <div className="flex">

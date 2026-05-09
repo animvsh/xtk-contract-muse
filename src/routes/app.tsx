@@ -265,7 +265,7 @@ function AppLayout() {
             <div className="mx-auto flex min-w-0 items-center gap-2 rounded-md border border-black/5 bg-white px-3 py-1 text-xs text-[oklch(0.4_0_0)] md:px-4">
               <span className="breathe h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: workspace.color }} />
               <span className="truncate font-medium text-[oklch(0.25_0_0)]">{workspace.name.toLowerCase().replace(/\s+/g, "-")}</span>
-              <span className="hidden truncate text-[oklch(0.55_0_0)] sm:inline">.beevr.io{pathname.replace(/^\/app/, "") || "/home"}</span>
+              <span className="hidden truncate text-[oklch(0.55_0_0)] sm:inline">.beevr.dev{pathname.replace(/^\/app/, "") || "/home"}</span>
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">
