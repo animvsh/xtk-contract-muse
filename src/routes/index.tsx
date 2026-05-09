@@ -28,23 +28,23 @@ function Landing() {
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
           <header className="flex items-center justify-between px-10 py-8">
-            <div className="flex items-center gap-2.5">
-              <BrandLogo className="h-9 w-9 object-contain" />
+            <Link to="/" className="clicky-sm flex items-center gap-2.5">
+              <BrandLogo className="h-9 w-9 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
-            </div>
+            </Link>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
-              <a href="#company" className="hover:text-black">Company</a>
-              <a href="#features" className="hover:text-black">Features</a>
-              <a href="#pricing" className="hover:text-black">Pricing</a>
-              <a href="#contacts" className="hover:text-black">Contacts</a>
+              <a href="#company" className="story-link transition-colors hover:text-black">Company</a>
+              <a href="#features" className="story-link transition-colors hover:text-black">Features</a>
+              <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
+              <a href="#contacts" className="story-link transition-colors hover:text-black">Contacts</a>
             </nav>
             <div className="flex items-center gap-6">
-              <Link to="/auth" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+              <Link to="/auth" className="clicky-sm text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
                 Sign in
               </Link>
               <Link
                 to="/onboarding"
-                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50"
               >
                 Join the waitlist
               </Link>
