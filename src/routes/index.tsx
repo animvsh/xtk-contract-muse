@@ -109,11 +109,14 @@ function Landing() {
                 { icon: Zap, title: "Cloud agents", desc: "Spin up agents that act on your data — no code, no cron." },
                 { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs out of the box." },
               ].map((f) => (
-                <div key={f.title} className="alive cursor-default rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6">
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110">
+                <div
+                  key={f.title}
+                  className="alive group cursor-pointer rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6 hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)] active:scale-[0.98]"
+                >
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
                     <f.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold">{f.title}</h3>
+                  <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
                   <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                 </div>
               ))}
