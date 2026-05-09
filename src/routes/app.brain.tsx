@@ -819,3 +819,161 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
     </div>
   );
 }
+
+const METHOD_TONE: Record<ApiEndpoint["method"], string> = {
+  GET: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+  POST: "bg-blue-500/10 text-blue-700 border-blue-500/30",
+  PUT: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+  PATCH: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+  DELETE: "bg-rose-500/10 text-rose-700 border-rose-500/30",
+};
+
+function slugify(s: string) {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+}
+
+function ApiProposalCard({ draft }: { draft: ApiDraft }) {
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState<{ id: string } | null>(null);
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const user = userRes.user;
+      if (!user) throw new Error("Sign in required");
+      const { data: row, error } = await supabase
+        .from("apis")
+        .insert({
+          user_id: user.id,
+          name: draft.name,
+          slug: slugify(draft.name) || "api",
+          description: draft.description,
+          emoji: draft.emoji,
+          kind: draft.kind,
+          method: draft.method,
+          path: draft.path,
+          spec: draft as never,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      setSaved({ id: row.id });
+      toast.success(`${draft.emoji} ${draft.name} created`, { description: `${draft.method} ${draft.path}` });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save API");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (saved) {
+    return (
+      <div className="animate-pop rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-white p-5">
+        <div className="flex items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white">
+            <Check className="h-5 w-5" strokeWidth={3} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl leading-none">{draft.emoji}</span>
+              <h3 className="text-base font-semibold">{draft.name} is live</h3>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">{draft.method} {draft.path}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => navigate({ to: "/app/apis/$id", params: { id: saved.id } })}
+                className="clicky-sm inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90"
+              >
+                <PlayCircle className="h-3.5 w-3.5" /> Open playground
+              </button>
+              <button
+                onClick={() => navigate({ to: "/app/apis" })}
+                className="clicky-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                See all APIs
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const endpoints = draft.endpoints?.length ? draft.endpoints : [{ method: draft.method, path: draft.path, summary: draft.description }];
+
+  return (
+    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
+      <div className="relative px-5 pt-5 pb-4">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
+        <div className="relative flex items-start gap-3">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
+            <span aria-hidden>{draft.emoji}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+              <Server className="h-3 w-3" /> New API draft
+              <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
+                {draft.kind === "rest" ? "REST resource" : "Custom function"}
+              </span>
+            </div>
+            <h3 className="mt-0.5 truncate text-base font-semibold">{draft.name}</h3>
+            <p className="mt-0.5 text-sm text-muted-foreground">{draft.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-black/5 bg-muted/20 p-4">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Endpoints</div>
+        <div className="space-y-1.5">
+          {endpoints.slice(0, 6).map((ep, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
+              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method]}`}>
+                {ep.method}
+              </span>
+              <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
+              <span className="ml-auto truncate text-muted-foreground">{ep.summary}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {draft.params.length > 0 && (
+        <div className="border-t border-black/5 p-4">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Parameters</div>
+          <div className="flex flex-wrap gap-1.5">
+            {draft.params.slice(0, 6).map((p) => (
+              <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium">
+                <Code2 className="h-2.5 w-2.5" />
+                <code className="font-mono">{p.name}</code>
+                <span className="text-muted-foreground">{p.type}</span>
+                {p.required && <span className="text-rose-600">*</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
+        <span className="text-[11px] text-muted-foreground">Saves as a mock API — playground returns the sample response.</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toast("Discarded draft")}
+            className="clicky-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-black/5"
+          >
+            Dismiss
+          </button>
+          <button
+            onClick={save}
+            disabled={busy}
+            className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {busy ? "Creating…" : "Create API"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
