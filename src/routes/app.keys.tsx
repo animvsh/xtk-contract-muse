@@ -73,7 +73,15 @@ function KeysPage() {
         }
       />
 
-      {keys.length === 0 ? (
+      {error ? (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+          Couldn't load access keys. {error instanceof Error ? error.message : ""} Try refreshing.
+        </div>
+      ) : isLoading ? (
+        <div className="rounded-2xl border border-dashed border-border bg-white/50 p-10 text-center text-sm text-muted-foreground">
+          Loading access keys…
+        </div>
+      ) : keys.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-white/50 p-10 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <KeyRound className="h-6 w-6" />
