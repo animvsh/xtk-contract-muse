@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { ArrowRight, ArrowLeft, Briefcase, Sparkles, Phone, Linkedin, Mail, Lock, Loader2, Check, Building2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Briefcase, Sparkles, Phone, Linkedin, Mail, Lock, Loader2, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
