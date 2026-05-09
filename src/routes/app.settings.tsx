@@ -96,7 +96,7 @@ function Settings() {
               onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = "none")}
             />
           ) : (
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)] text-xl font-semibold text-white">
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-xl font-semibold text-white">
               {initial}
             </div>
           )}
