@@ -162,8 +162,8 @@ function AppLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-[oklch(0.96_0_0)] p-0 text-foreground md:p-3">
-      <div className="relative mx-auto flex min-h-screen max-w-[1500px] overflow-hidden bg-white shadow-xl ring-1 ring-black/5 md:min-h-[calc(100vh-1.5rem)] md:rounded-[24px]">
+    <div className="h-screen overflow-hidden bg-[oklch(0.96_0_0)] p-0 text-foreground md:p-3">
+      <div className="relative mx-auto flex h-full max-w-[1500px] overflow-hidden bg-white ring-1 ring-black/5 md:rounded-[24px]">
         <aside
           className={`hidden shrink-0 flex-col border-r border-black/5 bg-white p-3 transition-[width] duration-200 ease-out md:flex ${
             collapsed ? "w-[68px]" : "w-60 p-5"
