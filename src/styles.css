@@ -108,26 +108,51 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Clicky press effect */
+/* Global subtle press on every interactive element */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a {
+  transition:
+    transform 90ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 100ms ease,
+    color 100ms ease,
+    border-color 100ms ease,
+    box-shadow 100ms ease,
+    opacity 100ms ease;
+}
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active {
+  transform: scale(0.96);
+  transition-duration: 40ms;
+}
+
+/* Clicky press effect (opt-in for stronger feedback) */
 .clicky {
   transition:
-    transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 120ms ease,
-    background-color 120ms ease,
-    border-color 120ms ease,
-    opacity 120ms ease;
+    transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 100ms ease,
+    background-color 100ms ease,
+    border-color 100ms ease,
+    opacity 100ms ease;
   will-change: transform;
 }
 .clicky:hover {
   transform: translateY(-1px);
 }
 .clicky:active {
-  transform: translateY(0) scale(0.97);
-  transition-duration: 60ms;
+  transform: translateY(0) scale(0.95);
+  transition-duration: 50ms;
 }
 
+.clicky-sm {
+  transition:
+    transform 90ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 100ms ease,
+    color 100ms ease;
+}
 .clicky-sm:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
+  transition-duration: 40ms;
 }
 
 @keyframes pop-in {
