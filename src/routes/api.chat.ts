@@ -195,7 +195,7 @@ export const Route = createFileRoute("/api/chat")({
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-2.5-flash");
+        const model = gateway("openai/gpt-5-mini");
 
         const result = streamText({
           model,
@@ -229,6 +229,10 @@ export const Route = createFileRoute("/api/chat")({
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages as UIMessage[],
+          onError: (error) => {
+            console.error("[api/chat] stream error:", error);
+            return error instanceof Error ? error.message : String(error);
+          },
         });
       },
     },
