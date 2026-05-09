@@ -384,3 +384,19 @@ select:focus-visible {
     transform: none !important;
   }
 }
+
+/* User preference: no drop shadows on UI elements */
+*,
+*::before,
+*::after {
+  box-shadow: none !important;
+}
+/* Re-enable focus rings (which use box-shadow) */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent) !important;
+}
