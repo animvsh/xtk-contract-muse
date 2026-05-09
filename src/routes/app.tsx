@@ -72,7 +72,7 @@ function AppLayout() {
       </div>
       <nav className="space-y-1">
         {navItems.map((item) => {
-          const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
+          const active = pathname === item.to || pathname.startsWith(item.to + "/");
           const Icon = item.icon;
           return (
             <Link
