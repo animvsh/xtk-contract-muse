@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ArrowRight, ArrowLeft, Briefcase, Sparkles, Phone, Linkedin, Mail, Lock, Loader2, Check, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,6 @@ function Onboarding() {
   }, [session, loading, navigate]);
 
   const steps = ["About you", "Your business", "Contact", "Create account"];
-  const progress = useMemo(() => ((step + 1) / steps.length) * 100, [step, steps.length]);
 
   const next = () => { setDir(1); setStep((s) => Math.min(s + 1, steps.length - 1)); };
   const back = () => { setDir(-1); setStep((s) => Math.max(s - 1, 0)); };
