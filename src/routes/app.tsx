@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { useWorkspaces } from "@/hooks/use-workspaces";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
