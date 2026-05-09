@@ -180,7 +180,7 @@ function Onboarding() {
                     </p>
                     <div className="mt-8 space-y-3">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">Your name</label>
-                      <input autoFocus type="text" placeholder="Ada Lovelace" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && next()} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                      <input autoFocus type="text" placeholder="Ada Lovelace" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && next()} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                     </div>
                   </>
                 )}
@@ -194,11 +194,11 @@ function Onboarding() {
                     <div className="mt-8 space-y-5">
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">What business do you run?</label>
-                        <input autoFocus type="text" placeholder="e.g. SaaS for dentists" value={business} onChange={(e) => setBusiness(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input autoFocus type="text" placeholder="e.g. SaaS for dentists" value={business} onChange={(e) => setBusiness(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">What do you want to do with Beevr?</label>
-                        <textarea rows={4} placeholder="Automate revenue reports, build internal agents, …" value={goal} onChange={(e) => setGoal(e.target.value)} className="w-full resize-none rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <textarea rows={4} placeholder="Automate revenue reports, build internal agents, …" value={goal} onChange={(e) => setGoal(e.target.value)} className="field w-full resize-none rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                     </div>
                   </>
@@ -213,13 +213,13 @@ function Onboarding() {
                     <div className="mt-8 space-y-4">
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">Phone number</label>
-                        <input autoFocus type="tel" placeholder="+1 555 123 4567" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input autoFocus type="tel" placeholder="+1 555 123 4567" value={phone} onChange={(e) => setPhone(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-base outline-none" />
                       </div>
                       <div>
                         <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">LinkedIn (optional)</label>
                         <div className="relative">
                           <Linkedin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                          <input type="url" placeholder="linkedin.com/in/you" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-base outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                          <input type="url" placeholder="linkedin.com/in/you" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-base outline-none" />
                         </div>
                       </div>
                       <div>
@@ -267,11 +267,11 @@ function Onboarding() {
                     <div className="space-y-3">
                       <div className="relative">
                         <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                        <input type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none" />
                       </div>
                       <div className="relative">
                         <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-                        <input type="password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && createAccount()} className="w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none transition focus:border-[oklch(0.68_0.22_40)]" />
+                        <input type="password" placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && canProceed() && createAccount()} className="field w-full rounded-xl border border-black/10 bg-white pl-10 pr-4 py-3.5 text-sm outline-none" />
                       </div>
                     </div>
                   </>
