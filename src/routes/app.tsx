@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { useWorkspaces } from "@/hooks/use-workspaces";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -26,6 +28,7 @@ function AppLayout() {
   const isNavigating = useRouterState({ select: (s) => s.isLoading || s.isTransitioning });
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { current: workspace } = useWorkspaces();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -50,7 +53,7 @@ function AppLayout() {
 
       <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] overflow-hidden rounded-[24px] bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.93_0.1_75)] shadow-2xl">
         <aside className="hidden w-60 shrink-0 flex-col bg-transparent p-5 md:flex">
-          <Link to="/" className="mb-8 flex items-center gap-2.5">
+          <Link to="/" className="mb-4 flex items-center gap-2.5">
             <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
               <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
               <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
@@ -59,6 +62,9 @@ function AppLayout() {
             </div>
             <span className="text-lg font-bold tracking-tight">Beevr</span>
           </Link>
+          <div className="mb-5">
+            <WorkspaceSwitcher />
+          </div>
           <nav className="space-y-1">
             {navItems.map((item) => {
               const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
@@ -113,8 +119,10 @@ function AppLayout() {
               <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
               <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
             </div>
-            <div className="mx-auto rounded-md border border-black/5 bg-white px-4 py-1 text-xs text-[oklch(0.4_0_0)]">
-              app.beevr.io{pathname.replace(/^\/app/, "") || "/home"}
+            <div className="mx-auto flex items-center gap-2 rounded-md border border-black/5 bg-white px-4 py-1 text-xs text-[oklch(0.4_0_0)]">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: workspace.color }} />
+              <span className="font-medium text-[oklch(0.25_0_0)]">{workspace.name.toLowerCase().replace(/\s+/g, "-")}</span>
+              <span className="text-[oklch(0.55_0_0)]">.beevr.io{pathname.replace(/^\/app/, "") || "/home"}</span>
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">

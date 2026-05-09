@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
+import { WorkspaceProvider } from "@/hooks/use-workspaces";
 
 import appCss from "../styles.css?url";
 
@@ -77,8 +78,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster position="bottom-right" />
+        <WorkspaceProvider>
+          <Outlet />
+          <Toaster position="bottom-right" />
+        </WorkspaceProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
