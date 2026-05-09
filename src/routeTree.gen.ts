@@ -33,6 +33,7 @@ import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
+import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as DocsExamplesBookstoreSalesAgentRouteImport } from './routes/docs.examples.bookstore-sales-agent'
 import { Route as DocsCloudBuildsAgentsRouteImport } from './routes/docs.cloud-builds.agents'
@@ -165,6 +166,11 @@ const AppAgentsRoute = AppAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/chat': typeof ApiChatRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/api/chat'
+    | '/app/admin'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/api/chat'
+    | '/app/admin'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/api/chat'
+    | '/app/admin'
     | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
@@ -638,6 +650,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin': {
+      id: '/app/admin'
+      path: '/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -755,6 +774,7 @@ const AppTeamRouteWithChildren =
   AppTeamRoute._addFileChildren(AppTeamRouteChildren)
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
@@ -768,6 +788,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppAgentsRoute: AppAgentsRouteWithChildren,
   AppApprovalsRoute: AppApprovalsRoute,
   AppBrainRoute: AppBrainRoute,
