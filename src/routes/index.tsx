@@ -29,7 +29,7 @@ function Landing() {
           {/* Nav */}
           <header className="flex items-center justify-between px-10 py-8">
             <Link to="/" className="clicky-sm flex items-center gap-2.5">
-              <BrandLogo className="h-9 w-9 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
+              <BrandLogo className="h-12 w-12 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
             </Link>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
@@ -181,7 +181,7 @@ function DashboardPreview() {
         {/* Sidebar */}
         <div className="w-48 border-r border-black/5 p-4 text-xs">
           <div className="mb-6 flex items-center gap-2 font-bold">
-            <BrandLogo className="h-5 w-5 object-contain" />
+            <BrandLogo className="h-8 w-8 object-contain" />
             Beevr
           </div>
           <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Main</div>
