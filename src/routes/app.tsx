@@ -35,6 +35,15 @@ function AppLayout() {
   const navigate = useNavigate();
   const { current: workspace } = useWorkspaces();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("beevr-sidebar-collapsed") === "1";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("beevr-sidebar-collapsed", collapsed ? "1" : "0");
+    }
+  }, [collapsed]);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
