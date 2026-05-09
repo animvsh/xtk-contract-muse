@@ -7,18 +7,27 @@ export function SplashScreen() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("beevr-splash-shown")) {
-      setVisible(false);
-      return;
-    }
-    const fadeTimer = setTimeout(() => setFading(true), 1100);
-    const hideTimer = setTimeout(() => {
-      setVisible(false);
-      sessionStorage.setItem("beevr-splash-shown", "1");
-    }, 1700);
+
+    const dismiss = () => {
+      setFading(true);
+      setTimeout(() => setVisible(false), 500);
+    };
+
+    // Safety: never let it stay forever
+    const maxTimer = setTimeout(dismiss, 3000);
+    // Minimum visibility so it doesn't flash
+    const minTimer = setTimeout(() => {
+      if (document.readyState === "complete") {
+        dismiss();
+      } else {
+        window.addEventListener("load", dismiss, { once: true });
+      }
+    }, 400);
+
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
+      clearTimeout(maxTimer);
+      clearTimeout(minTimer);
+      window.removeEventListener("load", dismiss);
     };
   }, []);
 
