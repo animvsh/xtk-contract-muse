@@ -9,7 +9,17 @@ import {
   Users,
   Zap,
   Bot,
+  ExternalLink,
+  Clock,
+  User as UserIcon,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type Update = {
   id: string;
