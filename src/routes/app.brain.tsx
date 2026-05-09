@@ -88,7 +88,7 @@ function BrainPage() {
         <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
           {isEmpty && (
             <div className="animate-[fadeInUp_300ms_ease-out]">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-lg shadow-primary/20">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
                 <Brain className="h-7 w-7" />
               </div>
               <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
@@ -154,7 +154,7 @@ function BrainPage() {
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-        <div className="h-16 bg-gradient-to-t from-white/90 via-white/60 to-transparent" />
+        <div className="h-4 bg-white" />
         <div className="pointer-events-auto bg-white/80 px-6 pb-5 pt-2 backdrop-blur-xl">
           <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-black/10 bg-white p-2 shadow-lg shadow-black/5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
             <textarea
@@ -279,7 +279,7 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
 
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.75_0.15_75)] text-primary-foreground shadow-sm">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
         <Brain className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1 space-y-3">

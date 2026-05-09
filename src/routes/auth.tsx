@@ -123,7 +123,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-foreground p-3 text-foreground">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] border border-primary/10 bg-gradient-to-b from-card via-background to-secondary p-4 shadow-2xl sm:p-6">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] border border-primary/10 bg-card p-4 shadow-2xl sm:p-6">
         <div className="auth-card w-full max-w-sm rounded-3xl border border-border bg-card/90 p-7 shadow-2xl shadow-primary/10 backdrop-blur sm:p-8">
           <Link
             to="/"

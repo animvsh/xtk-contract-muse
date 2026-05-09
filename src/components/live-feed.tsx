@@ -100,7 +100,7 @@ export function LiveFeed() {
   }, []);
 
   return (
-    <div className="hidden w-72 shrink-0 border-l border-black/5 bg-gradient-to-b from-white/70 to-white/30 backdrop-blur lg:flex lg:flex-col">
+    <div className="hidden w-72 shrink-0 border-l border-black/5 bg-white lg:flex lg:flex-col">
       <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -123,7 +123,7 @@ export function LiveFeed() {
       </div>
       <div ref={scrollRef} className="relative flex-1 overflow-y-auto px-3 py-3">
         {/* timeline rail */}
-        <div className="pointer-events-none absolute bottom-3 left-[26px] top-3 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+        <div className="pointer-events-none absolute bottom-3 left-[26px] top-3 w-px bg-border" />
         <ul className="space-y-2">
           {items.map((item, idx) => {
             const Icon = item.icon;
@@ -168,8 +168,6 @@ export function LiveFeed() {
             );
           })}
         </ul>
-        {/* fade */}
-        <div className="pointer-events-none sticky bottom-0 -mx-3 h-8 bg-gradient-to-t from-white/80 to-transparent" />
       </div>
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>

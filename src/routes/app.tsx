@@ -120,7 +120,7 @@ function AppLayout() {
             }`}
             title={mini ? displayName : undefined}
           >
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[oklch(0.7_0.18_50)] to-[oklch(0.6_0.2_30)] text-sm font-semibold text-white">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-sm font-semibold text-white">
               {initial}
             </div>
             {!mini && (
@@ -195,7 +195,7 @@ function AppLayout() {
           <div
             className={`pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden transition-opacity duration-200 ${isNavigating ? "opacity-100" : "opacity-0"}`}
           >
-            <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[oklch(0.68_0.22_40)] to-transparent" />
+            <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-[oklch(0.68_0.22_40)]" />
           </div>
           <div className="flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 md:px-6">
             <button
@@ -219,7 +219,7 @@ function AppLayout() {
               <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
             </div>
             <div className="mx-auto flex min-w-0 items-center gap-2 rounded-md border border-black/5 bg-white px-3 py-1 text-xs text-[oklch(0.4_0_0)] md:px-4">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: workspace.color }} />
+              <span className="breathe h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: workspace.color }} />
               <span className="truncate font-medium text-[oklch(0.25_0_0)]">{workspace.name.toLowerCase().replace(/\s+/g, "-")}</span>
               <span className="hidden truncate text-[oklch(0.55_0_0)] sm:inline">.beevr.io{pathname.replace(/^\/app/, "") || "/home"}</span>
             </div>

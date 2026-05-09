@@ -26,9 +26,7 @@ export function AgentCanvas({
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-white via-white to-[oklch(0.98_0.02_60)] p-6 shadow-sm backdrop-blur">
-      {/* Subtle animated grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, oklch(0.2 0 0) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm backdrop-blur">
       {activeIndex !== undefined && activeIndex !== -1 && (
         <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-[60%] -translate-x-1/2 rounded-full bg-[oklch(0.72_0.21_45)]/20 blur-3xl" />
       )}
@@ -64,7 +62,7 @@ function Connector({ status }: { status: "idle" | "pending" | "active" | "done" 
       <div className="h-[2px] w-full rounded-full bg-black/[0.06]" />
       <div
         className={`absolute inset-y-0 left-0 my-auto h-[2px] rounded-full transition-all duration-700 ease-out ${
-          filled ? "w-full bg-gradient-to-r from-[oklch(0.72_0.21_45)] to-[oklch(0.78_0.16_70)]" : "w-0"
+          filled ? "w-full bg-[oklch(0.72_0.21_45)]" : "w-0"
         }`}
       />
       {status === "active" && (
@@ -104,16 +102,16 @@ function Node({
       style={{ animation: `fade-in 0.4s ease-out ${index * 60}ms both` }}
     >
       {status === "active" && (
-        <span className="pointer-events-none absolute -inset-px rounded-xl bg-gradient-to-r from-[oklch(0.72_0.21_45)]/0 via-[oklch(0.72_0.21_45)]/30 to-[oklch(0.72_0.21_45)]/0 opacity-50 blur-md" />
+        <span className="pointer-events-none absolute -inset-px rounded-xl bg-[oklch(0.72_0.21_45)]/20 opacity-50 blur-md" />
       )}
 
       <div className="relative flex items-center gap-2">
         <span
           className={`relative flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
             status === "done"
-              ? "bg-gradient-to-br from-[oklch(0.72_0.21_45)] to-[oklch(0.62_0.22_30)] text-white"
+              ? "bg-[oklch(0.72_0.21_45)] text-white"
               : status === "active"
-                ? "bg-gradient-to-br from-[oklch(0.78_0.16_70)] to-[oklch(0.72_0.21_45)] text-white"
+                ? "bg-[oklch(0.72_0.21_45)] text-white"
                 : kind === "trigger"
                   ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
                   : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"

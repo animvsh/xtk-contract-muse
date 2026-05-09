@@ -354,7 +354,7 @@ function FilePreview({ file }: { file: FileItem }) {
         <div
           className="flex h-72 w-full items-center justify-center rounded-xl text-white shadow-inner"
           style={{
-            background: `linear-gradient(135deg, ${meta.tone}, oklch(0.85 0.05 75))`,
+            background: meta.tone,
           }}
         >
           <FileImage className="h-16 w-16 opacity-90" />
@@ -369,7 +369,7 @@ function FilePreview({ file }: { file: FileItem }) {
       <div className="flex flex-col items-center gap-4">
         <div
           className="flex h-56 w-full items-center justify-center rounded-xl text-white shadow-inner"
-          style={{ background: `linear-gradient(135deg, ${meta.tone}, oklch(0.2 0.05 280))` }}
+          style={{ background: meta.tone }}
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur">
             <Icon className="h-7 w-7" />

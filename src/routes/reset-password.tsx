@@ -33,7 +33,7 @@ function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[oklch(0.04_0_0)] p-3">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.93_0.1_75)] p-6 shadow-2xl">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] bg-white p-6 shadow-2xl">
         <form onSubmit={submit} className="w-full max-w-sm rounded-3xl border border-black/5 bg-white/80 p-8 backdrop-blur">
           <Link to="/" className="mb-6 flex items-center gap-2.5">
             <div className="grid h-7 w-7 grid-cols-2 gap-0.5">
