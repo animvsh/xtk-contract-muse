@@ -591,20 +591,60 @@ const CADENCE_LABEL: Record<AgentDraft["schedule"]["cadence"], string> = {
   monthly: "Every month",
 };
 
+type BuildStep = {
+  id: string;
+  label: string;
+  detail?: string;
+  status: "pending" | "running" | "done";
+  durationMs: number;
+};
+
+function buildPlan(d: AgentDraft): BuildStep[] {
+  const steps: BuildStep[] = [
+    { id: "validate", label: "Validating spec", detail: `${d.name} · ${d.emoji}`, status: "pending", durationMs: 380 },
+    { id: "compile", label: "Compiling agent definition", detail: "writing manifest.json", status: "pending", durationMs: 520 },
+  ];
+  for (const src of d.dataSources.slice(0, 3)) {
+    const head = src.split(/[ (]/)[0];
+    steps.push({ id: `src-${head}`, label: `Connecting to ${head}`, detail: src, status: "pending", durationMs: 600 + Math.random() * 400 });
+  }
+  for (const t of d.tools.slice(0, 3)) {
+    steps.push({ id: `tool-${t}`, label: `Authorizing ${t}`, detail: "OAuth scope verified", status: "pending", durationMs: 450 + Math.random() * 300 });
+  }
+  steps.push(
+    { id: "trigger", label: `Scheduling ${CADENCE_LABEL[d.schedule.cadence].toLowerCase()} trigger`, detail: `fires at ${d.schedule.timeOfDay}`, status: "pending", durationMs: 480 },
+    { id: "delivery", label: `Wiring ${CHANNEL_META[d.channel].label.toLowerCase()} delivery`, detail: d.recipient || "default workspace channel", status: "pending", durationMs: 520 },
+    { id: "dryrun", label: "Running first dry-run", detail: "simulating tomorrow's execution", status: "pending", durationMs: 850 },
+    { id: "deploy", label: "Deploying to Beevr runtime", detail: "edge worker provisioned", status: "pending", durationMs: 700 },
+  );
+  return steps;
+}
+
 function AgentProposalCard({ draft }: { draft: AgentDraft }) {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState<{ id: string } | null>(null);
-  const [busy, setBusy] = useState(false);
   const [d, setD] = useState<AgentDraft>(draft);
+  const [building, setBuilding] = useState(false);
+  const [steps, setSteps] = useState<BuildStep[]>([]);
   const channel = CHANNEL_META[d.channel];
   const ChannelIcon = channel.icon;
 
   const update = <K extends keyof AgentDraft>(k: K, v: AgentDraft[K]) =>
     setD((cur) => ({ ...cur, [k]: v }));
 
-  const save = async () => {
-    setBusy(true);
+  const runBuild = async () => {
+    setEditing(false);
+    setBuilding(true);
+    const plan = buildPlan(d);
+    setSteps(plan);
+
+    for (let i = 0; i < plan.length; i++) {
+      setSteps((cur) => cur.map((s, idx) => (idx === i ? { ...s, status: "running" } : s)));
+      await new Promise((r) => setTimeout(r, plan[i].durationMs));
+      setSteps((cur) => cur.map((s, idx) => (idx === i ? { ...s, status: "done" } : s)));
+    }
+
     try {
       const { data: userRes } = await supabase.auth.getUser();
       const user = userRes.user;
@@ -622,13 +662,10 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
         .single();
       if (error) throw error;
       setSaved({ id: row.id });
-      toast.success(`${d.emoji} ${d.name} created`, {
-        description: `${d.trigger} · ${d.action}`,
-      });
+      toast.success(`${d.emoji} ${d.name} deployed`, { description: `${d.trigger} · ${d.action}` });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't save agent");
-    } finally {
-      setBusy(false);
+      setBuilding(false);
     }
   };
 
@@ -667,6 +704,74 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
     );
   }
 
+  if (building) {
+    const doneCount = steps.filter((s) => s.status === "done").length;
+    const pct = Math.round((doneCount / steps.length) * 100);
+    return (
+      <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/25 bg-white">
+        <div className="relative px-5 pt-5 pb-3">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 animate-pulse rounded-full bg-primary/15 blur-3xl" />
+          <div className="relative flex items-start gap-3">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
+              <span aria-hidden>{d.emoji}</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Building agent
+              </div>
+              <h3 className="mt-0.5 truncate text-base font-semibold">{d.name}</h3>
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-black/5">
+                <div
+                  className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all duration-500 ease-out"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-black/5 bg-muted/20 p-4">
+          <ol className="space-y-1">
+            {steps.map((s) => (
+              <li
+                key={s.id}
+                className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors ${
+                  s.status === "running" ? "bg-primary/5" : ""
+                }`}
+              >
+                <span className="grid h-4 w-4 shrink-0 place-items-center">
+                  {s.status === "done" ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={3} />
+                  ) : s.status === "running" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                  ) : (
+                    <Circle className="h-2 w-2 text-muted-foreground/40" strokeWidth={3} />
+                  )}
+                </span>
+                <span
+                  className={`font-medium ${
+                    s.status === "done"
+                      ? "text-foreground"
+                      : s.status === "running"
+                      ? "text-foreground"
+                      : "text-muted-foreground/60"
+                  }`}
+                >
+                  {s.label}
+                </span>
+                {s.detail && s.status !== "pending" && (
+                  <span className="ml-auto truncate text-[11px] font-mono text-muted-foreground">
+                    {s.detail}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
       {/* Glow header */}
@@ -679,7 +784,7 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
               <Sparkles className="h-3 w-3" />
-              New agent draft
+              Agent draft · review & edit
             </div>
             {editing ? (
               <input
@@ -777,7 +882,16 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">What it does</div>
-            <div className="mt-0.5 text-sm">{d.action}</div>
+            {editing ? (
+              <textarea
+                value={d.action}
+                onChange={(e) => update("action", e.target.value)}
+                rows={2}
+                className="mt-1 w-full resize-none rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+              />
+            ) : (
+              <div className="mt-0.5 text-sm">{d.action}</div>
+            )}
             {d.dataSources.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {d.dataSources.map((src) => (
@@ -807,12 +921,11 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             Dismiss
           </button>
           <button
-            onClick={save}
-            disabled={busy}
-            className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            onClick={runBuild}
+            className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90"
           >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-            {busy ? "Creating…" : "Create agent"}
+            <Sparkles className="h-3.5 w-3.5" />
+            Approve & build
           </button>
         </div>
       </div>
