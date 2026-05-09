@@ -17,9 +17,18 @@ import {
   Inbox,
   BookOpen,
   Circle,
+  MessageSquare,
+  Clock,
+  Zap,
+  Sparkles,
+  Hash,
+  Phone,
+  Plug,
 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/brain")({
   validateSearch: z.object({ q: z.string().optional() }),
@@ -41,6 +50,19 @@ const TOOL_META: Record<
 type StepStatus = "pending" | "in-progress" | "done" | "warning";
 type PlanSubtask = { id: string; title: string; status: StepStatus };
 type PlanTask = { id: string; title: string; status: StepStatus; subtasks: PlanSubtask[] };
+
+type AgentDraft = {
+  name: string;
+  description: string;
+  emoji: string;
+  schedule: { cadence: "hourly" | "daily" | "weekly" | "weekdays" | "monthly"; timeOfDay: string };
+  trigger: string;
+  action: string;
+  dataSources: string[];
+  channel: "sms" | "email" | "slack" | "in-app";
+  recipient?: string;
+  tools: string[];
+};
 
 function BrainPage() {
   const { q } = Route.useSearch();
@@ -215,6 +237,7 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
   type Unit =
     | { kind: "text"; key: string; text: string }
     | { kind: "tool"; key: string; part: ToolPartShape }
+    | { kind: "agent"; key: string; draft: AgentDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
 
   const units: Unit[] = [];
@@ -228,6 +251,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
     if (!part.type.startsWith("tool-")) return;
     const tp = part as ToolPartShape;
     const name = tp.type.replace(/^tool-/, "");
+
+    if (name === "proposeAgent") {
+      const input = tp.input as AgentDraft | undefined;
+      if (input && input.name) {
+        units.push({ kind: "agent", key: `a${idx}`, draft: input });
+      }
+      return;
+    }
 
     if (name === "createPlan") {
       const input = tp.input as { tasks?: PlanTask[] } | undefined;
@@ -294,6 +325,9 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
           }
           if (u.kind === "plan") {
             return <PlanBlock key={u.key} tasks={u.snapshot} running={u.running} />;
+          }
+          if (u.kind === "agent") {
+            return <AgentProposalCard key={u.key} draft={u.draft} />;
           }
           return <ToolPart key={u.key} part={u.part} />;
         })}
@@ -501,4 +535,248 @@ function summarizeInput(name: string, input: unknown): string {
   if (name === "draftDocument") return `${i.title}`;
   if (name === "sendEmail") return `→ ${i.to}`;
   return "";
+}
+
+const CHANNEL_META: Record<AgentDraft["channel"], { label: string; icon: typeof Phone; tone: string }> = {
+  sms: { label: "Text message", icon: Phone, tone: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  email: { label: "Email", icon: Mail, tone: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+  slack: { label: "Slack", icon: Hash, tone: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
+  "in-app": { label: "In-app notification", icon: MessageSquare, tone: "bg-primary/10 text-primary border-primary/20" },
+};
+
+const CADENCE_LABEL: Record<AgentDraft["schedule"]["cadence"], string> = {
+  hourly: "Every hour",
+  daily: "Every day",
+  weekdays: "Weekdays",
+  weekly: "Every week",
+  monthly: "Every month",
+};
+
+function AgentProposalCard({ draft }: { draft: AgentDraft }) {
+  const navigate = useNavigate();
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState<{ id: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [d, setD] = useState<AgentDraft>(draft);
+  const channel = CHANNEL_META[d.channel];
+  const ChannelIcon = channel.icon;
+
+  const update = <K extends keyof AgentDraft>(k: K, v: AgentDraft[K]) =>
+    setD((cur) => ({ ...cur, [k]: v }));
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const user = userRes.user;
+      if (!user) throw new Error("Sign in required");
+      const { data: row, error } = await supabase
+        .from("agents")
+        .insert({
+          name: d.name,
+          description: d.description,
+          status: "active",
+          spec: d as unknown as Record<string, unknown>,
+          user_id: user.id,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      setSaved({ id: row.id });
+      toast.success(`${d.emoji} ${d.name} created`, {
+        description: `${d.trigger} · ${d.action}`,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save agent");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (saved) {
+    return (
+      <div className="animate-pop relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-white p-5">
+        <div className="flex items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white text-lg">
+            <Check className="h-5 w-5" strokeWidth={3} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl leading-none">{d.emoji}</span>
+              <h3 className="text-base font-semibold">{d.name} is live</h3>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {d.trigger.toLowerCase()} · {d.action.toLowerCase()}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => navigate({ to: "/app/agents/$id", params: { id: saved.id } })}
+                className="clicky-sm inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-black/[0.03]"
+              >
+                Open agent <ChevronDown className="h-3 w-3 -rotate-90" />
+              </button>
+              <button
+                onClick={() => navigate({ to: "/app/agents" })}
+                className="clicky-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                See all agents
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
+      {/* Glow header */}
+      <div className="relative px-5 pt-5 pb-4">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
+        <div className="relative flex items-start gap-3">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
+            <span aria-hidden>{d.emoji}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="h-3 w-3" />
+              New agent draft
+            </div>
+            {editing ? (
+              <input
+                value={d.name}
+                onChange={(e) => update("name", e.target.value)}
+                className="mt-0.5 w-full rounded-md border border-black/10 bg-white px-2 py-1 text-base font-semibold outline-none focus:border-primary"
+              />
+            ) : (
+              <h3 className="mt-0.5 truncate text-base font-semibold">{d.name}</h3>
+            )}
+            {editing ? (
+              <textarea
+                value={d.description}
+                onChange={(e) => update("description", e.target.value)}
+                rows={2}
+                className="mt-1.5 w-full resize-none rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+              />
+            ) : (
+              <p className="mt-0.5 text-sm text-muted-foreground">{d.description}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Body grid */}
+      <div className="grid divide-y divide-black/5 border-t border-black/5 sm:grid-cols-2 sm:divide-y-0 sm:divide-x">
+        <div className="flex items-start gap-3 p-4">
+          <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+            <Clock className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">When</div>
+            {editing ? (
+              <div className="mt-1 flex gap-1.5">
+                <select
+                  value={d.schedule.cadence}
+                  onChange={(e) => update("schedule", { ...d.schedule, cadence: e.target.value as AgentDraft["schedule"]["cadence"] })}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+                >
+                  {Object.entries(CADENCE_LABEL).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </select>
+                <input
+                  type="time"
+                  value={d.schedule.timeOfDay}
+                  onChange={(e) => update("schedule", { ...d.schedule, timeOfDay: e.target.value })}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+                />
+              </div>
+            ) : (
+              <div className="mt-0.5 text-sm font-medium">
+                {CADENCE_LABEL[d.schedule.cadence]} at {d.schedule.timeOfDay}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 p-4">
+          <div className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${channel.tone}`}>
+            <ChannelIcon className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Send via</div>
+            {editing ? (
+              <div className="mt-1 flex flex-col gap-1.5">
+                <select
+                  value={d.channel}
+                  onChange={(e) => update("channel", e.target.value as AgentDraft["channel"])}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+                >
+                  {Object.entries(CHANNEL_META).map(([k, v]) => (
+                    <option key={k} value={k}>{v.label}</option>
+                  ))}
+                </select>
+                <input
+                  placeholder={d.channel === "sms" ? "+1 555 0123" : d.channel === "email" ? "you@company.com" : "#channel"}
+                  value={d.recipient ?? ""}
+                  onChange={(e) => update("recipient", e.target.value)}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
+                />
+              </div>
+            ) : (
+              <div className="mt-0.5 text-sm font-medium">
+                {channel.label}
+                {d.recipient && <span className="ml-1 text-muted-foreground">→ {d.recipient}</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 p-4 sm:col-span-2 sm:border-t sm:border-black/5">
+          <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-600">
+            <Zap className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">What it does</div>
+            <div className="mt-0.5 text-sm">{d.action}</div>
+            {d.dataSources.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {d.dataSources.map((src) => (
+                  <span key={src} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground/80">
+                    <Plug className="h-2.5 w-2.5" /> {src}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
+        <button
+          onClick={() => setEditing((v) => !v)}
+          className="clicky-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-black/5 hover:text-foreground"
+        >
+          {editing ? "Done editing" : "Edit details"}
+        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toast("Discarded draft")}
+            className="clicky-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-black/5"
+          >
+            Dismiss
+          </button>
+          <button
+            onClick={save}
+            disabled={busy}
+            className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {busy ? "Creating…" : "Create agent"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
