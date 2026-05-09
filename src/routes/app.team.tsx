@@ -84,7 +84,7 @@ function TeamSpaces() {
             params={{ id: s.id }}
             className="group rounded-2xl border border-black/[0.06] bg-white/70 p-4 backdrop-blur transition-colors hover:border-primary/30"
           >
-            <div className="h-16 rounded-lg" style={{ background: `linear-gradient(135deg, ${s.color}, oklch(0.95 0.04 80))` }} />
+            <div className="h-16 rounded-lg" style={{ background: s.color }} />
             <div className="mt-4 flex items-center justify-between">
               <h3 className="font-medium">{s.name}</h3>
               <span className="flex items-center gap-1 text-xs text-muted-foreground">

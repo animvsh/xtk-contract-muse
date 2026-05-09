@@ -55,7 +55,7 @@ function TeamSpaceDetail() {
         <ArrowLeft className="h-3 w-3" /> Team Spaces
       </Link>
       <div className="mb-8 flex items-center gap-4">
-        <div className="h-14 w-14 rounded-xl" style={{ background: `linear-gradient(135deg, ${space.color}, oklch(0.95 0.04 80))` }} />
+        <div className="h-14 w-14 rounded-xl" style={{ background: space.color }} />
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{space.name}</h1>
           <p className="text-sm text-muted-foreground">{members.length} members</p>

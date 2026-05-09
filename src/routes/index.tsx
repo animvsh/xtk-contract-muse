@@ -23,7 +23,7 @@ function Landing() {
         <div className="pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-60 blur-[120px]" />
 
         {/* Inner rounded white card */}
-        <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.92_0.12_75)] shadow-2xl">
+        <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
           <header className="flex items-center justify-between px-10 py-8">
             <div className="flex items-center gap-2.5">
