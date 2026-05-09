@@ -17,9 +17,18 @@ import {
   Inbox,
   BookOpen,
   Circle,
+  MessageSquare,
+  Clock,
+  Zap,
+  Sparkles,
+  Hash,
+  Phone,
+  Plug,
 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/brain")({
   validateSearch: z.object({ q: z.string().optional() }),
