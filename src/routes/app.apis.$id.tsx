@@ -85,7 +85,7 @@ function ApiPlaygroundPage() {
         navigate({ to: "/app/apis" });
         return;
       }
-      setApi(row as ApiRow);
+      setApi(row as unknown as ApiRow);
       setHistory((hist ?? []) as RequestRow[]);
       setLoading(false);
     })();
@@ -237,8 +237,8 @@ function Playground({ api, onRun }: { api: ApiRow; onRun: () => void }) {
         api_id: api.id,
         method: api.method,
         path: builtPath,
-        request: { params: values, body: body ? tryParse(body) : null },
-        response: tryParse(respBody) ?? { raw: respBody },
+        request: { params: values, body: body ? tryParse(body) : null } as never,
+        response: (tryParse(respBody) ?? { raw: respBody }) as never,
         status,
       });
       onRun();

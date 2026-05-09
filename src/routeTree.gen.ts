@@ -33,6 +33,7 @@ import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
+import { Route as AppApisRouteImport } from './routes/app.apis'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
@@ -44,6 +45,7 @@ import { Route as DocsCliClaudeCodeRouteImport } from './routes/docs.cli.claude-
 import { Route as DocsBuildingToolsCustomerHealthDashboardRouteImport } from './routes/docs.building-tools.customer-health-dashboard'
 import { Route as AppTeamIdRouteImport } from './routes/app.team.$id'
 import { Route as AppKeysIdRouteImport } from './routes/app.keys.$id'
+import { Route as AppApisIdRouteImport } from './routes/app.apis.$id'
 import { Route as AppAgentsNewRouteImport } from './routes/app.agents.new'
 import { Route as AppAgentsIdRouteImport } from './routes/app.agents.$id'
 
@@ -167,6 +169,11 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApisRoute = AppApisRouteImport.update({
+  id: '/apis',
+  path: '/apis',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAgentsRoute = AppAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
@@ -224,6 +231,11 @@ const AppKeysIdRoute = AppKeysIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppKeysRoute,
 } as any)
+const AppApisIdRoute = AppApisIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppApisRoute,
+} as any)
 const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -245,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
+  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -265,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/docs/': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/apis/$id': typeof AppApisIdRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
   '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
@@ -283,6 +297,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
+  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -303,6 +318,7 @@ export interface FileRoutesByTo {
   '/docs': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/apis/$id': typeof AppApisIdRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
   '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
@@ -323,6 +339,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
+  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -343,6 +360,7 @@ export interface FileRoutesById {
   '/docs/': typeof DocsIndexRoute
   '/app/agents/$id': typeof AppAgentsIdRoute
   '/app/agents/new': typeof AppAgentsNewRoute
+  '/app/apis/$id': typeof AppApisIdRoute
   '/app/keys/$id': typeof AppKeysIdRoute
   '/app/team/$id': typeof AppTeamIdRoute
   '/docs/building-tools/customer-health-dashboard': typeof DocsBuildingToolsCustomerHealthDashboardRoute
@@ -364,6 +382,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
+    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -384,6 +403,7 @@ export interface FileRouteTypes {
     | '/docs/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/apis/$id'
     | '/app/keys/$id'
     | '/app/team/$id'
     | '/docs/building-tools/customer-health-dashboard'
@@ -402,6 +422,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
+    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -422,6 +443,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/apis/$id'
     | '/app/keys/$id'
     | '/app/team/$id'
     | '/docs/building-tools/customer-health-dashboard'
@@ -441,6 +463,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
+    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -461,6 +484,7 @@ export interface FileRouteTypes {
     | '/docs/'
     | '/app/agents/$id'
     | '/app/agents/new'
+    | '/app/apis/$id'
     | '/app/keys/$id'
     | '/app/team/$id'
     | '/docs/building-tools/customer-health-dashboard'
@@ -663,6 +687,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/apis': {
+      id: '/app/apis'
+      path: '/apis'
+      fullPath: '/app/apis'
+      preLoaderRoute: typeof AppApisRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/agents': {
       id: '/app/agents'
       path: '/agents'
@@ -740,6 +771,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppKeysIdRouteImport
       parentRoute: typeof AppKeysRoute
     }
+    '/app/apis/$id': {
+      id: '/app/apis/$id'
+      path: '/$id'
+      fullPath: '/app/apis/$id'
+      preLoaderRoute: typeof AppApisIdRouteImport
+      parentRoute: typeof AppApisRoute
+    }
     '/app/agents/new': {
       id: '/app/agents/new'
       path: '/new'
@@ -771,6 +809,17 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
   AppAgentsRouteChildren,
 )
 
+interface AppApisRouteChildren {
+  AppApisIdRoute: typeof AppApisIdRoute
+}
+
+const AppApisRouteChildren: AppApisRouteChildren = {
+  AppApisIdRoute: AppApisIdRoute,
+}
+
+const AppApisRouteWithChildren =
+  AppApisRoute._addFileChildren(AppApisRouteChildren)
+
 interface AppKeysRouteChildren {
   AppKeysIdRoute: typeof AppKeysIdRoute
 }
@@ -796,6 +845,7 @@ const AppTeamRouteWithChildren =
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
+  AppApisRoute: typeof AppApisRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
   AppBuildsRoute: typeof AppBuildsRoute
@@ -810,6 +860,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAgentsRoute: AppAgentsRouteWithChildren,
+  AppApisRoute: AppApisRouteWithChildren,
   AppApprovalsRoute: AppApprovalsRoute,
   AppBrainRoute: AppBrainRoute,
   AppBuildsRoute: AppBuildsRoute,
