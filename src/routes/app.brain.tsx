@@ -939,11 +939,11 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
         </div>
       </div>
 
-      {draft.params.length > 0 && (
+      {(draft.params?.length ?? 0) > 0 && (
         <div className="border-t border-black/5 p-4">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Parameters</div>
           <div className="flex flex-wrap gap-1.5">
-            {draft.params.slice(0, 6).map((p) => (
+            {(draft.params ?? []).slice(0, 6).map((p) => (
               <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium">
                 <Code2 className="h-2.5 w-2.5" />
                 <code className="font-mono">{p.name}</code>
