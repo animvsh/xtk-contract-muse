@@ -27,12 +27,12 @@ export function ReasoningSteps({ log, live = false }: { log: string; live?: bool
   }, [log, live, bullets.length]);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-white via-white to-[oklch(0.98_0.02_60)] p-5 shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
       <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[oklch(0.72_0.21_45)]/10 blur-3xl" />
 
       {summary && (
         <div className="relative mb-4 flex items-start gap-2.5">
-          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-gradient-to-br from-[oklch(0.78_0.16_70)] to-[oklch(0.72_0.21_45)] text-white">
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[oklch(0.72_0.21_45)] text-white">
             <Sparkles className="h-3 w-3" />
           </span>
           <div className="flex-1 pt-0.5 text-sm font-medium leading-relaxed text-foreground">{summary}</div>

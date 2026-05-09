@@ -26,7 +26,7 @@ export function AgentCanvas({
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-white via-white to-[oklch(0.98_0.02_60)] p-6 shadow-sm backdrop-blur">
+    <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm backdrop-blur">
       {/* Subtle animated grid */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, oklch(0.2 0 0) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
       {activeIndex !== undefined && activeIndex !== -1 && (
@@ -113,7 +113,7 @@ function Node({
             status === "done"
               ? "bg-gradient-to-br from-[oklch(0.72_0.21_45)] to-[oklch(0.62_0.22_30)] text-white"
               : status === "active"
-                ? "bg-gradient-to-br from-[oklch(0.78_0.16_70)] to-[oklch(0.72_0.21_45)] text-white"
+                ? "bg-[oklch(0.72_0.21_45)] text-white"
                 : kind === "trigger"
                   ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
                   : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"
