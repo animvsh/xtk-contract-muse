@@ -204,14 +204,14 @@ function AppLayout() {
           <div className="flex items-center gap-2 border-b border-black/5 bg-white/60 px-3 py-3 md:px-6">
             <button
               onClick={() => setMobileNavOpen(true)}
-              className="-ml-1 rounded-lg p-1.5 text-[oklch(0.3_0_0)] hover:bg-black/5 md:hidden"
+              className="clicky-sm -ml-1 rounded-lg p-1.5 text-[oklch(0.3_0_0)] hover:bg-black/5 md:hidden"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
             </button>
             <button
               onClick={() => setCollapsed((c) => !c)}
-              className="hidden -ml-1 rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5 md:inline-flex"
+              className="clicky-sm hidden -ml-1 rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5 md:inline-flex"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
