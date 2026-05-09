@@ -171,6 +171,63 @@ export function LiveFeed() {
         {/* fade */}
         <div className="pointer-events-none sticky bottom-0 -mx-3 h-8 bg-gradient-to-t from-white/80 to-transparent" />
       </div>
+
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="sm:max-w-md">
+          {selected && (() => {
+            const Icon = selected.icon;
+            return (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                      style={{ backgroundColor: selected.color }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                        {selected.source}
+                      </div>
+                      <DialogTitle className="text-base">{selected.detail.target}</DialogTitle>
+                    </div>
+                  </div>
+                  <DialogDescription className="flex items-center gap-1.5 pt-1 text-xs">
+                    <UserIcon className="h-3 w-3" />
+                    <span className="font-medium text-foreground">{selected.detail.actor}</span>
+                    <span>{selected.detail.action}</span>
+                    <span className="mx-1">·</span>
+                    <Clock className="h-3 w-3" />
+                    <span>{relative(selected.ts, now)}</span>
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3 text-sm leading-relaxed text-foreground">
+                  {selected.detail.preview}
+                </div>
+
+                <dl className="grid grid-cols-2 gap-2 text-xs">
+                  {selected.detail.meta.map((m) => (
+                    <div key={m.label} className="rounded-lg border border-black/5 bg-white p-2.5">
+                      <dt className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{m.label}</dt>
+                      <dd className="mt-0.5 truncate font-medium text-foreground">{m.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <button
+                  className="clicky-sm inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+                  onClick={() => setSelected(null)}
+                >
+                  Open in {selected.source}
+                  <ExternalLink className="h-3 w-3" />
+                </button>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
