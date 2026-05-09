@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { WorkspaceProvider } from "@/hooks/use-workspaces";
+import { SplashScreen } from "@/components/splash-screen";
 
 import appCss from "../styles.css?url";
 
@@ -88,6 +89,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <WorkspaceProvider>
+          <SplashScreen />
           <Outlet />
           <Toaster position="bottom-right" />
         </WorkspaceProvider>
