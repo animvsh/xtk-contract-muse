@@ -365,6 +365,9 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
           if (u.kind === "agent") {
             return <AgentProposalCard key={u.key} draft={u.draft} />;
           }
+          if (u.kind === "api") {
+            return <ApiProposalCard key={u.key} draft={u.draft} />;
+          }
           return <ToolPart key={u.key} part={u.part} />;
         })}
       </div>
