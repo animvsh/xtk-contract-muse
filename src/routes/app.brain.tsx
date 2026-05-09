@@ -83,7 +83,7 @@ function BrainPage() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="relative flex h-[calc(100vh-3rem)] min-h-0 flex-1 flex-col">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">
         <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
           {isEmpty && (
