@@ -86,7 +86,7 @@ function ApiPlaygroundPage() {
         return;
       }
       setApi(row as unknown as ApiRow);
-      setHistory((hist ?? []) as RequestRow[]);
+      setHistory((hist ?? []) as unknown as RequestRow[]);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -104,7 +104,7 @@ function ApiPlaygroundPage() {
     const { data } = await supabase
       .from("api_requests").select("*").eq("api_id", id)
       .order("created_at", { ascending: false }).limit(50);
-    setHistory((data ?? []) as RequestRow[]);
+    setHistory((data ?? []) as unknown as RequestRow[]);
   };
 
   const remove = async () => {
