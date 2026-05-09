@@ -101,8 +101,8 @@ function AppLayout() {
                 mini ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 active
-                  ? "bg-[oklch(0.68_0.22_40)] text-white shadow-md shadow-[oklch(0.68_0.22_40)]/30 font-semibold"
-                  : "text-[oklch(0.3_0_0)] hover:bg-white/60"
+                  ? "bg-[oklch(0.15_0_0)] text-white font-semibold"
+                  : "text-[oklch(0.3_0_0)] hover:bg-black/[0.04]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />
