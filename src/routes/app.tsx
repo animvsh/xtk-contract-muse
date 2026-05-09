@@ -190,7 +190,7 @@ function AppLayout() {
               >
                 <X className="h-4 w-4" />
               </button>
-              {sidebarContent}
+              {renderSidebar(false)}
             </aside>
           </div>
         )}
