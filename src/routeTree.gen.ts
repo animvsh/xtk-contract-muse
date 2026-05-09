@@ -33,10 +33,10 @@ import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
-import { Route as AppApisRouteImport } from './routes/app.apis'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AppApisIndexRouteImport } from './routes/app.apis.index'
 import { Route as DocsExamplesBookstoreSalesAgentRouteImport } from './routes/docs.examples.bookstore-sales-agent'
 import { Route as DocsCloudBuildsAgentsRouteImport } from './routes/docs.cloud-builds.agents'
 import { Route as DocsCliOpencodeRouteImport } from './routes/docs.cli.opencode'
@@ -169,11 +169,6 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
-const AppApisRoute = AppApisRouteImport.update({
-  id: '/apis',
-  path: '/apis',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAgentsRoute = AppAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
@@ -188,6 +183,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppApisIndexRoute = AppApisIndexRouteImport.update({
+  id: '/apis/',
+  path: '/apis/',
+  getParentRoute: () => AppRoute,
 } as any)
 const DocsExamplesBookstoreSalesAgentRoute =
   DocsExamplesBookstoreSalesAgentRouteImport.update({
@@ -232,9 +232,9 @@ const AppKeysIdRoute = AppKeysIdRouteImport.update({
   getParentRoute: () => AppKeysRoute,
 } as any)
 const AppApisIdRoute = AppApisIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AppApisRoute,
+  id: '/apis/$id',
+  path: '/apis/$id',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   id: '/new',
@@ -257,7 +257,6 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
-  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -287,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -297,7 +297,6 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
-  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -327,6 +326,7 @@ export interface FileRoutesByTo {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis': typeof AppApisIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -339,7 +339,6 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
-  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -369,6 +368,7 @@ export interface FileRoutesById {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -382,7 +382,6 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
-    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -412,6 +411,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -422,7 +422,6 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
-    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -452,6 +451,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis'
   id:
     | '__root__'
     | '/'
@@ -463,7 +463,6 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
-    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -493,6 +492,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -687,13 +687,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/apis': {
-      id: '/app/apis'
-      path: '/apis'
-      fullPath: '/app/apis'
-      preLoaderRoute: typeof AppApisRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/agents': {
       id: '/app/agents'
       path: '/agents'
@@ -714,6 +707,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/apis/': {
+      id: '/app/apis/'
+      path: '/apis'
+      fullPath: '/app/apis/'
+      preLoaderRoute: typeof AppApisIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/docs/examples/bookstore-sales-agent': {
       id: '/docs/examples/bookstore-sales-agent'
@@ -773,10 +773,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/apis/$id': {
       id: '/app/apis/$id'
-      path: '/$id'
+      path: '/apis/$id'
       fullPath: '/app/apis/$id'
       preLoaderRoute: typeof AppApisIdRouteImport
-      parentRoute: typeof AppApisRoute
+      parentRoute: typeof AppRoute
     }
     '/app/agents/new': {
       id: '/app/agents/new'
@@ -809,17 +809,6 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
   AppAgentsRouteChildren,
 )
 
-interface AppApisRouteChildren {
-  AppApisIdRoute: typeof AppApisIdRoute
-}
-
-const AppApisRouteChildren: AppApisRouteChildren = {
-  AppApisIdRoute: AppApisIdRoute,
-}
-
-const AppApisRouteWithChildren =
-  AppApisRoute._addFileChildren(AppApisRouteChildren)
-
 interface AppKeysRouteChildren {
   AppKeysIdRoute: typeof AppKeysIdRoute
 }
@@ -845,7 +834,6 @@ const AppTeamRouteWithChildren =
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
-  AppApisRoute: typeof AppApisRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
   AppBuildsRoute: typeof AppBuildsRoute
@@ -855,12 +843,13 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppApisIdRoute: typeof AppApisIdRoute
+  AppApisIndexRoute: typeof AppApisIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAgentsRoute: AppAgentsRouteWithChildren,
-  AppApisRoute: AppApisRouteWithChildren,
   AppApprovalsRoute: AppApprovalsRoute,
   AppBrainRoute: AppBrainRoute,
   AppBuildsRoute: AppBuildsRoute,
@@ -870,6 +859,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppApisIdRoute: AppApisIdRoute,
+  AppApisIndexRoute: AppApisIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -934,3 +925,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/app/apis")({
+export const Route = createFileRoute("/app/apis/")({
   component: ApisPage,
 });
 
