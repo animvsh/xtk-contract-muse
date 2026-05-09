@@ -190,12 +190,52 @@ button {
   );
 }
 
+@keyframes feed-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    max-height: 0;
+    margin-top: 0;
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 96px;
+    filter: blur(0);
+  }
+}
+.feed-enter {
+  animation: feed-enter 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+@keyframes feed-shift {
+  0% {
+    transform: translateY(-46px);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.feed-shift {
+  animation: feed-shift 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .clicky,
   .auth-input,
   .animate-pop,
   .ring-pulse,
-  .shimmer-text {
+  .shimmer-text,
+  .feed-enter,
+  .feed-shift {
     animation: none !important;
     transition-duration: 1ms !important;
     transform: none !important;

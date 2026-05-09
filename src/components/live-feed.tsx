@@ -110,12 +110,12 @@ export function LiveFeed() {
             return (
               <li
                 key={item.id}
-                className={`group relative flex items-start gap-3 rounded-xl border bg-white/90 p-2.5 text-xs shadow-sm transition-all ${
+                className={`group relative flex items-start gap-3 overflow-hidden rounded-xl border bg-white/90 p-2.5 text-xs shadow-sm transition-all duration-300 ${
                   isNew
-                    ? "animate-pop border-primary/40 shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_15%,transparent)]"
+                    ? "feed-enter border-primary/40 shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_15%,transparent)]"
                     : "border-black/[0.05] hover:-translate-y-0.5 hover:border-black/10 hover:shadow-md"
                 }`}
-                style={{ opacity: Math.max(0.55, 1 - idx * 0.04) }}
+                style={{ opacity: isNew ? undefined : Math.max(0.55, 1 - idx * 0.04) }}
               >
                 <div className="relative">
                   <div
