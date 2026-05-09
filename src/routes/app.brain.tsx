@@ -604,11 +604,11 @@ function buildPlan(d: AgentDraft): BuildStep[] {
     { id: "validate", label: "Validating spec", detail: `${d.name} · ${d.emoji}`, status: "pending", durationMs: 380 },
     { id: "compile", label: "Compiling agent definition", detail: "writing manifest.json", status: "pending", durationMs: 520 },
   ];
-  for (const src of d.dataSources.slice(0, 3)) {
+  for (const src of (d.dataSources ?? []).slice(0, 3)) {
     const head = src.split(/[ (]/)[0];
     steps.push({ id: `src-${head}`, label: `Connecting to ${head}`, detail: src, status: "pending", durationMs: 600 + Math.random() * 400 });
   }
-  for (const t of d.tools.slice(0, 3)) {
+  for (const t of (d.tools ?? []).slice(0, 3)) {
     steps.push({ id: `tool-${t}`, label: `Authorizing ${t}`, detail: "OAuth scope verified", status: "pending", durationMs: 450 + Math.random() * 300 });
   }
   steps.push(
@@ -892,9 +892,9 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             ) : (
               <div className="mt-0.5 text-sm">{d.action}</div>
             )}
-            {d.dataSources.length > 0 && (
+            {(d.dataSources?.length ?? 0) > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {d.dataSources.map((src) => (
+                {(d.dataSources ?? []).map((src) => (
                   <span key={src} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground/80">
                     <Plug className="h-2.5 w-2.5" /> {src}
                   </span>

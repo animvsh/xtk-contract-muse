@@ -37,6 +37,7 @@ import { Route as AppApisRouteImport } from './routes/app.apis'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AppApisIndexRouteImport } from './routes/app.apis.index'
 import { Route as DocsExamplesBookstoreSalesAgentRouteImport } from './routes/docs.examples.bookstore-sales-agent'
 import { Route as DocsCloudBuildsAgentsRouteImport } from './routes/docs.cloud-builds.agents'
 import { Route as DocsCliOpencodeRouteImport } from './routes/docs.cli.opencode'
@@ -189,6 +190,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppApisIndexRoute = AppApisIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppApisRoute,
+} as any)
 const DocsExamplesBookstoreSalesAgentRoute =
   DocsExamplesBookstoreSalesAgentRouteImport.update({
     id: '/bookstore-sales-agent',
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -297,7 +304,6 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
-  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -327,6 +333,7 @@ export interface FileRoutesByTo {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis': typeof AppApisIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -369,6 +376,7 @@ export interface FileRoutesById {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -412,6 +420,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -422,7 +431,6 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
-    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -452,6 +460,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis'
   id:
     | '__root__'
     | '/'
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/apis/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -715,6 +725,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/apis/': {
+      id: '/app/apis/'
+      path: '/'
+      fullPath: '/app/apis/'
+      preLoaderRoute: typeof AppApisIndexRouteImport
+      parentRoute: typeof AppApisRoute
+    }
     '/docs/examples/bookstore-sales-agent': {
       id: '/docs/examples/bookstore-sales-agent'
       path: '/bookstore-sales-agent'
@@ -811,10 +828,12 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
 
 interface AppApisRouteChildren {
   AppApisIdRoute: typeof AppApisIdRoute
+  AppApisIndexRoute: typeof AppApisIndexRoute
 }
 
 const AppApisRouteChildren: AppApisRouteChildren = {
   AppApisIdRoute: AppApisIdRoute,
+  AppApisIndexRoute: AppApisIndexRoute,
 }
 
 const AppApisRouteWithChildren =
