@@ -10,19 +10,17 @@ export function SplashScreen() {
 
     const dismiss = () => {
       setFading(true);
-      setTimeout(() => setVisible(false), 500);
+      setTimeout(() => setVisible(false), 700);
     };
 
-    // Safety: never let it stay forever
     const maxTimer = setTimeout(dismiss, 3000);
-    // Minimum visibility so it doesn't flash
     const minTimer = setTimeout(() => {
       if (document.readyState === "complete") {
         dismiss();
       } else {
         window.addEventListener("load", dismiss, { once: true });
       }
-    }, 400);
+    }, 700);
 
     return () => {
       clearTimeout(maxTimer);
@@ -35,12 +33,17 @@ export function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[oklch(0.98_0.015_85)] transition-opacity duration-500 ${
-        fading ? "opacity-0" : "opacity-100"
+      className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[oklch(0.98_0.015_85)] ${
+        fading ? "splash-out" : ""
       }`}
       aria-hidden="true"
     >
-      <BrandLogo className="h-28 w-28 object-contain splash-logo" />
+      <div className="relative">
+        {/* expanding rings */}
+        <span className="splash-ring absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[oklch(0.68_0.22_40)]/40" />
+        <span className="splash-ring splash-ring-delay absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[oklch(0.68_0.22_40)]/30" />
+        <BrandLogo className="splash-logo relative h-28 w-28 object-contain" />
+      </div>
     </div>
   );
 }
