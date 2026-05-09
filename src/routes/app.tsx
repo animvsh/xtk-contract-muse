@@ -27,8 +27,6 @@ const navItems = [
   { label: "Files", to: "/app/files" as const, icon: FileStack },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
   { label: "Access Keys", to: "/app/keys" as const, icon: KeyRound },
-  { label: "Approvals", to: "/app/approvals" as const, icon: ShieldCheck },
-  { label: "Settings", to: "/app/settings" as const, icon: Settings },
 ];
 
 function AppLayout() {
