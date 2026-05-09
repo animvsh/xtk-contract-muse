@@ -38,18 +38,18 @@ function Landing() {
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
               <a href="#company" className="hover:text-black">Company</a>
               <a href="#features" className="hover:text-black">Features</a>
-              <a href="#reviews" className="hover:text-black">Reviews</a>
+              <a href="#pricing" className="hover:text-black">Pricing</a>
               <a href="#contacts" className="hover:text-black">Contacts</a>
             </nav>
             <div className="flex items-center gap-6">
-              <Link to="/onboarding" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
-                Get Started
+              <Link to="/auth" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+                Sign in
               </Link>
               <Link
                 to="/onboarding"
                 className="rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
               >
-                Learn More
+                Join the waitlist
               </Link>
             </div>
           </header>
@@ -78,7 +78,7 @@ function Landing() {
                 to="/onboarding"
                 className="inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
               >
-                <Phone className="h-4 w-4" /> Talk to sales
+                <Sparkles className="h-4 w-4" /> Join the waitlist
               </Link>
               <a
                 href="#features"
@@ -119,42 +119,35 @@ function Landing() {
             </div>
           </section>
 
-          {/* Pricing */}
-          <section id="reviews" className="bg-white px-10 py-20">
-            <h2 className="text-center text-4xl font-bold tracking-tight">Simple pricing</h2>
-            <div className="mx-auto mt-12 grid max-w-3xl gap-6 md:grid-cols-2">
-              {[
-                { name: "Team", price: "$20", per: "per user / month", features: ["Unlimited search", "5 connectors", "Up to 10 agents"] },
-                { name: "Business", price: "$50", per: "per user / month", features: ["Everything in Team", "Unlimited connectors", "SSO + audit logs"], featured: true },
-              ].map((p) => (
-                <div
-                  key={p.name}
-                  className={`rounded-2xl border p-6 ${p.featured ? "border-[oklch(0.68_0.22_40)] bg-[oklch(0.98_0.04_70)]" : "border-black/10 bg-white"}`}
-                >
-                  <div className="text-sm text-[oklch(0.4_0_0)]">{p.name}</div>
-                  <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold">{p.price}</span>
-                    <span className="text-sm text-[oklch(0.4_0_0)]">{p.per}</span>
-                  </div>
-                  <ul className="mt-6 space-y-2 text-sm">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-[oklch(0.68_0.22_40)]" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    to="/onboarding"
-                    className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold ${
-                      p.featured
-                        ? "bg-[oklch(0.68_0.22_40)] text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
-                        : "border border-black/10 hover:bg-[oklch(0.97_0_0)]"
-                    }`}
-                  >
-                    Start free <ArrowRight className="h-4 w-4" />
-                  </Link>
+          {/* Pricing — custom only */}
+          <section id="pricing" className="bg-white px-10 py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
+                <Sparkles className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Private beta
+              </div>
+              <h2 className="mt-4 text-4xl font-bold tracking-tight">Custom pricing</h2>
+              <p className="mt-3 text-[oklch(0.4_0_0)]">
+                Beevr is hand-rolled for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume, and goals.
+              </p>
+              <div className="mx-auto mt-10 max-w-md rounded-2xl border border-[oklch(0.68_0.22_40)] bg-[oklch(0.98_0.04_70)] p-8 text-left">
+                <div className="text-sm font-medium text-[oklch(0.4_0_0)]">Tailored plan</div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-4xl font-bold">Let's talk</span>
                 </div>
-              ))}
+                <ul className="mt-6 space-y-2 text-sm">
+                  {["Scoped to your team size", "Connectors built for your stack", "White-glove onboarding", "Direct line to the founders"].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-[oklch(0.68_0.22_40)]" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/onboarding"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
+                >
+                  Join the waitlist <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </section>
 
