@@ -58,12 +58,14 @@ function AuthPage() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       if (mode === "signin" && /invalid login credentials/i.test(msg)) {
-        toast.error(
-          "That email or password doesn't match. Create an account or reset your password.",
-          {
-            action: { label: "Sign up", onClick: () => setMode("signup") },
-          },
+        setNotice(
+          "No password on file for this email. If you signed up with Google, use Continue with Google. Otherwise, reset your password to set a new one.",
         );
+        toast.error("Can't sign in with that password", {
+          description: "This email may have been created with Google. Try Continue with Google or reset your password.",
+          action: { label: "Use Google", onClick: () => void google() },
+          duration: 8000,
+        });
       } else if (/email not confirmed/i.test(msg)) {
         setNotice(
           "Email confirmation is now turned off. Try creating the account again or reset your password.",
@@ -72,8 +74,13 @@ function AuthPage() {
       } else if (/already registered|already exists|user already/i.test(msg)) {
         setMode("signin");
         setNotice(
-          "That email already has an account. Sign in, or use Forgot password to set a new password.",
+          "That email already has an account. If you signed up with Google, use Continue with Google. Otherwise, sign in or reset your password.",
         );
+        toast.message("Account already exists", {
+          description: "Try Continue with Google, or reset your password to set a new one.",
+          action: { label: "Use Google", onClick: () => void google() },
+          duration: 8000,
+        });
       } else {
         toast.error(msg);
       }
