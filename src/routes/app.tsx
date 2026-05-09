@@ -126,7 +126,7 @@ function AppLayout() {
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">
-            <div key={pathname} className="flex min-h-0 flex-1 flex-col overflow-hidden animate-[fadeInUp_180ms_ease-out]">
+            <div key={pathname} className="flex min-h-0 flex-1 flex-col overflow-hidden animate-[fadeInUp_80ms_ease-out]">
               <Outlet />
             </div>
             <LiveFeed />
