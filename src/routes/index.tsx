@@ -181,12 +181,7 @@ function DashboardPreview() {
         {/* Sidebar */}
         <div className="w-48 border-r border-black/5 p-4 text-xs">
           <div className="mb-6 flex items-center gap-2 font-bold">
-            <div className="grid h-5 w-5 grid-cols-2 gap-0.5">
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
-            </div>
+            <BrandLogo className="h-5 w-5 object-contain" />
             Beevr
           </div>
           <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Main</div>
