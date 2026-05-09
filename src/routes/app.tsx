@@ -117,8 +117,8 @@ function AppLayout() {
   const renderSidebar = (mini: boolean) => (
     <>
       <Link to="/" className={`mb-4 flex items-center gap-2.5 ${mini ? "justify-center" : ""}`}>
-        <BrandLogo className="h-7 w-7 shrink-0 object-contain" />
-        {!mini && <span className="text-lg font-bold tracking-tight">Beevr</span>}
+        <BrandLogo className="h-10 w-10 shrink-0 object-contain" />
+        {!mini && <span className="text-xl font-bold tracking-tight">Beevr</span>}
       </Link>
       {!mini && (
         <div className="mb-5">
