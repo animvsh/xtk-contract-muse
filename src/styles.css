@@ -85,15 +85,37 @@
 
 /* Slide + fade for stepped flows (onboarding) */
 @keyframes stepInRight {
-  from { opacity: 0; transform: translateX(24px); filter: blur(2px); }
-  to   { opacity: 1; transform: translateX(0);    filter: blur(0); }
+  0%   { opacity: 0; transform: translate3d(32px, 6px, 0) scale(0.985); filter: blur(6px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
 }
 @keyframes stepInLeft {
-  from { opacity: 0; transform: translateX(-24px); filter: blur(2px); }
-  to   { opacity: 1; transform: translateX(0);     filter: blur(0); }
+  0%   { opacity: 0; transform: translate3d(-32px, 6px, 0) scale(0.985); filter: blur(6px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
 }
-.step-in-right { animation: stepInRight 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-.step-in-left  { animation: stepInLeft 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.step-in-right { animation: stepInRight 520ms cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, opacity, filter; }
+.step-in-left  { animation: stepInLeft 520ms cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, opacity, filter; }
+
+/* Children gently rise into place after the step container settles */
+.step-in-right > *, .step-in-left > * {
+  opacity: 0;
+  animation: fadeInUp 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.step-in-right > *:nth-child(1), .step-in-left > *:nth-child(1) { animation-delay: 80ms; }
+.step-in-right > *:nth-child(2), .step-in-left > *:nth-child(2) { animation-delay: 150ms; }
+.step-in-right > *:nth-child(3), .step-in-left > *:nth-child(3) { animation-delay: 220ms; }
+.step-in-right > *:nth-child(4), .step-in-left > *:nth-child(4) { animation-delay: 290ms; }
+.step-in-right > *:nth-child(5), .step-in-left > *:nth-child(5) { animation-delay: 360ms; }
+.step-in-right > *:nth-child(6), .step-in-left > *:nth-child(6) { animation-delay: 430ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .step-in-right, .step-in-left,
+  .step-in-right > *, .step-in-left > * {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
 
 /* Field focus glow for premium-feeling inputs */
 .field {
