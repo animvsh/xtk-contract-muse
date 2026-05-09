@@ -27,6 +27,7 @@ import {
   permissionMeta,
   scopeLabel,
 } from "@/lib/access-keys-config";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/app/keys/$id")({
   component: KeyDetail,
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/app/keys/$id")({
 
 function KeyDetail() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const get = useServerFn(getAccessKey);
   const rotate = useServerFn(rotateAccessKey);
   const setStatus = useServerFn(updateAccessKeyStatus);
@@ -42,8 +44,9 @@ function KeyDetail() {
   const navigate = useNavigate();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["access-key", id],
+    queryKey: ["access-key", id, user?.id],
     queryFn: () => get({ data: { id } }),
+    enabled: !!user,
     retry: false,
   });
 
