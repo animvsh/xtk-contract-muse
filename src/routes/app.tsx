@@ -62,6 +62,36 @@ function AppLayout() {
     );
   }
 
+  const ADMIN_EMAIL = "aalang@ucsc.edu";
+  const isAdmin = user.email?.toLowerCase() === ADMIN_EMAIL;
+  if (!isAdmin) {
+    return (
+      <div className="relative min-h-screen overflow-hidden bg-[oklch(0.04_0_0)] p-3 text-white">
+        <div className="pointer-events-none absolute -left-32 top-20 h-[500px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-50 blur-[120px]" />
+        <div className="pointer-events-none absolute -right-32 top-60 h-[500px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-50 blur-[120px]" />
+        <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-xl items-center justify-center">
+          <div className="w-full rounded-[28px] bg-white p-10 text-center text-[oklch(0.15_0_0)] ring-1 ring-black/5">
+            <div className="mx-auto mb-5 grid h-12 w-12 grid-cols-2 gap-0.5">
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+              <span className="rounded-full bg-[oklch(0.68_0.22_40)]" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">You're on the list 🐝</h1>
+            <p className="mt-3 text-[oklch(0.4_0_0)]">
+              Beevr is still in private beta. We've saved your application and we'll reach out personally as soon as a spot opens for {user.email}.
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Link to="/" className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-[oklch(0.25_0_0)] hover:bg-[oklch(0.97_0_0)]">Back home</Link>
+              <button onClick={() => signOut().then(() => navigate({ to: "/" }))} className="clicky rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white hover:bg-[oklch(0.62_0.22_40)]">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   const displayName = (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
   const initial = displayName.charAt(0).toUpperCase();
 
