@@ -30,23 +30,6 @@ type Update = {
   ts: number;
 };
 
-const POOL: Omit<Update, "id" | "ts">[] = [
-  { icon: FileText, source: "Notion", text: "Adithya created 'Q4 Hiring Plan'", color: "oklch(0.25 0 0)" },
-  { icon: MessageSquare, source: "Slack", text: "12 new messages in #engineering", color: "oklch(0.55 0.22 320)" },
-  { icon: Mail, source: "Gmail", text: "Maya replied to 'Onboarding'", color: "oklch(0.6 0.22 25)" },
-  { icon: GitBranch, source: "GitHub", text: "PR #482 merged by Sarah", color: "oklch(0.25 0 0)" },
-  { icon: Bot, source: "Agent", text: "Sales Digest posted weekly summary", color: "oklch(0.62 0.22 40)" },
-  { icon: FileText, source: "Drive", text: "New file: 'Investor Update Nov.pdf'", color: "oklch(0.55 0.18 145)" },
-  { icon: Calendar, source: "Calendar", text: "Meeting 'Design review' starts in 15m", color: "oklch(0.55 0.2 250)" },
-  { icon: DollarSign, source: "Stripe", text: "$4,820 invoice paid by Acme Corp", color: "oklch(0.55 0.2 280)" },
-  { icon: Users, source: "HubSpot", text: "New deal: Globex · $42k", color: "oklch(0.62 0.22 35)" },
-  { icon: Zap, source: "Linear", text: "Adithya moved BEE-218 to In Progress", color: "oklch(0.5 0.2 280)" },
-  { icon: MessageSquare, source: "Slack", text: "Animesh mentioned you in #product", color: "oklch(0.55 0.22 320)" },
-  { icon: FileText, source: "Notion", text: "Sarah edited 'Beevr Brand Guidelines'", color: "oklch(0.25 0 0)" },
-  { icon: Bot, source: "Agent", text: "Inbox Triage labeled 7 emails", color: "oklch(0.62 0.22 40)" },
-  { icon: Mail, source: "Gmail", text: "Contract signed by adithya@beevr.io", color: "oklch(0.6 0.22 25)" },
-];
-
 type Detail = {
   actor: string;
   action: string;
