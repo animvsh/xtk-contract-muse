@@ -42,6 +42,19 @@ type StepStatus = "pending" | "in-progress" | "done" | "warning";
 type PlanSubtask = { id: string; title: string; status: StepStatus };
 type PlanTask = { id: string; title: string; status: StepStatus; subtasks: PlanSubtask[] };
 
+type AgentDraft = {
+  name: string;
+  description: string;
+  emoji: string;
+  schedule: { cadence: "hourly" | "daily" | "weekly" | "weekdays" | "monthly"; timeOfDay: string };
+  trigger: string;
+  action: string;
+  dataSources: string[];
+  channel: "sms" | "email" | "slack" | "in-app";
+  recipient?: string;
+  tools: string[];
+};
+
 function BrainPage() {
   const { q } = Route.useSearch();
   const [input, setInput] = useState("");
