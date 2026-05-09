@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Brain, Home, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X } from "lucide-react";
 import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
