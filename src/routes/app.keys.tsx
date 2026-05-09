@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { useAuth } from "@/hooks/use-auth";
 import {
   createAccessKey,
   listAccessKeys,
@@ -41,12 +42,14 @@ export const Route = createFileRoute("/app/keys")({
 type AccessKey = Awaited<ReturnType<typeof listAccessKeys>>[number];
 
 function KeysPage() {
+  const { user } = useAuth();
   const list = useServerFn(listAccessKeys);
   const setStatus = useServerFn(updateAccessKeyStatus);
   const qc = useQueryClient();
   const { data: keys = [], error, isLoading } = useQuery({
-    queryKey: ["access-keys"],
+    queryKey: ["access-keys", user?.id],
     queryFn: () => list(),
+    enabled: !!user,
     retry: false,
   });
   const [open, setOpen] = useState(false);
