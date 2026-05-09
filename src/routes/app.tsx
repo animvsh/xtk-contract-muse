@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { Brain, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X, ChevronUp, PanelLeftClose, PanelLeft, Shield } from "lucide-react";
+import { Brain, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X, ChevronUp, PanelLeftClose, PanelLeft, Shield, Server } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/app")({
 const navItems = [
   { label: "Home", to: "/app/brain" as const, icon: Brain },
   { label: "Agents", to: "/app/agents" as const, icon: Bot },
+  { label: "APIs", to: "/app/apis" as const, icon: Server },
   { label: "Builds", to: "/app/builds" as const, icon: Cloud },
   { label: "Team Spaces", to: "/app/team" as const, icon: Users },
   { label: "Files", to: "/app/files" as const, icon: FileStack },

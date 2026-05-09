@@ -177,6 +177,87 @@ export type Database = {
         }
         Relationships: []
       }
+      api_requests: {
+        Row: {
+          api_id: string
+          created_at: string
+          id: string
+          method: string
+          path: string
+          request: Json
+          response: Json
+          status: number
+          user_id: string
+        }
+        Insert: {
+          api_id: string
+          created_at?: string
+          id?: string
+          method: string
+          path: string
+          request?: Json
+          response?: Json
+          status?: number
+          user_id: string
+        }
+        Update: {
+          api_id?: string
+          created_at?: string
+          id?: string
+          method?: string
+          path?: string
+          request?: Json
+          response?: Json
+          status?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      apis: {
+        Row: {
+          created_at: string
+          description: string
+          emoji: string
+          id: string
+          kind: string
+          method: string
+          name: string
+          path: string
+          slug: string
+          spec: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          kind?: string
+          method?: string
+          name: string
+          path: string
+          slug: string
+          spec?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          kind?: string
+          method?: string
+          name?: string
+          path?: string
+          slug?: string
+          spec?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       connections: {
         Row: {
           connected: boolean
