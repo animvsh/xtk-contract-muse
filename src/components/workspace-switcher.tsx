@@ -54,23 +54,16 @@ export function WorkspaceSwitcher() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((o) => !o)}
-          className="clicky group flex w-full items-center gap-2.5 rounded-xl border border-black/5 bg-white/70 p-2 text-left shadow-sm transition-all hover:border-black/10 hover:bg-white"
+          className="clicky group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/70"
         >
           <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white shadow-sm"
+            className="h-2 w-2 shrink-0 rounded-full"
             style={{ background: current.color }}
-          >
-            {initials(current.name)}
+          />
+          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[oklch(0.2_0_0)]">
+            {current.name}
           </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-semibold text-[oklch(0.2_0_0)]">
-              {current.name}
-            </span>
-            <span className="block truncate text-[11px] text-[oklch(0.5_0_0)]">
-              {current.company}
-            </span>
-          </span>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 text-[oklch(0.5_0_0)] transition-transform group-hover:text-[oklch(0.3_0_0)]" />
+          <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-[oklch(0.5_0_0)] transition-colors group-hover:text-[oklch(0.2_0_0)]" />
         </button>
 
         {open && (
@@ -94,17 +87,15 @@ export function WorkspaceSwitcher() {
                     }`}
                   >
                     <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-semibold text-white"
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ background: w.color }}
-                    >
-                      {initials(w.name)}
-                    </span>
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-[oklch(0.2_0_0)]">
                         {w.name}
                       </span>
                       <span className="block truncate text-[11px] text-[oklch(0.5_0_0)]">
-                        {w.company} · {w.industry}
+                        {w.company}
                       </span>
                     </span>
                     {active && <Check className="h-4 w-4 text-[oklch(0.55_0.18_145)]" />}
