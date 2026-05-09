@@ -88,24 +88,25 @@ function BrainPage() {
         <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
           {isEmpty && (
             <div className="animate-[fadeInUp_300ms_ease-out]">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+              <div className="float-y wobble-hover mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
                 <Brain className="h-7 w-7" />
               </div>
               <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
               <p className="mt-2 text-base text-muted-foreground">
                 Connected to Notion, Gmail contacts, document drafting, and email.
               </p>
-              <div className="mt-8 grid gap-2 text-sm sm:grid-cols-2">
+              <div className="stagger mt-8 grid gap-2 text-sm sm:grid-cols-2">
                 {[
                   "Look at the doc about Beevr and send Adithya an employment contract",
                   "Find the Q3 roadmap in Notion and summarize it",
                   "Draft a follow-up email to the latest customer thread",
                   "Who emailed me about pricing this week?",
-                ].map((s) => (
+                ].map((s, i) => (
                   <button
                     key={s}
                     onClick={() => sendMessage({ text: s })}
-                    className="clicky group rounded-xl border border-black/5 bg-white/70 px-4 py-3 text-left leading-snug text-foreground/80 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:text-foreground hover:shadow-md"
+                    style={{ ['--i' as never]: i }}
+                    className="clicky alive slide-in-right group rounded-xl border border-black/5 bg-white/70 px-4 py-3 text-left leading-snug text-foreground/80 shadow-sm backdrop-blur transition-all hover:border-primary/30 hover:bg-white hover:text-foreground"
                   >
                     {s}
                   </button>
