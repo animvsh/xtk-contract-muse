@@ -209,6 +209,14 @@ function AppLayout() {
             >
               <Menu className="h-5 w-5" />
             </button>
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="hidden -ml-1 rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5 md:inline-flex"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            </button>
             <div className="hidden gap-1.5 md:flex">
               <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
               <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.16_70)]" />
