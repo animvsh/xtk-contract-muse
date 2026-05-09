@@ -131,7 +131,7 @@ function BrainPage() {
             )}
             {status === "submitted" && (
               <div className="animate-pop flex gap-3">
-                <div className="ring-pulse flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                <div className="ring-pulse float-y flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
                   <Brain className="h-4 w-4" />
                 </div>
                 <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm">
