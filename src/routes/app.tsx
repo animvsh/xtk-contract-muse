@@ -19,8 +19,7 @@ export const Route = createFileRoute("/app")({
 });
 
 const navItems = [
-  { label: "Home", to: "/app" as const, icon: Home, exact: true },
-  { label: "Brain", to: "/app/brain" as const, icon: Brain },
+  { label: "Home", to: "/app/brain" as const, icon: Brain },
   { label: "Agents", to: "/app/agents" as const, icon: Bot },
   { label: "Builds", to: "/app/builds" as const, icon: Cloud },
   { label: "Team Spaces", to: "/app/team" as const, icon: Users },
