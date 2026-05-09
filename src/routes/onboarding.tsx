@@ -144,7 +144,7 @@ function Onboarding() {
               </div>
             </div>
 
-            <div key={step} className="grid gap-8 px-6 py-10 md:grid-cols-[1.1fr_0.9fr] md:px-10 md:py-14 animate-[fadeInUp_220ms_ease-out]">
+            <div key={step} className={`grid gap-8 px-6 py-10 md:grid-cols-[1.1fr_0.9fr] md:px-10 md:py-14 ${dir === 1 ? "step-in-right" : "step-in-left"}`}>
               <div className="flex flex-col">
                 {step === 0 && (
                   <>
@@ -258,16 +258,16 @@ function Onboarding() {
 
                 <div className="mt-8 flex items-center gap-3">
                   {step > 0 && (
-                    <button type="button" onClick={back} disabled={busy} className="clicky inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-[oklch(0.25_0_0)] hover:bg-[oklch(0.97_0_0)]">
-                      <ArrowLeft className="h-4 w-4" /> Back
+                    <button type="button" onClick={back} disabled={busy} className="clicky group inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-[oklch(0.25_0_0)] hover:bg-[oklch(0.97_0_0)]">
+                      <ArrowLeft className="nudge-x h-4 w-4 group-hover:-translate-x-0.5" /> Back
                     </button>
                   )}
                   {step < steps.length - 1 ? (
-                    <button type="button" onClick={next} disabled={!canProceed()} className="clicky inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white hover:bg-[oklch(0.62_0.22_40)] disabled:cursor-not-allowed disabled:opacity-50">
-                      Continue <ArrowRight className="h-4 w-4" />
+                    <button type="button" onClick={next} disabled={!canProceed()} className="clicky shine group inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] disabled:cursor-not-allowed disabled:opacity-50">
+                      Continue <ArrowRight className="nudge-x h-4 w-4" />
                     </button>
                   ) : (
-                    <button type="button" onClick={createAccount} disabled={!canProceed() || busy} className="clicky inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white hover:bg-[oklch(0.62_0.22_40)] disabled:cursor-not-allowed disabled:opacity-50">
+                    <button type="button" onClick={createAccount} disabled={!canProceed() || busy} className="clicky shine inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] disabled:cursor-not-allowed disabled:opacity-50">
                       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                       {busy ? "Submitting…" : "Join waitlist"}
                     </button>
