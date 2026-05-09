@@ -42,12 +42,14 @@ export const Route = createFileRoute("/app/keys")({
 type AccessKey = Awaited<ReturnType<typeof listAccessKeys>>[number];
 
 function KeysPage() {
+  const { user } = useAuth();
   const list = useServerFn(listAccessKeys);
   const setStatus = useServerFn(updateAccessKeyStatus);
   const qc = useQueryClient();
   const { data: keys = [], error, isLoading } = useQuery({
-    queryKey: ["access-keys"],
+    queryKey: ["access-keys", user?.id],
     queryFn: () => list(),
+    enabled: !!user,
     retry: false,
   });
   const [open, setOpen] = useState(false);
