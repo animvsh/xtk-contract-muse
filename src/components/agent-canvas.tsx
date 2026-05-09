@@ -64,7 +64,7 @@ function Connector({ status }: { status: "idle" | "pending" | "active" | "done" 
       <div className="h-[2px] w-full rounded-full bg-black/[0.06]" />
       <div
         className={`absolute inset-y-0 left-0 my-auto h-[2px] rounded-full transition-all duration-700 ease-out ${
-          filled ? "w-full bg-gradient-to-r from-[oklch(0.72_0.21_45)] to-[oklch(0.78_0.16_70)]" : "w-0"
+          filled ? "w-full bg-[oklch(0.72_0.21_45)]" : "w-0"
         }`}
       />
       {status === "active" && (
@@ -111,7 +111,7 @@ function Node({
         <span
           className={`relative flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
             status === "done"
-              ? "bg-gradient-to-br from-[oklch(0.72_0.21_45)] to-[oklch(0.62_0.22_30)] text-white"
+              ? "bg-[oklch(0.72_0.21_45)] text-white"
               : status === "active"
                 ? "bg-[oklch(0.72_0.21_45)] text-white"
                 : kind === "trigger"
