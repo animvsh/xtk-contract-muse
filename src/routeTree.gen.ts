@@ -33,6 +33,7 @@ import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppBuildsRouteImport } from './routes/app.builds'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppApprovalsRouteImport } from './routes/app.approvals'
+import { Route as AppApisRouteImport } from './routes/app.apis'
 import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
@@ -169,6 +170,11 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApisRoute = AppApisRouteImport.update({
+  id: '/apis',
+  path: '/apis',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAgentsRoute = AppAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
@@ -185,9 +191,9 @@ const ApiChatRoute = ApiChatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppApisIndexRoute = AppApisIndexRouteImport.update({
-  id: '/apis/',
-  path: '/apis/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppApisRoute,
 } as any)
 const DocsExamplesBookstoreSalesAgentRoute =
   DocsExamplesBookstoreSalesAgentRouteImport.update({
@@ -232,9 +238,9 @@ const AppKeysIdRoute = AppKeysIdRouteImport.update({
   getParentRoute: () => AppKeysRoute,
 } as any)
 const AppApisIdRoute = AppApisIdRouteImport.update({
-  id: '/apis/$id',
-  path: '/apis/$id',
-  getParentRoute: () => AppRoute,
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppApisRoute,
 } as any)
 const AppAgentsNewRoute = AppAgentsNewRouteImport.update({
   id: '/new',
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
+  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -339,6 +346,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
   '/app/agents': typeof AppAgentsRouteWithChildren
+  '/app/apis': typeof AppApisRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -382,6 +390,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
+    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -463,6 +472,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/app/admin'
     | '/app/agents'
+    | '/app/apis'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -687,6 +697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/apis': {
+      id: '/app/apis'
+      path: '/apis'
+      fullPath: '/app/apis'
+      preLoaderRoute: typeof AppApisRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/agents': {
       id: '/app/agents'
       path: '/agents'
@@ -710,10 +727,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/apis/': {
       id: '/app/apis/'
-      path: '/apis'
+      path: '/'
       fullPath: '/app/apis/'
       preLoaderRoute: typeof AppApisIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppApisRoute
     }
     '/docs/examples/bookstore-sales-agent': {
       id: '/docs/examples/bookstore-sales-agent'
@@ -773,10 +790,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/apis/$id': {
       id: '/app/apis/$id'
-      path: '/apis/$id'
+      path: '/$id'
       fullPath: '/app/apis/$id'
       preLoaderRoute: typeof AppApisIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppApisRoute
     }
     '/app/agents/new': {
       id: '/app/agents/new'
@@ -809,6 +826,19 @@ const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
   AppAgentsRouteChildren,
 )
 
+interface AppApisRouteChildren {
+  AppApisIdRoute: typeof AppApisIdRoute
+  AppApisIndexRoute: typeof AppApisIndexRoute
+}
+
+const AppApisRouteChildren: AppApisRouteChildren = {
+  AppApisIdRoute: AppApisIdRoute,
+  AppApisIndexRoute: AppApisIndexRoute,
+}
+
+const AppApisRouteWithChildren =
+  AppApisRoute._addFileChildren(AppApisRouteChildren)
+
 interface AppKeysRouteChildren {
   AppKeysIdRoute: typeof AppKeysIdRoute
 }
@@ -834,6 +864,7 @@ const AppTeamRouteWithChildren =
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAgentsRoute: typeof AppAgentsRouteWithChildren
+  AppApisRoute: typeof AppApisRouteWithChildren
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppBrainRoute: typeof AppBrainRoute
   AppBuildsRoute: typeof AppBuildsRoute
@@ -843,13 +874,12 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
-  AppApisIdRoute: typeof AppApisIdRoute
-  AppApisIndexRoute: typeof AppApisIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAgentsRoute: AppAgentsRouteWithChildren,
+  AppApisRoute: AppApisRouteWithChildren,
   AppApprovalsRoute: AppApprovalsRoute,
   AppBrainRoute: AppBrainRoute,
   AppBuildsRoute: AppBuildsRoute,
@@ -859,8 +889,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
-  AppApisIdRoute: AppApisIdRoute,
-  AppApisIndexRoute: AppApisIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
