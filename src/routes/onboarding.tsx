@@ -127,40 +127,40 @@ function Onboarding() {
           </Link>
         </header>
 
-            <div className="px-6 pt-6 md:px-10">
-              <div className="flex items-center justify-between gap-2">
-                {steps.map((label, i) => {
-                  const done = i < step;
-                  const active = i === step;
-                  return (
-                    <div key={label} className="flex flex-1 items-center gap-2 last:flex-none">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
-                            done
-                              ? "bg-[oklch(0.68_0.22_40)] text-white"
-                              : active
-                                ? "ring-2 ring-[oklch(0.68_0.22_40)] ring-offset-2 ring-offset-white bg-[oklch(0.68_0.22_40)] text-white scale-105"
-                                : "bg-[oklch(0.94_0_0)] text-[oklch(0.5_0_0)]"
-                          }`}
-                        >
-                          {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                        </div>
-                        <span className={`hidden text-xs font-medium md:inline ${active ? "text-[oklch(0.15_0_0)]" : "text-[oklch(0.5_0_0)]"}`}>{label}</span>
-                      </div>
-                      {i < steps.length - 1 && (
-                        <div className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-[oklch(0.94_0_0)]">
-                          <div
-                            className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500 ease-out"
-                            style={{ width: i < step ? "100%" : "0%" }}
-                          />
-                        </div>
-                      )}
+        <div className="mx-auto mt-10 w-full max-w-xl">
+          <div className="flex items-center justify-between gap-2">
+            {steps.map((label, i) => {
+              const done = i < step;
+              const active = i === step;
+              return (
+                <div key={label} className="flex flex-1 items-center gap-2 last:flex-none">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
+                        done
+                          ? "bg-[oklch(0.68_0.22_40)] text-white"
+                          : active
+                            ? "bg-[oklch(0.68_0.22_40)] text-white scale-110 shadow-md shadow-[oklch(0.68_0.22_40)]/40"
+                            : "bg-[oklch(0.93_0_0)] text-[oklch(0.55_0_0)]"
+                      }`}
+                    >
+                      {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                    <span className={`hidden text-xs font-medium md:inline ${active ? "text-[oklch(0.15_0_0)]" : "text-[oklch(0.55_0_0)]"}`}>{label}</span>
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-[oklch(0.92_0_0)]">
+                      <div
+                        className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500 ease-out"
+                        style={{ width: i < step ? "100%" : "0%" }}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <div key={step} className={`mx-auto mt-10 w-full max-w-xl ${dir === 1 ? "step-in-right" : "step-in-left"}`}>
           {step === 0 && (
