@@ -576,7 +576,7 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
           name: d.name,
           description: d.description,
           status: "active",
-          spec: d as unknown as Record<string, unknown>,
+          spec: d as never,
           user_id: user.id,
         })
         .select("id")
