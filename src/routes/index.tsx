@@ -47,7 +47,7 @@ function Landing() {
               </Link>
               <Link
                 to="/onboarding"
-                className="rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
               >
                 Join the waitlist
               </Link>
@@ -76,13 +76,14 @@ function Landing() {
             <div className="mt-10 flex items-center justify-center gap-3">
               <Link
                 to="/onboarding"
-                className="inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
               >
                 <Sparkles className="h-4 w-4" /> Join the waitlist
+                <ArrowRight className="nudge-x h-4 w-4" />
               </Link>
               <a
                 href="#features"
-                className="rounded-xl border border-black/10 bg-white px-6 py-3.5 text-[15px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)]"
+                className="clicky rounded-xl border border-black/10 bg-white px-6 py-3.5 text-[15px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)]"
               >
                 Learn More
               </a>
@@ -102,14 +103,14 @@ function Landing() {
           {/* Features */}
           <section id="features" className="border-t border-black/5 bg-white px-10 py-20">
             <h2 className="text-center text-4xl font-bold tracking-tight">Built for teams that move fast</h2>
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
+            <div className="stagger mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
               {[
                 { icon: Brain, title: "Unified brain", desc: "One search across every doc, channel, and inbox in your stack." },
                 { icon: Zap, title: "Cloud agents", desc: "Spin up agents that act on your data — no code, no cron." },
                 { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs out of the box." },
               ].map((f) => (
-                <div key={f.title} className="rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6">
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)]">
+                <div key={f.title} className="alive cursor-default rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110">
                     <f.icon className="h-5 w-5" />
                   </div>
                   <h3 className="font-semibold">{f.title}</h3>
@@ -143,9 +144,9 @@ function Landing() {
                 </ul>
                 <Link
                   to="/onboarding"
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
+                  className="clicky shine group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
                 >
-                  Join the waitlist <ArrowRight className="h-4 w-4" />
+                  Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
                 </Link>
               </div>
             </div>
