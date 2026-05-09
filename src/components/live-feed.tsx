@@ -168,8 +168,6 @@ export function LiveFeed() {
             );
           })}
         </ul>
-        {/* fade */}
-        <div className="pointer-events-none sticky bottom-0 -mx-3 h-8 bg-white" />
       </div>
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
