@@ -7,7 +7,7 @@ export const Route = createFileRoute("/app/approvals")({
 });
 
 const PENDING = [
-  { id: "1", agent: "Contract Sender", action: "Send employment contract to maya@beevr.io", time: "2m ago" },
+  { id: "1", agent: "Contract Sender", action: "Send employment contract to maya@beevr.dev", time: "2m ago" },
   { id: "2", agent: "Inbox Triage", action: "Auto-reply to 3 vendor emails with templated response", time: "11m ago" },
   { id: "3", agent: "Sales Digest", action: "Post weekly digest to #sales-leadership", time: "1h ago" },
 ];

@@ -47,10 +47,10 @@ const AGENTS: BilledAgent[] = [
     trend: 18,
     status: "active",
     users: [
-      { name: "Adithya Rao", email: "adithya@beevr.io", runs: 612, color: COLORS[0] },
-      { name: "Maya Chen", email: "maya@beevr.io", runs: 488, color: COLORS[1] },
-      { name: "Jordan Park", email: "jordan@beevr.io", runs: 410, color: COLORS[2] },
-      { name: "Priya Shah", email: "priya@beevr.io", runs: 330, color: COLORS[3] },
+      { name: "Adithya Rao", email: "adithya@beevr.dev", runs: 612, color: COLORS[0] },
+      { name: "Maya Chen", email: "maya@beevr.dev", runs: 488, color: COLORS[1] },
+      { name: "Jordan Park", email: "jordan@beevr.dev", runs: 410, color: COLORS[2] },
+      { name: "Priya Shah", email: "priya@beevr.dev", runs: 330, color: COLORS[3] },
     ],
   },
   {
@@ -64,9 +64,9 @@ const AGENTS: BilledAgent[] = [
     trend: 6,
     status: "active",
     users: [
-      { name: "Maya Chen", email: "maya@beevr.io", runs: 41, color: COLORS[1] },
-      { name: "Sam Whitfield", email: "sam@beevr.io", runs: 33, color: COLORS[4] },
-      { name: "Jordan Park", email: "jordan@beevr.io", runs: 18, color: COLORS[2] },
+      { name: "Maya Chen", email: "maya@beevr.dev", runs: 41, color: COLORS[1] },
+      { name: "Sam Whitfield", email: "sam@beevr.dev", runs: 33, color: COLORS[4] },
+      { name: "Jordan Park", email: "jordan@beevr.dev", runs: 18, color: COLORS[2] },
     ],
   },
   {
@@ -80,8 +80,8 @@ const AGENTS: BilledAgent[] = [
     trend: -4,
     status: "active",
     users: [
-      { name: "Adithya Rao", email: "adithya@beevr.io", runs: 12, color: COLORS[0] },
-      { name: "Lena Park", email: "lena@beevr.io", runs: 4, color: COLORS[5] },
+      { name: "Adithya Rao", email: "adithya@beevr.dev", runs: 12, color: COLORS[0] },
+      { name: "Lena Park", email: "lena@beevr.dev", runs: 4, color: COLORS[5] },
     ],
   },
   {
@@ -95,10 +95,10 @@ const AGENTS: BilledAgent[] = [
     trend: 32,
     status: "active",
     users: [
-      { name: "Priya Shah", email: "priya@beevr.io", runs: 1240, color: COLORS[3] },
-      { name: "Sam Whitfield", email: "sam@beevr.io", runs: 980, color: COLORS[4] },
-      { name: "Maya Chen", email: "maya@beevr.io", runs: 540, color: COLORS[1] },
-      { name: "Jordan Park", email: "jordan@beevr.io", runs: 360, color: COLORS[2] },
+      { name: "Priya Shah", email: "priya@beevr.dev", runs: 1240, color: COLORS[3] },
+      { name: "Sam Whitfield", email: "sam@beevr.dev", runs: 980, color: COLORS[4] },
+      { name: "Maya Chen", email: "maya@beevr.dev", runs: 540, color: COLORS[1] },
+      { name: "Jordan Park", email: "jordan@beevr.dev", runs: 360, color: COLORS[2] },
     ],
   },
   {
@@ -112,9 +112,9 @@ const AGENTS: BilledAgent[] = [
     trend: 11,
     status: "active",
     users: [
-      { name: "Jordan Park", email: "jordan@beevr.io", runs: 102, color: COLORS[2] },
-      { name: "Adithya Rao", email: "adithya@beevr.io", runs: 64, color: COLORS[0] },
-      { name: "Lena Park", email: "lena@beevr.io", runs: 42, color: COLORS[5] },
+      { name: "Jordan Park", email: "jordan@beevr.dev", runs: 102, color: COLORS[2] },
+      { name: "Adithya Rao", email: "adithya@beevr.dev", runs: 64, color: COLORS[0] },
+      { name: "Lena Park", email: "lena@beevr.dev", runs: 42, color: COLORS[5] },
     ],
   },
   {
@@ -128,11 +128,11 @@ const AGENTS: BilledAgent[] = [
     trend: 24,
     status: "active",
     users: [
-      { name: "Maya Chen", email: "maya@beevr.io", runs: 5210, color: COLORS[1] },
-      { name: "Adithya Rao", email: "adithya@beevr.io", runs: 4180, color: COLORS[0] },
-      { name: "Priya Shah", email: "priya@beevr.io", runs: 2980, color: COLORS[3] },
-      { name: "Sam Whitfield", email: "sam@beevr.io", runs: 1490, color: COLORS[4] },
-      { name: "Jordan Park", email: "jordan@beevr.io", runs: 960, color: COLORS[2] },
+      { name: "Maya Chen", email: "maya@beevr.dev", runs: 5210, color: COLORS[1] },
+      { name: "Adithya Rao", email: "adithya@beevr.dev", runs: 4180, color: COLORS[0] },
+      { name: "Priya Shah", email: "priya@beevr.dev", runs: 2980, color: COLORS[3] },
+      { name: "Sam Whitfield", email: "sam@beevr.dev", runs: 1490, color: COLORS[4] },
+      { name: "Jordan Park", email: "jordan@beevr.dev", runs: 960, color: COLORS[2] },
     ],
   },
 ];

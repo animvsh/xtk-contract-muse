@@ -72,7 +72,7 @@ const tools = {
     execute: async ({ name }) => {
       await new Promise((r) => setTimeout(r, 600));
       const slug = name.toLowerCase().replace(/[^a-z]/g, "");
-      return { matches: [{ name, email: `${slug}@beevr.io`, title: "Engineering", recentThreads: 3, lastSeen: "2 days ago" }] };
+      return { matches: [{ name, email: `${slug}@beevr.dev`, title: "Engineering", recentThreads: 3, lastSeen: "2 days ago" }] };
     },
   }),
   searchEmails: tool({
