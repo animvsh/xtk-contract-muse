@@ -72,6 +72,7 @@ export function LiveFeed() {
   );
   const [newCount, setNewCount] = useState(0);
   const [now, setNow] = useState(now0);
+  const [selected, setSelected] = useState<FullUpdate | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
