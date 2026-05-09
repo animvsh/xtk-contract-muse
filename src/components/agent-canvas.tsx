@@ -102,7 +102,7 @@ function Node({
       style={{ animation: `fade-in 0.4s ease-out ${index * 60}ms both` }}
     >
       {status === "active" && (
-        <span className="pointer-events-none absolute -inset-px rounded-xl bg-gradient-to-r from-[oklch(0.72_0.21_45)]/0 via-[oklch(0.72_0.21_45)]/30 to-[oklch(0.72_0.21_45)]/0 opacity-50 blur-md" />
+        <span className="pointer-events-none absolute -inset-px rounded-xl bg-[oklch(0.72_0.21_45)]/20 opacity-50 blur-md" />
       )}
 
       <div className="relative flex items-center gap-2">
