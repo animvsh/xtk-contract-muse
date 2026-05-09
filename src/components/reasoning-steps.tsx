@@ -43,8 +43,7 @@ export function ReasoningSteps({ log, live = false }: { log: string; live?: bool
         {bullets.slice(0, shown).map((b, i) => (
           <div
             key={i}
-            className="relative"
-            style={{ animation: `fade-in 0.4s ease-out both` }}
+            className="slide-in-left relative"
           >
             <span className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full bg-white ring-2 ring-[oklch(0.72_0.21_45)]/40">
               <span className="h-1 w-1 rounded-full bg-[oklch(0.72_0.21_45)]" />
