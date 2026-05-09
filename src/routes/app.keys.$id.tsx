@@ -41,9 +41,10 @@ function KeyDetail() {
   const qc = useQueryClient();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["access-key", id],
     queryFn: () => get({ data: { id } }),
+    retry: false,
   });
 
   const rotateMut = useMutation({
@@ -73,8 +74,23 @@ function KeyDetail() {
     },
   });
 
-  if (isLoading || !data?.key) {
+  if (isLoading) {
     return <div className="p-10 text-sm text-muted-foreground">Loading…</div>;
+  }
+  if (error || !data?.key) {
+    return (
+      <div className="mx-auto w-full max-w-3xl px-6 py-10">
+        <Link to="/app/keys" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Back to keys
+        </Link>
+        <div className="rounded-2xl border border-border bg-white/70 p-8 text-center">
+          <h2 className="text-lg font-semibold">Key not found</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {error instanceof Error ? error.message : "This access key may have been deleted."}
+          </p>
+        </div>
+      </div>
+    );
   }
   const k = data.key;
   const meta = permissionMeta(k.permission);
