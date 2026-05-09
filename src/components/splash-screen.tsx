@@ -31,13 +31,7 @@ export function SplashScreen() {
       }`}
       aria-hidden="true"
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[oklch(0.72_0.21_45)] opacity-30 blur-[120px]" />
-      </div>
-      <div className="relative flex flex-col items-center gap-5 splash-pop">
-        <BrandLogo className="h-24 w-24 object-contain drop-shadow-[0_0_40px_oklch(0.72_0.21_45/0.5)]" />
-        <span className="text-2xl font-bold tracking-tight text-[oklch(0.15_0_0)]">Beevr</span>
-      </div>
+      <BrandLogo className="h-28 w-28 object-contain splash-logo" />
     </div>
   );
 }
