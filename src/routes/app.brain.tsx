@@ -892,9 +892,9 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             ) : (
               <div className="mt-0.5 text-sm">{d.action}</div>
             )}
-            {d.dataSources.length > 0 && (
+            {(d.dataSources?.length ?? 0) > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {d.dataSources.map((src) => (
+                {(d.dataSources ?? []).map((src) => (
                   <span key={src} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground/80">
                     <Plug className="h-2.5 w-2.5" /> {src}
                   </span>
