@@ -132,6 +132,26 @@ const tools = {
       return { delivered: true, to, subject, attachments: attachments ?? [], messageId: `msg_${Math.random().toString(36).slice(2, 10)}` };
     },
   }),
+  proposeAgent: tool({
+    description:
+      "Use this WHEN AND ONLY WHEN the user asks to create / build / set up / make a new agent, automation, scheduled task, daily digest, alert, or recurring workflow. Render a draft agent the user can review, edit, and save. Do NOT call createPlan or updateStep when using this tool — the proposal IS the response.",
+    inputSchema: z.object({
+      name: z.string().describe("Short human name, e.g. 'Daily Revenue Text'"),
+      description: z.string().describe("One-sentence summary of what the agent does"),
+      emoji: z.string().describe("Single emoji that fits the agent, e.g. '💸'"),
+      schedule: z.object({
+        cadence: z.enum(["hourly", "daily", "weekly", "weekdays", "monthly"]),
+        timeOfDay: z.string().describe("HH:MM 24h, e.g. '08:00'. Use '08:00' for 'every morning'."),
+      }),
+      trigger: z.string().describe("Plain-English trigger summary, e.g. 'Every morning at 8:00am'"),
+      action: z.string().describe("Plain-English action summary, e.g. 'Send a text message with yesterday's revenue'"),
+      dataSources: z.array(z.string()).describe("Where data comes from, e.g. ['Stripe charges (last 24h)']"),
+      channel: z.enum(["sms", "email", "slack", "in-app"]),
+      recipient: z.string().optional().describe("Phone number, email, or channel — leave blank if unknown"),
+      tools: z.array(z.string()).describe("Tool/connector names this agent will use, e.g. ['Stripe', 'Twilio']"),
+    }),
+    execute: async (input) => ({ ok: true, draft: input }),
+  }),
 };
 
 export const Route = createFileRoute("/api/chat")({
