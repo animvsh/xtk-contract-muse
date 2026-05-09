@@ -101,8 +101,8 @@ function AppLayout() {
                 mini ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 active
-                  ? "bg-[oklch(0.68_0.22_40)] text-white shadow-md shadow-[oklch(0.68_0.22_40)]/30 font-semibold"
-                  : "text-[oklch(0.3_0_0)] hover:bg-white/60"
+                  ? "bg-[oklch(0.15_0_0)] text-white font-semibold"
+                  : "text-[oklch(0.3_0_0)] hover:bg-black/[0.04]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -162,14 +162,10 @@ function AppLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-[oklch(0.04_0_0)] p-0 text-foreground md:p-3">
-      {/* Orange ambient glow */}
-      <div className="pointer-events-none fixed -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-40 blur-[120px]" />
-      <div className="pointer-events-none fixed -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-40 blur-[120px]" />
-
-      <div className="relative mx-auto flex min-h-screen max-w-[1500px] overflow-hidden bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.93_0.1_75)] shadow-2xl md:min-h-[calc(100vh-1.5rem)] md:rounded-[24px]">
+    <div className="min-h-screen bg-[oklch(0.96_0_0)] p-0 text-foreground md:p-3">
+      <div className="relative mx-auto flex min-h-screen max-w-[1500px] overflow-hidden bg-white shadow-xl ring-1 ring-black/5 md:min-h-[calc(100vh-1.5rem)] md:rounded-[24px]">
         <aside
-          className={`hidden shrink-0 flex-col bg-transparent p-3 transition-[width] duration-200 ease-out md:flex ${
+          className={`hidden shrink-0 flex-col border-r border-black/5 bg-white p-3 transition-[width] duration-200 ease-out md:flex ${
             collapsed ? "w-[68px]" : "w-60 p-5"
           }`}
         >
@@ -182,7 +178,7 @@ function AppLayout() {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-[fadeIn_150ms_ease-out]" />
             <aside
               onClick={(e) => e.stopPropagation()}
-              className="absolute left-0 top-0 flex h-full w-72 flex-col bg-gradient-to-b from-white via-[oklch(0.97_0.04_85)] to-[oklch(0.95_0.08_75)] p-5 shadow-2xl animate-[slideInLeft_200ms_ease-out]"
+              className="absolute left-0 top-0 flex h-full w-72 flex-col bg-white p-5 shadow-2xl animate-[slideInLeft_200ms_ease-out]"
             >
               <button
                 onClick={() => setMobileNavOpen(false)}
@@ -195,13 +191,13 @@ function AppLayout() {
           </div>
         )}
 
-        <main className="relative flex flex-1 flex-col overflow-hidden border-black/5 bg-white/40 backdrop-blur-sm md:border-l">
+        <main className="relative flex flex-1 flex-col overflow-hidden bg-white">
           <div
             className={`pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 overflow-hidden transition-opacity duration-200 ${isNavigating ? "opacity-100" : "opacity-0"}`}
           >
             <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[oklch(0.68_0.22_40)] to-transparent" />
           </div>
-          <div className="flex items-center gap-2 border-b border-black/5 bg-white/60 px-3 py-3 md:px-6">
+          <div className="flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 md:px-6">
             <button
               onClick={() => setMobileNavOpen(true)}
               className="clicky-sm -ml-1 rounded-lg p-1.5 text-[oklch(0.3_0_0)] hover:bg-black/5 md:hidden"
