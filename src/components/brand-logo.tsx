@@ -12,6 +12,11 @@ export function BrandLogo({ className, alt = "Beevr" }: Props) {
       alt={alt}
       className={className ?? "h-8 w-8 object-contain"}
       draggable={false}
+      loading="eager"
+      decoding="sync"
+      fetchPriority="high"
+      width={64}
+      height={64}
     />
   );
 }

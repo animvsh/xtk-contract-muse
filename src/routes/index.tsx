@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import ycLogo from "@/assets/yc-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,23 +28,23 @@ function Landing() {
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
           <header className="flex items-center justify-between px-10 py-8">
-            <div className="flex items-center gap-2.5">
-              <BrandLogo className="h-9 w-9 object-contain" />
+            <Link to="/" className="clicky-sm flex items-center gap-2.5">
+              <BrandLogo className="h-9 w-9 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
-            </div>
+            </Link>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
-              <a href="#company" className="hover:text-black">Company</a>
-              <a href="#features" className="hover:text-black">Features</a>
-              <a href="#pricing" className="hover:text-black">Pricing</a>
-              <a href="#contacts" className="hover:text-black">Contacts</a>
+              <a href="#company" className="story-link transition-colors hover:text-black">Company</a>
+              <a href="#features" className="story-link transition-colors hover:text-black">Features</a>
+              <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
+              <a href="#contacts" className="story-link transition-colors hover:text-black">Contacts</a>
             </nav>
             <div className="flex items-center gap-6">
-              <Link to="/auth" className="text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+              <Link to="/auth" className="clicky-sm text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
                 Sign in
               </Link>
               <Link
                 to="/onboarding"
-                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50"
               >
                 Join the waitlist
               </Link>
@@ -52,21 +53,24 @@ function Landing() {
 
           {/* Hero */}
           <section className="px-10 pb-20 pt-12 text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/60 px-4 py-1.5 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
-              <div className="flex -space-x-1.5">
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.7_0.18_50)]" />
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.6_0.2_30)]" />
-                <span className="h-5 w-5 rounded-full border-2 border-white bg-[oklch(0.75_0.15_70)]" />
-              </div>
+            <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
+              <img
+                src={ycLogo}
+                alt="Y Combinator"
+                width={20}
+                height={20}
+                className="h-5 w-5 rounded-[4px] object-contain"
+                loading="eager"
+                decoding="sync"
+              />
               Not backed by Y Combinator (yet)
             </div>
 
             <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
-              Beevr Makes Your Company<br />Brain Feel Effortless
+              Talk to your business.
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-[oklch(0.4_0_0)]">
-              Take charge of your company's knowledge with Beevr — the
-              AI workspace built to scale with your team.
+              With intelligent AI that knows everything about your business — from your docs and emails to your customers and revenue.
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-3">
@@ -105,11 +109,14 @@ function Landing() {
                 { icon: Zap, title: "Cloud agents", desc: "Spin up agents that act on your data — no code, no cron." },
                 { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs out of the box." },
               ].map((f) => (
-                <div key={f.title} className="alive cursor-default rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6">
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110">
+                <div
+                  key={f.title}
+                  className="alive group cursor-pointer rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6 hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)] active:scale-[0.98]"
+                >
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
                     <f.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold">{f.title}</h3>
+                  <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
                   <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                 </div>
               ))}
