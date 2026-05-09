@@ -215,6 +215,7 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
   type Unit =
     | { kind: "text"; key: string; text: string }
     | { kind: "tool"; key: string; part: ToolPartShape }
+    | { kind: "agent"; key: string; draft: AgentDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
 
   const units: Unit[] = [];
@@ -228,6 +229,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
     if (!part.type.startsWith("tool-")) return;
     const tp = part as ToolPartShape;
     const name = tp.type.replace(/^tool-/, "");
+
+    if (name === "proposeAgent") {
+      const input = tp.input as AgentDraft | undefined;
+      if (input && input.name) {
+        units.push({ kind: "agent", key: `a${idx}`, draft: input });
+      }
+      return;
+    }
 
     if (name === "createPlan") {
       const input = tp.input as { tasks?: PlanTask[] } | undefined;
