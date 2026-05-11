@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Settings as SettingsIcon, User as UserIcon, LogOut, Save, Loader2, Check } from "lucide-react";
+import { Settings as SettingsIcon, User as UserIcon, LogOut, Save, Loader2, Check, Building2, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useWorkspaces, type Workspace } from "@/hooks/use-workspaces";
 
 export const Route = createFileRoute("/app/settings")({
   component: Settings,
