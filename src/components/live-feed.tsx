@@ -137,7 +137,7 @@ export function LiveFeed() {
                     ? "feed-enter border-primary/40 shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_15%,transparent)]"
                     : "border-black/[0.05] hover:-translate-y-0.5 hover:border-black/10 hover:shadow-md active:scale-[0.98]"
                 }`}
-                style={{ opacity: isNew ? undefined : Math.max(0.55, 1 - idx * 0.04) }}
+                
               >
                 <div className="relative">
                   <div
