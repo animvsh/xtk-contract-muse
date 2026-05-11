@@ -280,6 +280,8 @@ export const Route = createFileRoute("/api/chat")({
             "- Then ONE short plain-text line like 'Here's the MCP — install it in your coding tool and start calling tools.' Nothing else.",
             "- DO NOT call createPlan, updateStep, proposeAgent, proposeApi, or other tools.",
             "",
+            "CLARIFICATION RULE (applies to MODE A / B / E): Before proposing an agent, API, or MCP, decide if there's a CRITICAL missing detail you genuinely cannot guess (e.g. SMS but no phone, ambiguous metric source, multiple plausible cadences). If yes, call `clarify` ONCE with 1-3 multiple-choice questions and end your turn with ONE short line. The user's answers will come back as the next message — only THEN call propose*. If you can make a confident assumption with a sensible default, skip clarify and propose directly.",
+            "",
             "MODE C — CONVERSATIONAL. Greetings, small talk, thanks, vague non-tasks, meta questions.",
             "- ONE short, warm, plain-text reply (1-2 sentences). For greetings, briefly mention you can search Notion/Gmail, draft docs, send emails, build agents, create APIs, and spin up MCP servers.",
             "",
