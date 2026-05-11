@@ -55,6 +55,7 @@ const triggerIcon = (type: string) => {
 
 function AgentDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
