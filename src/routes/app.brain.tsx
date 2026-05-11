@@ -539,7 +539,7 @@ type ToolPartShape = {
   errorText?: string;
 };
 
-function AssistantMessage({ msg }: { msg: UIMsg }) {
+function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) => void }) {
   // Build the live plan + ordered render units from message parts
   const plan: PlanTask[] = [];
   const taskIndex = new Map<string, PlanTask>();
