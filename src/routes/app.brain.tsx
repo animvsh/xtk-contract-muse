@@ -1346,7 +1346,7 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
         <div className="space-y-1.5">
           {endpoints.slice(0, 6).map((ep, i) => (
             <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
-              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method]}`}>
+              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
                 {ep.method}
               </span>
               <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
