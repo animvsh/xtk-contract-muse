@@ -932,6 +932,25 @@ function buildPlan(d: AgentDraft): BuildStep[] {
   return steps;
 }
 
+function agentDraftToWorkflowSpec(d: AgentDraft) {
+  const cadence = CADENCE_LABEL[d.schedule.cadence] ?? "On schedule";
+  const trigger = { type: "schedule", description: `${cadence} at ${d.schedule.timeOfDay}` };
+  const steps = [
+    ...(d.dataSources ?? []).map((src) => {
+      const integration = src.split(/[ (]/)[0] || "Source";
+      return { title: `Read from ${integration}`, integration, action: src };
+    }),
+    ...(d.tools ?? []).map((tool) => ({ title: `Use ${tool}`, integration: tool, action: `Call ${tool} API` })),
+    {
+      title: `Send via ${CHANNEL_META[d.channel].label}`,
+      integration: d.channel === "sms" ? "Twilio" : d.channel === "email" ? "Gmail" : d.channel === "slack" ? "Slack" : "Beevr",
+      action: d.recipient ? `${d.action || "Deliver update"} → ${d.recipient}` : d.action || "Deliver update",
+    },
+  ];
+
+  return { name: d.name, description: d.description, emoji: d.emoji, trigger, steps };
+}
+
 function normalizeAgentDraft(input: Partial<AgentDraft> | undefined | null): AgentDraft {
   const src = (input ?? {}) as Partial<AgentDraft>;
   const cadence = src.schedule?.cadence ?? "daily";
@@ -985,7 +1004,7 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
           name: d.name,
           description: d.description,
           status: "active",
-          spec: d as never,
+          spec: agentDraftToWorkflowSpec(d) as never,
           user_id: user.id,
         })
         .select("id")
