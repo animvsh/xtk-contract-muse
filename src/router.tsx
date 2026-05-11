@@ -59,10 +59,13 @@ export const getRouter = () => {
     routeTree,
     context: {},
     scrollRestoration: true,
-    defaultPreload: "intent",
-    defaultPreloadStaleTime: 30_000,
-    defaultPreloadGcTime: 5 * 60_000,
-    defaultPendingMs: 0,
+    // Preload chunks + loaders as soon as a Link renders → clicks feel instant.
+    defaultPreload: "render",
+    defaultPreloadDelay: 0,
+    defaultPreloadStaleTime: 60_000,
+    defaultPreloadGcTime: 10 * 60_000,
+    // Avoid flashing a pending state on fast navigations.
+    defaultPendingMs: 200,
     defaultPendingMinMs: 0,
     defaultViewTransition: false,
     defaultErrorComponent: DefaultErrorComponent,
