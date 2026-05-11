@@ -15,11 +15,20 @@ import {
   Download,
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
+  Star,
+  CheckCircle2,
+  Copy,
+  Check,
+  ArrowUpDown,
+  X as XIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 const ADMIN_EMAIL = "aalang@ucsc.edu";
+const STAR_KEY = "beevr.admin.starred";
+const DONE_KEY = "beevr.admin.contacted";
 
 type Submission = {
   id: string;
@@ -33,10 +42,26 @@ type Submission = {
   created_at: string;
 };
 
+type SortKey = "newest" | "oldest" | "name" | "starred";
+type FilterKey = "all" | "starred" | "contacted" | "uncontacted" | "with_business";
+
 export const Route = createFileRoute("/app/admin")({
   head: () => ({ meta: [{ title: "Admin — Waitlist" }] }),
   component: AdminPage,
 });
+
+function loadSet(key: string): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    return new Set(JSON.parse(localStorage.getItem(key) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+function saveSet(key: string, set: Set<string>) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(key, JSON.stringify([...set]));
+}
 
 function AdminPage() {
   const { user, loading } = useAuth();
@@ -45,6 +70,15 @@ function AdminPage() {
   const [busy, setBusy] = useState(true);
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Submission | null>(null);
+  const [starred, setStarred] = useState<Set<string>>(new Set());
+  const [contacted, setContacted] = useState<Set<string>>(new Set());
+  const [sort, setSort] = useState<SortKey>("newest");
+  const [filter, setFilter] = useState<FilterKey>("all");
+
+  useEffect(() => {
+    setStarred(loadSet(STAR_KEY));
+    setContacted(loadSet(DONE_KEY));
+  }, []);
 
   useEffect(() => {
     if (!loading && (!user || user.email?.toLowerCase() !== ADMIN_EMAIL)) {
@@ -65,27 +99,51 @@ function AdminPage() {
     })();
   }, [user]);
 
-  const filtered = rows.filter((r) => {
-    if (!q) return true;
-    const hay = [r.email, r.full_name, r.business, r.goal, r.phone, r.linkedin, r.referral_source]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-    return hay.includes(q.toLowerCase());
-  });
+  const toggleStar = (id: string) =>
+    setStarred((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      saveSet(STAR_KEY, next);
+      return next;
+    });
+  const toggleContacted = (id: string) =>
+    setContacted((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      saveSet(DONE_KEY, next);
+      return next;
+    });
+
+  const filtered = useMemo(() => {
+    let list = rows.filter((r) => {
+      if (filter === "starred" && !starred.has(r.id)) return false;
+      if (filter === "contacted" && !contacted.has(r.id)) return false;
+      if (filter === "uncontacted" && contacted.has(r.id)) return false;
+      if (filter === "with_business" && !r.business) return false;
+      if (!q) return true;
+      const hay = [r.email, r.full_name, r.business, r.goal, r.phone, r.linkedin, r.referral_source]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q.toLowerCase());
+    });
+    if (sort === "oldest") list = [...list].sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
+    else if (sort === "name") list = [...list].sort((a, b) => (a.full_name || a.email).localeCompare(b.full_name || b.email));
+    else if (sort === "starred") list = [...list].sort((a, b) => (starred.has(b.id) ? 1 : 0) - (starred.has(a.id) ? 1 : 0));
+    return list;
+  }, [rows, q, filter, sort, starred, contacted]);
 
   const stats = useMemo(() => {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
     const last7 = rows.filter((r) => now - new Date(r.created_at).getTime() < 7 * day).length;
     const last24 = rows.filter((r) => now - new Date(r.created_at).getTime() < day).length;
-    const withBusiness = rows.filter((r) => r.business).length;
-    return { total: rows.length, last7, last24, withBusiness };
-  }, [rows]);
+    return { total: rows.length, last7, last24, starred: starred.size, contacted: contacted.size };
+  }, [rows, starred, contacted]);
 
   const exportCsv = () => {
-    const headers = ["Created", "Name", "Email", "Business", "Goal", "Phone", "LinkedIn", "Referral"];
-    const escape = (v: string | null) => `"${(v ?? "").replace(/"/g, '""')}"`;
+    const headers = ["Created", "Name", "Email", "Business", "Goal", "Phone", "LinkedIn", "Referral", "Starred", "Contacted"];
+    const escape = (v: string | null | boolean) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const lines = [
       headers.join(","),
       ...rows.map((r) =>
@@ -98,6 +156,8 @@ function AdminPage() {
           r.phone,
           r.linkedin,
           r.referral_source,
+          starred.has(r.id),
+          contacted.has(r.id),
         ]
           .map(escape)
           .join(","),
@@ -112,6 +172,10 @@ function AdminPage() {
     URL.revokeObjectURL(url);
   };
 
+  const selectedIdx = selected ? filtered.findIndex((r) => r.id === selected.id) : -1;
+  const goPrev = () => selectedIdx > 0 && setSelected(filtered[selectedIdx - 1]);
+  const goNext = () => selectedIdx >= 0 && selectedIdx < filtered.length - 1 && setSelected(filtered[selectedIdx + 1]);
+
   return (
     <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-4 py-8 md:px-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -121,33 +185,71 @@ function AdminPage() {
           </div>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-[oklch(0.18_0_0)]">Waitlist applicants</h1>
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
-            Everyone who applied to join Beevr. Click any row to see their full answers.
+            Triage applicants. Star, mark as contacted, search and export.
           </p>
         </div>
         <button
           onClick={exportCsv}
           disabled={rows.length === 0}
-          className="clicky inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] shadow-sm hover:bg-[oklch(0.97_0_0)] disabled:opacity-50"
+          className="clicky ripple inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0_0)] disabled:opacity-50"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         <StatCard icon={Users} label="Total" value={stats.total} accent="oklch(0.68 0.22 40)" />
-        <StatCard icon={TrendingUp} label="Last 7 days" value={stats.last7} accent="oklch(0.7 0.16 145)" />
+        <StatCard icon={TrendingUp} label="Last 7d" value={stats.last7} accent="oklch(0.7 0.16 145)" />
         <StatCard icon={Calendar} label="Last 24h" value={stats.last24} accent="oklch(0.68 0.18 250)" />
-        <StatCard icon={Briefcase} label="With business" value={stats.withBusiness} accent="oklch(0.74 0.16 85)" />
+        <StatCard icon={Star} label="Starred" value={stats.starred} accent="oklch(0.74 0.16 85)" />
+        <StatCard icon={CheckCircle2} label="Contacted" value={stats.contacted} accent="oklch(0.6 0.14 160)" />
       </div>
 
-      <div className="mb-4 relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by name, email, business, goal…"
-          className="w-full rounded-xl border border-black/10 bg-white py-3 pl-10 pr-3 text-sm text-[oklch(0.2_0_0)] shadow-sm outline-none placeholder:text-[oklch(0.55_0_0)] focus:border-[oklch(0.68_0.22_40)]/40"
-        />
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search name, email, business, goal…"
+            className="w-full rounded-xl border border-black/10 bg-white py-2.5 pl-10 pr-3 text-sm text-[oklch(0.2_0_0)] outline-none placeholder:text-[oklch(0.55_0_0)] focus:border-[oklch(0.68_0.22_40)]/40"
+          />
+        </div>
+        <div className="relative inline-flex items-center">
+          <ArrowUpDown className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="appearance-none rounded-xl border border-black/10 bg-white py-2.5 pl-9 pr-8 text-sm font-medium text-[oklch(0.2_0_0)] outline-none"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="name">Name A–Z</option>
+            <option value="starred">Starred first</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        {([
+          ["all", "All"],
+          ["starred", "Starred"],
+          ["uncontacted", "Uncontacted"],
+          ["contacted", "Contacted"],
+          ["with_business", "Has business"],
+        ] as [FilterKey, string][]).map(([k, l]) => (
+          <button
+            key={k}
+            onClick={() => setFilter(k)}
+            className={`clicky-sm rounded-full px-3 py-1.5 text-xs font-medium transition ${
+              filter === k
+                ? "bg-[oklch(0.68_0.22_40)] text-white"
+                : "border border-black/10 bg-white text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+            }`}
+          >
+            {l}
+          </button>
+        ))}
       </div>
 
       {busy ? (
@@ -156,46 +258,141 @@ function AdminPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-12 text-center text-sm text-[oklch(0.45_0_0)]">
-          {rows.length === 0 ? "No waitlist signups yet." : "No matches for that search."}
+          {rows.length === 0 ? "No waitlist signups yet." : "No matches."}
         </div>
       ) : (
         <div className="grid gap-2">
           {filtered.map((r) => (
-            <button
+            <Row
               key={r.id}
-              onClick={() => setSelected(r)}
-              className="clicky group flex w-full items-center gap-4 rounded-2xl border border-black/5 bg-white p-4 text-left shadow-sm transition hover:border-[oklch(0.68_0.22_40)]/30 hover:shadow-md"
-            >
-              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white shadow-sm">
-                {(r.full_name?.[0] || r.email[0]).toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="truncate font-semibold text-[oklch(0.18_0_0)]">
-                    {r.full_name || r.email.split("@")[0]}
-                  </div>
-                  {r.business && (
-                    <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] sm:inline">
-                      {r.business.slice(0, 24)}{r.business.length > 24 ? "…" : ""}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-0.5 flex items-center gap-2 truncate text-xs text-[oklch(0.45_0_0)]">
-                  <Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{r.email}</span>
-                </div>
-              </div>
-              <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] sm:flex">
-                <span>{new Date(r.created_at).toLocaleDateString()}</span>
-                <span className="text-[10px]">{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-              </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5" />
-            </button>
+              r={r}
+              starred={starred.has(r.id)}
+              contacted={contacted.has(r.id)}
+              onOpen={() => setSelected(r)}
+              onStar={() => toggleStar(r.id)}
+              onContacted={() => toggleContacted(r.id)}
+            />
           ))}
         </div>
       )}
 
-      {selected && <DetailDrawer s={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <DetailDrawer
+          s={selected}
+          starred={starred.has(selected.id)}
+          contacted={contacted.has(selected.id)}
+          onStar={() => toggleStar(selected.id)}
+          onContacted={() => toggleContacted(selected.id)}
+          onClose={() => setSelected(null)}
+          onPrev={selectedIdx > 0 ? goPrev : undefined}
+          onNext={selectedIdx < filtered.length - 1 ? goNext : undefined}
+          position={selectedIdx + 1}
+          total={filtered.length}
+        />
+      )}
     </div>
+  );
+}
+
+function Row({
+  r,
+  starred,
+  contacted,
+  onOpen,
+  onStar,
+  onContacted,
+}: {
+  r: Submission;
+  starred: boolean;
+  contacted: boolean;
+  onOpen: () => void;
+  onStar: () => void;
+  onContacted: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const copy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(r.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+  const stop = (fn: () => void) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    fn();
+  };
+  return (
+    <div
+      onClick={onOpen}
+      role="button"
+      className={`clicky group flex w-full items-center gap-3 rounded-2xl border bg-white p-3.5 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 ${
+        contacted ? "border-[oklch(0.6_0.14_160)]/30 bg-[oklch(0.97_0.04_160)]/40" : "border-black/5"
+      }`}
+    >
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
+        {(r.full_name?.[0] || r.email[0]).toUpperCase()}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <div className="truncate font-semibold text-[oklch(0.18_0_0)]">
+            {r.full_name || r.email.split("@")[0]}
+          </div>
+          {r.business && (
+            <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] sm:inline">
+              {r.business.slice(0, 24)}{r.business.length > 24 ? "…" : ""}
+            </span>
+          )}
+          {contacted && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-[oklch(0.6_0.14_160)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.14_160)]">
+              <CheckCircle2 className="h-2.5 w-2.5" /> Contacted
+            </span>
+          )}
+        </div>
+        <div className="mt-0.5 flex items-center gap-2 truncate text-xs text-[oklch(0.45_0_0)]">
+          <Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{r.email}</span>
+        </div>
+      </div>
+      <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] sm:flex">
+        <span>{new Date(r.created_at).toLocaleDateString()}</span>
+        <span className="text-[10px]">{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
+          {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+        </IconBtn>
+        <IconBtn onClick={stop(onContacted)} title={contacted ? "Mark as uncontacted" : "Mark as contacted"} active={contacted}>
+          <CheckCircle2 className={`h-3.5 w-3.5 ${contacted ? "text-[oklch(0.55_0.16_160)]" : ""}`} />
+        </IconBtn>
+        <IconBtn onClick={stop(onStar)} title={starred ? "Unstar" : "Star"} active={starred}>
+          <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)] text-[oklch(0.6_0.16_85)]" : ""}`} />
+        </IconBtn>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5" />
+    </div>
+  );
+}
+
+function IconBtn({
+  children,
+  onClick,
+  title,
+  active,
+}: {
+  children: React.ReactNode;
+  onClick: (e: React.MouseEvent) => void;
+  title: string;
+  active?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`clicky-sm grid h-7 w-7 place-items-center rounded-lg border transition ${
+        active ? "border-[oklch(0.74_0.16_85)]/40 bg-[oklch(0.74_0.16_85)]/10" : "border-transparent text-[oklch(0.45_0_0)] hover:border-black/10 hover:bg-[oklch(0.96_0_0)]"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -211,7 +408,7 @@ function StatCard({
   accent: string;
 }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+    <div className="alive rounded-2xl border border-black/5 bg-white p-4">
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">{label}</span>
         <span className="grid h-7 w-7 place-items-center rounded-lg text-white" style={{ background: accent }}>
@@ -223,38 +420,127 @@ function StatCard({
   );
 }
 
-function DetailDrawer({ s, onClose }: { s: Submission; onClose: () => void }) {
+function DetailDrawer({
+  s,
+  starred,
+  contacted,
+  onStar,
+  onContacted,
+  onClose,
+  onPrev,
+  onNext,
+  position,
+  total,
+}: {
+  s: Submission;
+  starred: boolean;
+  contacted: boolean;
+  onStar: () => void;
+  onContacted: () => void;
+  onClose: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+  position: number;
+  total: number;
+}) {
+  const [copied, setCopied] = useState(false);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && onPrev) onPrev();
+      if (e.key === "ArrowRight" && onNext) onNext();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, onPrev, onNext]);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText(s.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 animate-[fadeIn_150ms_ease-out]" />
       <div
-        className="relative flex h-full w-full max-w-lg flex-col overflow-y-auto bg-white shadow-2xl animate-[slideInRight_200ms_ease-out]"
+        className="relative flex h-full w-full max-w-lg flex-col overflow-y-auto bg-white animate-[slideInRight_220ms_cubic-bezier(0.22,1,0.36,1)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 flex items-center justify-between border-b border-black/5 bg-white px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
-              {(s.full_name?.[0] || s.email[0]).toUpperCase()}
-            </div>
-            <div>
-              <div className="font-semibold text-[oklch(0.18_0_0)]">{s.full_name || s.email}</div>
-              <div className="text-xs text-[oklch(0.5_0_0)]">
-                Applied {new Date(s.created_at).toLocaleString()}
+        <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
+                {(s.full_name?.[0] || s.email[0]).toUpperCase()}
+              </div>
+              <div>
+                <div className="font-semibold text-[oklch(0.18_0_0)]">{s.full_name || s.email}</div>
+                <div className="text-xs text-[oklch(0.5_0_0)]">
+                  Applied {new Date(s.created_at).toLocaleString()}
+                </div>
               </div>
             </div>
+            <button
+              onClick={onClose}
+              className="clicky-sm rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
+            >
+              <XIcon className="h-4 w-4" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
-          >
-            ✕
-          </button>
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              onClick={onStar}
+              className={`clicky-sm inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                starred
+                  ? "border-[oklch(0.74_0.16_85)]/40 bg-[oklch(0.74_0.16_85)]/15 text-[oklch(0.45_0.16_85)]"
+                  : "border-black/10 text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+              }`}
+            >
+              <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)]" : ""}`} /> {starred ? "Starred" : "Star"}
+            </button>
+            <button
+              onClick={onContacted}
+              className={`clicky-sm inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                contacted
+                  ? "border-[oklch(0.6_0.14_160)]/40 bg-[oklch(0.6_0.14_160)]/15 text-[oklch(0.4_0.14_160)]"
+                  : "border-black/10 text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" /> {contacted ? "Contacted" : "Mark contacted"}
+            </button>
+            <button
+              onClick={copyEmail}
+              className="clicky-sm inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy email"}
+            </button>
+            <a
+              href={`mailto:${s.email}`}
+              className="clicky-sm ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[oklch(0.68_0.22_40)] px-2.5 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+            >
+              <Mail className="h-3.5 w-3.5" /> Email
+            </a>
+          </div>
+          <div className="mt-3 flex items-center justify-between text-[11px] text-[oklch(0.5_0_0)]">
+            <span>{position} of {total}</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={onPrev}
+                disabled={!onPrev}
+                className="clicky-sm grid h-7 w-7 place-items-center rounded-md border border-black/10 disabled:opacity-40"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={onNext}
+                disabled={!onNext}
+                className="clicky-sm grid h-7 w-7 place-items-center rounded-md border border-black/10 disabled:opacity-40"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 p-6">
@@ -307,7 +593,7 @@ function Field({
       href={href}
       target={external ? "_blank" : undefined}
       rel="noreferrer"
-      className="rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3 transition hover:border-[oklch(0.68_0.22_40)]/30 hover:bg-white"
+      className="alive rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3 transition hover:border-[oklch(0.68_0.22_40)]/30 hover:bg-white"
     >
       {content}
     </a>
