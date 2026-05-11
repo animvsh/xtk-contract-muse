@@ -203,11 +203,22 @@ function BrainPage() {
     }
   }, [q, sendMessage]);
 
+  const stickToBottom = useRef(true);
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottom.current = distance < 80;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !stickToBottom.current) return;
+    el.scrollTop = el.scrollHeight;
   }, [messages, status]);
 
   const isLoading = status === "submitted" || status === "streaming";
@@ -305,7 +316,7 @@ function BrainPage() {
           </div>
         </div>
       )}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain">
         <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
           {isEmpty && (
             <div className="animate-[fadeInUp_300ms_ease-out]">
