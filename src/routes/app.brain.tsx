@@ -567,6 +567,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
       return;
     }
 
+    if (name === "proposeMcp") {
+      const input = tp.input as McpDraft | undefined;
+      if (input && input.name) {
+        units.push({ kind: "mcp", key: `mcp${idx}`, draft: input });
+      }
+      return;
+    }
+
     if (name === "createPlan") {
       const input = tp.input as { tasks?: PlanTask[] } | undefined;
       const tasks = input?.tasks ?? [];
