@@ -1425,8 +1425,8 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-2xl leading-none">{draft.emoji}</span>
-              <h3 className="text-base font-semibold">{draft.name} is live</h3>
+              <span className="text-2xl leading-none">{emoji}</span>
+              <h3 className="text-base font-semibold">{name} is live</h3>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Connect from Claude Code, Cursor or Codex with the URL below.</p>
             <code className="mt-2 inline-block rounded-md bg-muted px-2 py-1 font-mono text-[11px]">{url}</code>
