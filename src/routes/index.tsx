@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, ArrowRight, Check, Sparkles, Zap, Shield } from "lucide-react";
+import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, Plug, FileText, MessageSquare, Github, Mail, Slack, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import foundersIncLogo from "@/assets/founders-inc.png";
 
@@ -157,9 +158,59 @@ function Landing() {
   );
 }
 
+type ViewKey = "brain" | "agents" | "connections";
+
+const NAV: { key: ViewKey; label: string; icon: typeof Brain }[] = [
+  { key: "brain", label: "Brain", icon: Brain },
+  { key: "agents", label: "Agents", icon: Bot },
+  { key: "connections", label: "Connections", icon: Plug },
+];
+
+function useTick(ms: number) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setN((x) => x + 1), ms);
+    return () => clearInterval(id);
+  }, [ms]);
+  return n;
+}
+
 function DashboardPreview() {
+  const [view, setView] = useState<ViewKey>("brain");
+  const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean }>({ x: 110, y: 168, click: false });
+  const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({ brain: null, agents: null, connections: null });
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // Cycle views with a moving cursor
+  useEffect(() => {
+    const order: ViewKey[] = ["brain", "agents", "connections"];
+    let i = 0;
+    let timers: ReturnType<typeof setTimeout>[] = [];
+    const cycle = () => {
+      i = (i + 1) % order.length;
+      const next = order[i];
+      const target = navRefs.current[next];
+      const root = rootRef.current;
+      if (target && root) {
+        const tr = target.getBoundingClientRect();
+        const rr = root.getBoundingClientRect();
+        const x = tr.left - rr.left + tr.width / 2;
+        const y = tr.top - rr.top + tr.height / 2;
+        setCursor({ x, y, click: false });
+        timers.push(setTimeout(() => setCursor((c) => ({ ...c, click: true })), 700));
+        timers.push(setTimeout(() => {
+          setView(next);
+          setCursor((c) => ({ ...c, click: false }));
+        }, 850));
+      }
+      timers.push(setTimeout(cycle, 4200));
+    };
+    timers.push(setTimeout(cycle, 3500));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
-    <div className="text-[oklch(0.15_0_0)]">
+    <div ref={rootRef} className="relative text-[oklch(0.15_0_0)]">
       {/* Browser bar */}
       <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3">
         <div className="flex gap-1.5">
@@ -167,23 +218,37 @@ function DashboardPreview() {
           <span className="h-3 w-3 rounded-full bg-[oklch(0.85_0.18_85)]" />
           <span className="h-3 w-3 rounded-full bg-[oklch(0.75_0.18_145)]" />
         </div>
-        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)]">app.beevr.dev</div>
+        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)]">app.beevr.dev / {view}</div>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-48 border-r border-black/5 p-4 text-xs">
+        <div className="w-48 shrink-0 border-r border-black/5 p-4 text-xs">
           <div className="mb-6 flex items-center gap-2 font-bold">
             <BrandLogo className="h-8 w-8 object-contain" />
             Beevr
           </div>
           <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Main</div>
           <div className="space-y-1">
-            <div className="rounded-lg bg-[oklch(0.97_0.05_70)] px-2 py-1.5 font-medium text-[oklch(0.62_0.22_40)]">Brain</div>
+            {NAV.map((n) => {
+              const active = view === n.key;
+              return (
+                <div
+                  key={n.key}
+                  ref={(el) => { navRefs.current[n.key] = el; }}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-300 ${
+                    active
+                      ? "bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
+                      : "text-[oklch(0.4_0_0)]"
+                  }`}
+                >
+                  <n.icon className="h-3.5 w-3.5" />
+                  {n.label}
+                </div>
+              );
+            })}
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Team Spaces</div>
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Docs</div>
-            <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Agents</div>
-            <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Connections</div>
           </div>
           <div className="mt-6 mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Other</div>
           <div className="space-y-1">
@@ -192,74 +257,240 @@ function DashboardPreview() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-5">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 rounded-xl border border-black/5 bg-white p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h4 className="text-sm font-semibold">Knowledge Overview</h4>
-                <span className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] text-[oklch(0.4_0_0)]">Last 7 days</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg border border-black/5 p-3">
-                  <div className="text-[10px] text-[oklch(0.4_0_0)]">Docs indexed</div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">2,450</span>
-                    <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 36%</span>
-                  </div>
-                </div>
-                <div className="rounded-lg border border-black/5 p-3">
-                  <div className="text-[10px] text-[oklch(0.4_0_0)]">Queries</div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">1,320</span>
-                    <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 18%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Content — animated swap */}
+        <div key={view} className="flex-1 animate-fade-in p-5">
+          {view === "brain" && <BrainView />}
+          {view === "agents" && <AgentsView />}
+          {view === "connections" && <ConnectionsView />}
+        </div>
+      </div>
 
-            <div className="rounded-xl border border-black/5 bg-white p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h4 className="text-sm font-semibold">Activity</h4>
-              </div>
-              <div className="flex h-24 items-end gap-1.5">
-                {[40, 60, 50, 80, 95, 65, 70].map((h, i) => (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-sm ${i === 4 ? "bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.92_0_0)]"}`}
-                    style={{ height: `${h}%` }}
-                  />
-                ))}
-              </div>
-            </div>
+      {/* Faux cursor */}
+      <div
+        className="pointer-events-none absolute z-20 transition-all duration-700 ease-out"
+        style={{ left: cursor.x, top: cursor.y, transform: "translate(-2px, -2px)" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" className="drop-shadow-md">
+          <path d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z" fill="#111" stroke="white" strokeWidth="1.2" strokeLinejoin="round"/>
+        </svg>
+        {cursor.click && (
+          <span className="absolute -left-2 -top-2 h-7 w-7 animate-ping rounded-full bg-[oklch(0.68_0.22_40)] opacity-60" />
+        )}
+      </div>
+    </div>
+  );
+}
 
-            <div className="col-span-3 rounded-xl border border-black/5 bg-white p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h4 className="text-sm font-semibold">Recent activity</h4>
-                <div className="rounded-md bg-[oklch(0.97_0_0)] px-2 py-1 text-[10px] text-[oklch(0.4_0_0)]">Search…</div>
-              </div>
-              <div className="space-y-2 text-xs">
-                {[
-                  ["Adithya Pradeep", "created Beevr Hiring Doc", "Notion", "Synced"],
-                  ["Sarah Chen", "merged PR #482", "GitHub", "Synced"],
-                  ["Sales Digest", "posted weekly summary", "Agent", "Pending"],
-                ].map(([who, what, src, status], i) => (
-                  <div key={i} className="grid grid-cols-4 items-center border-t border-black/5 py-2 first:border-0">
-                    <span className="font-medium">{who}</span>
-                    <span className="text-[oklch(0.4_0_0)]">{what}</span>
-                    <span className="text-[oklch(0.4_0_0)]">{src}</span>
-                    <span>
-                      <span className={`rounded-md px-2 py-0.5 text-[10px] ${
-                        status === "Pending"
-                          ? "bg-[oklch(0.97_0.08_85)] text-[oklch(0.55_0.18_70)]"
-                          : "bg-[oklch(0.95_0.06_140)] text-[oklch(0.45_0.18_140)]"
-                      }`}>{status}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
+function BrainView() {
+  const tick = useTick(1400);
+  const docs = 2450 + (tick % 12) * 7;
+  const queries = 1320 + (tick % 18) * 3;
+  const heights = [40, 60, 50, 80, 95, 65, 70];
+  const activeBar = tick % heights.length;
+  const rows = [
+    ["Adithya Pradeep", "created Beevr Hiring Doc", "Notion", "Synced"],
+    ["Sarah Chen", "merged PR #482", "GitHub", "Synced"],
+    ["Sales Digest", "posted weekly summary", "Agent", "Pending"],
+    ["Maya Patel", "shared Q3 roadmap", "Slack", "Synced"],
+    ["Revenue Bot", "synced Stripe invoices", "Agent", "Pending"],
+  ];
+  const offset = tick % rows.length;
+  const visible = [0, 1, 2].map((i) => rows[(i + offset) % rows.length]);
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <div className="col-span-2 rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Knowledge Overview</h4>
+          <span className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] text-[oklch(0.4_0_0)]">Last 7 days</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-lg border border-black/5 p-3">
+            <div className="text-[10px] text-[oklch(0.4_0_0)]">Docs indexed</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tabular-nums">{docs.toLocaleString()}</span>
+              <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 36%</span>
             </div>
           </div>
+          <div className="rounded-lg border border-black/5 p-3">
+            <div className="text-[10px] text-[oklch(0.4_0_0)]">Queries</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tabular-nums">{queries.toLocaleString()}</span>
+              <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 18%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Activity</h4>
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" />
+        </div>
+        <div className="flex h-24 items-end gap-1.5">
+          {heights.map((h, i) => (
+            <div
+              key={i}
+              className={`flex-1 rounded-sm transition-all duration-500 ${
+                i === activeBar ? "bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.92_0_0)]"
+              }`}
+              style={{ height: `${h + (i === activeBar ? 5 : 0)}%` }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="col-span-3 rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Recent activity</h4>
+          <div className="rounded-md bg-[oklch(0.97_0_0)] px-2 py-1 text-[10px] text-[oklch(0.4_0_0)]">Search…</div>
+        </div>
+        <div className="space-y-2 text-xs">
+          {visible.map(([who, what, src, status], i) => (
+            <div
+              key={`${who}-${tick}`}
+              className="grid grid-cols-4 items-center border-t border-black/5 py-2 first:border-0 animate-fade-in"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              <span className="font-medium">{who}</span>
+              <span className="text-[oklch(0.4_0_0)]">{what}</span>
+              <span className="text-[oklch(0.4_0_0)]">{src}</span>
+              <span>
+                <span className={`rounded-md px-2 py-0.5 text-[10px] ${
+                  status === "Pending"
+                    ? "bg-[oklch(0.97_0.08_85)] text-[oklch(0.55_0.18_70)]"
+                    : "bg-[oklch(0.95_0.06_140)] text-[oklch(0.45_0.18_140)]"
+                }`}>{status}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AgentsView() {
+  const tick = useTick(1100);
+  const logs = [
+    "[trigger] schedule fired · 9:00 AM",
+    "[step] querying Stripe · invoices.list",
+    "[step] aggregating revenue by segment",
+    "[step] drafting weekly summary",
+    "[tool] slack.post → #revenue",
+    "[done] completed in 4.2s",
+  ];
+  const shown = logs.slice(0, Math.min(logs.length, (tick % (logs.length + 2)) + 1));
+  const agents = [
+    { name: "Revenue Digest", status: "Running", icon: Sparkles, color: "oklch(0.68_0.22_40)" },
+    { name: "Hiring Pipeline", status: "Idle", icon: Bot, color: "oklch(0.6_0.15_240)" },
+    { name: "Support Triage", status: "Running", icon: Zap, color: "oklch(0.65_0.18_140)" },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {agents.map((a, i) => {
+        const running = a.status === "Running";
+        return (
+          <div key={a.name} className="rounded-xl border border-black/5 bg-white p-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `color-mix(in oklab, ${a.color} 14%, white)` }}>
+                <a.icon className="h-3.5 w-3.5" style={{ color: a.color }} />
+              </div>
+              <div className="text-xs font-semibold">{a.name}</div>
+            </div>
+            <div className="mt-3 flex items-center gap-1.5 text-[10px]">
+              <span className={`h-1.5 w-1.5 rounded-full ${running ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.85_0_0)]"}`} />
+              <span className="text-[oklch(0.4_0_0)]">{a.status}{running ? ` · step ${(tick % 4) + 1}/4` : ""}</span>
+            </div>
+            <div className="mt-3 h-1 overflow-hidden rounded bg-[oklch(0.95_0_0)]">
+              <div
+                className="h-full rounded transition-all duration-500"
+                style={{
+                  width: running ? `${20 + ((tick + i * 3) % 8) * 10}%` : "0%",
+                  background: a.color,
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="col-span-3 rounded-xl border border-black/5 bg-[oklch(0.13_0_0)] p-4 text-[oklch(0.92_0_0)]">
+        <div className="mb-2 flex items-center justify-between">
+          <h4 className="text-xs font-semibold">Live logs · Revenue Digest</h4>
+          <span className="flex items-center gap-1 text-[10px] text-[oklch(0.7_0_0)]">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> streaming
+          </span>
+        </div>
+        <div className="space-y-1 font-mono text-[11px]">
+          {shown.map((l, i) => (
+            <div key={`${l}-${tick}`} className="animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
+              <span className="text-[oklch(0.55_0_0)]">›</span> <span className={l.includes("[done]") ? "text-[oklch(0.75_0.18_145)]" : l.includes("[tool]") ? "text-[oklch(0.78_0.18_85)]" : "text-[oklch(0.92_0_0)]"}>{l}</span>
+            </div>
+          ))}
+          <div className="inline-block h-3 w-1.5 animate-pulse bg-[oklch(0.68_0.22_40)]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConnectionsView() {
+  const tick = useTick(900);
+  const items = [
+    { name: "Notion", icon: FileText, color: "oklch(0.2_0_0)" },
+    { name: "GitHub", icon: Github, color: "oklch(0.2_0_0)" },
+    { name: "Slack", icon: Slack, color: "oklch(0.55_0.2_300)" },
+    { name: "Gmail", icon: Mail, color: "oklch(0.6_0.2_25)" },
+    { name: "Linear", icon: Zap, color: "oklch(0.5_0.18_270)" },
+    { name: "Stripe", icon: Send, color: "oklch(0.55_0.2_270)" },
+  ];
+  const syncing = tick % items.length;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Connections</h4>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">{items.length} connected</span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {items.map((it, i) => {
+            const isSync = i === syncing;
+            return (
+              <div key={it.name} className="flex items-center gap-3 rounded-lg border border-black/5 p-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[oklch(0.97_0_0)]">
+                  <it.icon className="h-4 w-4" style={{ color: it.color }} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-semibold">{it.name}</div>
+                  <div className="mt-0.5 flex items-center gap-1 text-[10px]">
+                    <span className={`h-1.5 w-1.5 rounded-full ${isSync ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.75_0.18_145)]"}`} />
+                    <span className="text-[oklch(0.4_0_0)]">{isSync ? "Syncing…" : "Up to date"}</span>
+                  </div>
+                </div>
+                <Check className="h-3.5 w-3.5 text-[oklch(0.6_0.18_140)]" />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <h4 className="text-xs font-semibold">Indexing</h4>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">{items[syncing].name}</span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded bg-[oklch(0.95_0_0)]">
+          <div
+            className="h-full rounded bg-[oklch(0.68_0.22_40)] transition-all duration-700"
+            style={{ width: `${10 + (tick % 10) * 9}%` }}
+          />
+        </div>
+        <div className="mt-2 flex items-center gap-1 text-[10px] text-[oklch(0.4_0_0)]">
+          <MessageSquare className="h-3 w-3" />
+          {1200 + (tick % 30) * 11} chunks embedded
         </div>
       </div>
     </div>
