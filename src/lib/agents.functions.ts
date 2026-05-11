@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuthHeader } from "@/integrations/supabase/auth-client-middleware";
 
 type AgentSpec = {
   name: string;
@@ -36,7 +37,7 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, schema: o
 }
 
 export const createAgentFromPrompt = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { prompt: string }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -86,7 +87,7 @@ export const createAgentFromPrompt = createServerFn({ method: "POST" })
   });
 
 export const runAgent = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { agentId: string }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
