@@ -28,11 +28,22 @@ const METHOD_TONE: Record<string, string> = {
   DELETE: "bg-rose-500/10 text-rose-700 border-rose-500/30",
 };
 
+const ENABLED_KEY = "beevr.apis.enabled.v1";
+function loadEnabledMap(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(ENABLED_KEY) || "{}"); } catch { return {}; }
+}
+function saveEnabledMap(m: Record<string, boolean>) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ENABLED_KEY, JSON.stringify(m));
+}
+
 function ApisPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [rows, setRows] = useState<ApiRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enabledMap, setEnabledMap] = useState<Record<string, boolean>>(() => loadEnabledMap());
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +71,16 @@ function ApisPage() {
     } else {
       toast.success("API deleted");
     }
+  };
+
+  const toggleEnabled = (id: string) => {
+    setEnabledMap((prev) => {
+      const isOn = prev[id] !== false; // default enabled
+      const next = { ...prev, [id]: !isOn };
+      saveEnabledMap(next);
+      toast.success(isOn ? "API disabled" : "API enabled");
+      return next;
+    });
   };
 
   return (
