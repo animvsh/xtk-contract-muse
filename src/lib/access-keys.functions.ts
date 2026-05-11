@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuthHeader } from "@/integrations/supabase/auth-client-middleware";
 import { z } from "zod";
 
 const CLIENT_LABELS: Record<string, string> = {
@@ -27,7 +28,7 @@ async function sha256(s: string) {
 }
 
 export const createAccessKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: {
     name: string;
     client: string;
@@ -87,7 +88,7 @@ export const createAccessKey = createServerFn({ method: "POST" })
   });
 
 export const listAccessKeys = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context;
     const { data, error } = await supabase
@@ -99,7 +100,7 @@ export const listAccessKeys = createServerFn({ method: "GET" })
   });
 
 export const getAccessKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -116,7 +117,7 @@ export const getAccessKey = createServerFn({ method: "POST" })
   });
 
 export const updateAccessKeyStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { id: string; status: "active" | "paused" }) =>
     z.object({ id: z.string().uuid(), status: z.enum(["active", "paused"]) }).parse(data),
   )
@@ -133,7 +134,7 @@ export const updateAccessKeyStatus = createServerFn({ method: "POST" })
   });
 
 export const deleteAccessKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -142,7 +143,7 @@ export const deleteAccessKey = createServerFn({ method: "POST" })
   });
 
 export const rotateAccessKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
