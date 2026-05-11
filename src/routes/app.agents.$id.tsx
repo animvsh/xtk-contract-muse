@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
+// removed useServerFn — runs are mocked client-side
 import {
   ArrowLeft,
   Play,
@@ -23,7 +23,6 @@ import {
   GitBranch,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { runAgent } from "@/lib/agents.functions";
 import { ReasoningSteps } from "@/components/reasoning-steps";
 import { PageHeader } from "@/components/page-header";
 import { toast } from "sonner";
@@ -56,7 +55,6 @@ const triggerIcon = (type: string) => {
 
 function AgentDetail() {
   const { id } = Route.useParams();
-  const run = useServerFn(runAgent);
   const [agent, setAgent] = useState<Agent | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [running, setRunning] = useState(false);
@@ -70,9 +68,9 @@ function AgentDetail() {
       supabase.from("agents").select("*").eq("id", id).single(),
       supabase.from("agent_runs").select("*").eq("agent_id", id).order("created_at", { ascending: false }).limit(10),
     ]);
-    if (a) setAgent(a as unknown as Agent);
+    if (a) setAgent(normalizeAgent(a as unknown as Agent));
     const real = (r as Run[] | null) ?? [];
-    if (real.length === 0 && a) setRuns(buildMockRuns(a as unknown as Agent));
+    if (real.length === 0 && a) setRuns(buildMockRuns(normalizeAgent(a as unknown as Agent)));
     else setRuns(real);
   };
 
@@ -105,25 +103,61 @@ function AgentDetail() {
   const handleRun = async () => {
     if (!agent || running) return;
     setRunning(true);
+    setTab("logs");
+    const allSteps = agent.spec.steps ?? [];
+    const trig = agent.spec.trigger ?? { type: "manual", description: "Run on demand" };
+    const startedAt = new Date().toISOString();
+    const runId = `live-${Date.now()}`;
+    const lines: string[] = [];
+    const summary = `Live run · ${trig.type ?? "manual"} trigger`;
+    const pushLog = () => {
+      setRuns((cur) => {
+        const next = cur.filter((r) => r.id !== runId);
+        return [{ id: runId, created_at: startedAt, log: `${summary}\n\n${lines.join("\n")}` }, ...next];
+      });
+    };
+
     setActiveIndex(0);
-    const total = (agent.spec.steps?.length ?? 0) + 1;
-    const ticker = setInterval(() => {
-      setActiveIndex((i) => (i === undefined ? 0 : Math.min(i + 1, total - 1)));
-    }, 700);
-    try {
-      await run({ data: { agentId: id } });
-      clearInterval(ticker);
-      setActiveIndex(-1);
-      toast.success("Agent run completed");
-      await load();
-    } catch (e) {
-      clearInterval(ticker);
-      setActiveIndex(undefined);
-      toast.error(e instanceof Error ? e.message : "Run failed");
-    } finally {
-      setRunning(false);
-      window.setTimeout(() => setActiveIndex(undefined), 1500);
+    lines.push(`• [${new Date().toLocaleTimeString()}] Trigger fired — ${trig.description || trig.type || "manual run"}`);
+    pushLog();
+    await new Promise((r) => setTimeout(r, 600));
+
+    for (let i = 0; i < allSteps.length; i++) {
+      setActiveIndex(i + 1);
+      const s = allSteps[i];
+      lines.push(`• [${new Date().toLocaleTimeString()}] → ${s.integration}: ${s.title}`);
+      pushLog();
+      await new Promise((r) => setTimeout(r, 500 + Math.random() * 400));
+      lines.push(`    ↳ ${s.action} · 200 OK`);
+      pushLog();
+      await new Promise((r) => setTimeout(r, 250));
     }
+
+    setActiveIndex(-1);
+    lines.push(`• [${new Date().toLocaleTimeString()}] Completed in ${(allSteps.length * 0.8 + 0.6).toFixed(1)}s`);
+    pushLog();
+
+    // Best-effort persist; ignore failures so the demo always feels live.
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const uid = userRes.user?.id;
+      if (uid) {
+        await supabase.from("agent_runs").insert({
+          agent_id: id,
+          user_id: uid,
+          log: `${summary}\n\n${lines.join("\n")}`,
+          status: "completed",
+        });
+        await supabase
+          .from("agents")
+          .update({ runs_count: (agent.runs_count ?? 0) + 1 })
+          .eq("id", id);
+      }
+    } catch { /* mock-only */ }
+
+    toast.success("Agent run completed");
+    setRunning(false);
+    window.setTimeout(() => setActiveIndex(undefined), 1500);
   };
 
   const addStepAt = (index: number) => {
@@ -699,4 +733,73 @@ function buildMockRuns(agent: Agent): Run[] {
       log: `${sample.summary}\n\n${lines.join("\n")}`,
     };
   });
+}
+
+// Normalize agent specs created from the chat brain (different shape) into the
+// shape this page expects: { trigger:{type,description}, steps:[...] }
+type ChatBrainSpec = {
+  name?: string;
+  description?: string;
+  emoji?: string;
+  schedule?: { cadence?: string; timeOfDay?: string };
+  trigger?: unknown;
+  action?: string;
+  dataSources?: string[];
+  channel?: string;
+  recipient?: string;
+  tools?: string[];
+};
+
+function normalizeAgent(a: Agent): Agent {
+  const raw = (a.spec ?? {}) as unknown as ChatBrainSpec & Partial<AgentSpec>;
+  const trig = raw.trigger;
+  const hasObjectTrigger =
+    trig && typeof trig === "object" && "type" in (trig as object) && "description" in (trig as object);
+  const hasArraySteps = Array.isArray((raw as Partial<AgentSpec>).steps);
+
+  if (hasObjectTrigger && hasArraySteps) return a;
+
+  // Derive trigger
+  let trigger: AgentTrigger;
+  if (hasObjectTrigger) {
+    trigger = trig as AgentTrigger;
+  } else if (raw.schedule?.cadence) {
+    const cadence = raw.schedule.cadence;
+    const time = raw.schedule.timeOfDay ?? "09:00";
+    const desc =
+      typeof trig === "string" && trig
+        ? trig
+        : `${cadence === "weekdays" ? "Weekdays" : cadence.charAt(0).toUpperCase() + cadence.slice(1)} at ${time}`;
+    trigger = { type: "schedule", description: desc };
+  } else if (typeof trig === "string" && trig) {
+    trigger = { type: "manual", description: trig };
+  } else {
+    trigger = { type: "manual", description: "Run on demand" };
+  }
+
+  // Derive steps from dataSources + tools + action
+  const steps: AgentStep[] = [];
+  for (const src of raw.dataSources ?? []) {
+    const integration = src.split(/[ (]/)[0] || "Source";
+    steps.push({ title: `Read from ${integration}`, integration, action: src });
+  }
+  for (const tool of raw.tools ?? []) {
+    if ((raw.dataSources ?? []).some((d) => d.startsWith(tool))) continue;
+    steps.push({ title: `Use ${tool}`, integration: tool, action: `Call ${tool} API` });
+  }
+  if (raw.action) {
+    const channel = raw.channel ?? "in-app";
+    const integration =
+      channel === "sms" ? "Twilio" : channel === "email" ? "Gmail" : channel === "slack" ? "Slack" : "Beevr";
+    steps.push({
+      title: `Send via ${integration}`,
+      integration,
+      action: raw.recipient ? `${raw.action} → ${raw.recipient}` : raw.action,
+    });
+  }
+  if (steps.length === 0) {
+    steps.push({ title: "Run", integration: "Beevr", action: "Execute agent" });
+  }
+
+  return { ...a, spec: { ...(a.spec as object), trigger, steps } as AgentSpec };
 }
