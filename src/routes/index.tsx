@@ -281,216 +281,324 @@ function DashboardPreview() {
   );
 }
 
-function BrainView() {
-  const tick = useTick(1400);
-  const docs = 2450 + (tick % 12) * 7;
-  const queries = 1320 + (tick % 18) * 3;
-  const heights = [40, 60, 50, 80, 95, 65, 70];
-  const activeBar = tick % heights.length;
-  const rows = [
-    ["Adithya Pradeep", "created Beevr Hiring Doc", "Notion", "Synced"],
-    ["Sarah Chen", "merged PR #482", "GitHub", "Synced"],
-    ["Sales Digest", "posted weekly summary", "Agent", "Pending"],
-    ["Maya Patel", "shared Q3 roadmap", "Slack", "Synced"],
-    ["Revenue Bot", "synced Stripe invoices", "Agent", "Pending"],
+// === FILES VIEW: drag-drop + processing pipeline ===
+function FilesView() {
+  const tick = useTick(900);
+  const phase = tick % 12; // 0–3 hover, 4 dropped, 5–8 uploading, 9–11 processed
+  const dropped = phase >= 4;
+  const uploading = phase >= 5 && phase <= 8;
+  const done = phase >= 9;
+  const progress = uploading ? Math.min(100, (phase - 4) * 28) : done ? 100 : 0;
+
+  const existing = [
+    { name: "Q3-roadmap.pdf", size: "1.4 MB", chunks: 184, src: "Notion" },
+    { name: "pricing-deck.pptx", size: "3.2 MB", chunks: 312, src: "Drive" },
+    { name: "support-faqs.md", size: "42 KB", chunks: 58, src: "GitHub" },
   ];
-  const offset = tick % rows.length;
-  const visible = [0, 1, 2].map((i) => rows[(i + offset) % rows.length]);
 
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="col-span-2 rounded-xl border border-black/5 bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Knowledge Overview</h4>
-          <span className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] text-[oklch(0.4_0_0)]">Last 7 days</span>
+          <h4 className="text-sm font-semibold">Upload knowledge</h4>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">PDF · DOCX · MD · CSV</span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-black/5 p-3">
-            <div className="text-[10px] text-[oklch(0.4_0_0)]">Docs indexed</div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-bold tabular-nums">{docs.toLocaleString()}</span>
-              <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 36%</span>
+        <div className={`relative grid h-40 place-items-center rounded-xl border-2 border-dashed transition-all duration-300 ${
+          dropped ? "border-[oklch(0.68_0.22_40)] bg-[oklch(0.97_0.05_70)]" : "border-black/10 bg-[oklch(0.98_0_0)]"
+        }`}>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className={`grid h-10 w-10 place-items-center rounded-xl transition-all ${dropped ? "bg-[oklch(0.68_0.22_40)] text-white scale-110" : "bg-white text-[oklch(0.4_0_0)] border border-black/10"}`}>
+              <Upload className="h-5 w-5" />
+            </div>
+            <div className="text-xs font-semibold">{dropped ? "contract.pdf" : "Drop a file or click to browse"}</div>
+            <div className="text-[10px] text-[oklch(0.4_0_0)]">{dropped ? "812 KB" : "Up to 50 MB per file"}</div>
+          </div>
+
+          {/* Floating file icon that drops in */}
+          <div
+            className="pointer-events-none absolute transition-all duration-700 ease-out"
+            style={{
+              top: dropped ? "50%" : "10%",
+              right: dropped ? "50%" : "10%",
+              transform: dropped ? "translate(50%, -120%) scale(0.6)" : "translate(0,0) scale(1)",
+              opacity: dropped ? 0 : 1,
+            }}
+          >
+            <div className="flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-2 py-1.5 text-[10px] shadow-md">
+              <FileText className="h-3.5 w-3.5 text-[oklch(0.6_0.2_25)]" /> contract.pdf
             </div>
           </div>
-          <div className="rounded-lg border border-black/5 p-3">
-            <div className="text-[10px] text-[oklch(0.4_0_0)]">Queries</div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-bold tabular-nums">{queries.toLocaleString()}</span>
-              <span className="rounded bg-[oklch(0.95_0.06_140)] px-1.5 py-0.5 text-[9px] text-[oklch(0.45_0.18_140)]">↑ 18%</span>
+        </div>
+
+        {(uploading || done) && (
+          <div className="mt-3 rounded-lg border border-black/5 bg-[oklch(0.98_0_0)] p-3 animate-fade-in">
+            <div className="flex items-center gap-2 text-xs">
+              <FileText className="h-4 w-4 text-[oklch(0.6_0.2_25)]" />
+              <span className="flex-1 truncate font-medium">contract.pdf</span>
+              <span className="tabular-nums text-[10px] text-[oklch(0.4_0_0)]">{progress}%</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/5">
+              <div className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[oklch(0.4_0_0)]">
+              {done ? (
+                <><Check className="h-3 w-3 text-[oklch(0.55_0.18_140)]" /> Indexed · 142 chunks · ready to query</>
+              ) : (
+                <><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> Extracting text · embedding chunks…</>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="rounded-xl border border-black/5 bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Activity</h4>
+          <h4 className="text-sm font-semibold">Recent files</h4>
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" />
         </div>
-        <div className="flex h-24 items-end gap-1.5">
-          {heights.map((h, i) => (
-            <div
-              key={i}
-              className={`flex-1 rounded-sm transition-all duration-500 ${
-                i === activeBar ? "bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.92_0_0)]"
-              }`}
-              style={{ height: `${h + (i === activeBar ? 5 : 0)}%` }}
-            />
+        <ul className="space-y-2">
+          {done && (
+            <li className="flex items-center gap-2 rounded-lg border border-[oklch(0.68_0.22_40)]/30 bg-[oklch(0.97_0.05_70)] p-2 animate-fade-in">
+              <FileText className="h-4 w-4 text-[oklch(0.6_0.2_25)]" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-xs font-medium">contract.pdf</div>
+                <div className="text-[10px] text-[oklch(0.4_0_0)]">812 KB · 142 chunks</div>
+              </div>
+              <span className="rounded bg-white px-1.5 py-0.5 text-[9px] text-[oklch(0.55_0.18_140)]">New</span>
+            </li>
+          )}
+          {existing.map((f) => (
+            <li key={f.name} className="flex items-center gap-2 rounded-lg border border-black/5 p-2">
+              <FileText className="h-4 w-4 text-[oklch(0.5_0_0)]" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-xs font-medium">{f.name}</div>
+                <div className="text-[10px] text-[oklch(0.4_0_0)]">{f.size} · {f.chunks} chunks</div>
+              </div>
+              <span className="text-[9px] text-[oklch(0.4_0_0)]">{f.src}</span>
+            </li>
           ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// === AGENTS VIEW: chat-to-build an agent ===
+function AgentsView() {
+  const tick = useTick(700);
+  const cycle = tick % 18;
+  const fullPrompt = "Create an agent that summarizes Stripe revenue every Monday at 9am and posts it to #revenue in Slack.";
+  const typedLen = Math.min(fullPrompt.length, cycle * 8);
+  const typed = fullPrompt.slice(0, typedLen);
+  const sent = cycle >= 8;
+  const replyLines = [
+    "Got it — I'll spin up an agent for that:",
+    "  · trigger: every Mon · 9:00 AM",
+    "  · query Stripe → invoices.list (last 7d)",
+    "  · summarize by segment + delta vs prior week",
+    "  · post → slack.#revenue",
+    "Ready to deploy?",
+  ];
+  const visibleReply = sent ? replyLines.slice(0, Math.min(replyLines.length, cycle - 7)) : [];
+  const created = cycle >= 14;
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {/* Chat side */}
+      <div className="col-span-2 flex h-[320px] flex-col rounded-xl border border-black/5 bg-white">
+        <div className="flex items-center justify-between border-b border-black/5 px-4 py-2.5">
+          <div className="flex items-center gap-2">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-[oklch(0.68_0.22_40)] text-white">
+              <Sparkles className="h-3.5 w-3.5" />
+            </div>
+            <div className="text-xs font-semibold">Build an agent</div>
+          </div>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">Beevr · gpt-5</span>
+        </div>
+
+        <div className="flex-1 space-y-2.5 overflow-hidden p-4 text-xs">
+          {sent && (
+            <div className="flex justify-end animate-fade-in">
+              <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[oklch(0.97_0_0)] px-3 py-2 text-[oklch(0.2_0_0)]">
+                {fullPrompt}
+              </div>
+            </div>
+          )}
+          {sent && (
+            <div className="flex items-start gap-2 animate-fade-in">
+              <div className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[oklch(0.68_0.22_40)] text-white">
+                <Sparkles className="h-3 w-3" />
+              </div>
+              <div className="min-w-0 flex-1 space-y-0.5 font-mono text-[11px] leading-relaxed text-[oklch(0.2_0_0)]">
+                {visibleReply.map((l, i) => (
+                  <div key={i} className="animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>{l}</div>
+                ))}
+                {visibleReply.length > 0 && visibleReply.length < replyLines.length && (
+                  <span className="inline-block h-3 w-1.5 animate-pulse bg-[oklch(0.68_0.22_40)]" />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-black/5 p-3">
+          <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2">
+            <Paperclip className="h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
+            <div className="min-w-0 flex-1 text-xs text-[oklch(0.2_0_0)]">
+              {sent ? <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span> : (
+                <>
+                  {typed}
+                  <span className="inline-block h-3 w-[2px] -mb-0.5 animate-pulse bg-[oklch(0.2_0_0)] align-middle" />
+                </>
+              )}
+            </div>
+            <button className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${typedLen > 0 ? "bg-[oklch(0.68_0.22_40)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}>
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="col-span-3 rounded-xl border border-black/5 bg-white p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Recent activity</h4>
-          <div className="rounded-md bg-[oklch(0.97_0_0)] px-2 py-1 text-[10px] text-[oklch(0.4_0_0)]">Search…</div>
-        </div>
-        <div className="space-y-2 text-xs">
-          {visible.map(([who, what, src, status], i) => (
-            <div
-              key={`${who}-${tick}`}
-              className="grid grid-cols-4 items-center border-t border-black/5 py-2 first:border-0 animate-fade-in"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <span className="font-medium">{who}</span>
-              <span className="text-[oklch(0.4_0_0)]">{what}</span>
-              <span className="text-[oklch(0.4_0_0)]">{src}</span>
-              <span>
-                <span className={`rounded-md px-2 py-0.5 text-[10px] ${
-                  status === "Pending"
-                    ? "bg-[oklch(0.97_0.08_85)] text-[oklch(0.55_0.18_70)]"
-                    : "bg-[oklch(0.95_0.06_140)] text-[oklch(0.45_0.18_140)]"
-                }`}>{status}</span>
-              </span>
+      {/* Agent preview */}
+      <div className="rounded-xl border border-black/5 bg-white p-4">
+        <div className="mb-3 text-xs font-semibold">Workspace agents</div>
+        <div className="space-y-2">
+          {created && (
+            <div className="rounded-lg border-2 border-[oklch(0.68_0.22_40)]/40 bg-[oklch(0.97_0.05_70)] p-3 animate-fade-in shadow-[0_0_0_3px_color-mix(in_oklab,oklch(0.68_0.22_40)_10%,transparent)]">
+              <div className="flex items-center gap-2">
+                <div className="grid h-7 w-7 place-items-center rounded-lg bg-[oklch(0.68_0.22_40)] text-white">
+                  <Bot className="h-3.5 w-3.5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs font-semibold">Revenue Digest</div>
+                  <div className="text-[10px] text-[oklch(0.4_0_0)]">Mon 9:00 · Stripe → Slack</div>
+                </div>
+                <span className="rounded bg-white px-1.5 py-0.5 text-[9px] font-medium text-[oklch(0.55_0.18_140)]">New</span>
+              </div>
+              <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[oklch(0.4_0_0)]">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> Deploying…
+              </div>
             </div>
-          ))}
+          )}
+          <AgentRow name="Hiring Pipeline" sub="Daily · Greenhouse → Notion" running />
+          <AgentRow name="Support Triage" sub="Realtime · Intercom" />
         </div>
       </div>
     </div>
   );
 }
 
-function AgentsView() {
-  const tick = useTick(1100);
-  const logs = [
-    "[trigger] schedule fired · 9:00 AM",
-    "[step] querying Stripe · invoices.list",
-    "[step] aggregating revenue by segment",
-    "[step] drafting weekly summary",
-    "[tool] slack.post → #revenue",
-    "[done] completed in 4.2s",
-  ];
-  const shown = logs.slice(0, Math.min(logs.length, (tick % (logs.length + 2)) + 1));
-  const agents = [
-    { name: "Revenue Digest", status: "Running", icon: Sparkles, color: "oklch(0.68_0.22_40)" },
-    { name: "Hiring Pipeline", status: "Idle", icon: Bot, color: "oklch(0.6_0.15_240)" },
-    { name: "Support Triage", status: "Running", icon: Zap, color: "oklch(0.65_0.18_140)" },
+function AgentRow({ name, sub, running }: { name: string; sub: string; running?: boolean }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-black/5 p-3">
+      <div className="grid h-7 w-7 place-items-center rounded-lg bg-[oklch(0.97_0_0)]">
+        <Bot className="h-3.5 w-3.5 text-[oklch(0.4_0_0)]" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs font-semibold">{name}</div>
+        <div className="text-[10px] text-[oklch(0.4_0_0)]">{sub}</div>
+      </div>
+      <span className={`h-1.5 w-1.5 rounded-full ${running ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.85_0_0)]"}`} />
+    </div>
+  );
+}
+
+// === BRAIN VIEW: ask-anything chat with sources ===
+function BrainView() {
+  const tick = useTick(650);
+  const cycle = tick % 16;
+  const question = "What's our MRR this month and which segment is growing fastest?";
+  const typedLen = Math.min(question.length, cycle * 9);
+  const typed = question.slice(0, typedLen);
+  const sent = cycle >= 8;
+  const answerWords = "MRR is $284k, up 12% MoM. The Mid-market segment is leading growth at +28% — driven by 14 new SaaS customers. Enterprise is flat; SMB churn is down 2pts.".split(" ");
+  const shownWords = sent ? answerWords.slice(0, Math.min(answerWords.length, (cycle - 7) * 6)) : [];
+  const sources = [
+    { name: "Stripe · Invoices", icon: Send, color: "oklch(0.55_0.2_270)" },
+    { name: "Hubspot · Deals", icon: Mail, color: "oklch(0.6_0.2_25)" },
+    { name: "Q3 Board Doc", icon: FileText, color: "oklch(0.5_0_0)" },
   ];
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {agents.map((a, i) => {
-        const running = a.status === "Running";
-        return (
-          <div key={a.name} className="rounded-xl border border-black/5 bg-white p-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `color-mix(in oklab, ${a.color} 14%, white)` }}>
-                <a.icon className="h-3.5 w-3.5" style={{ color: a.color }} />
-              </div>
-              <div className="text-xs font-semibold">{a.name}</div>
+      <div className="col-span-2 flex h-[320px] flex-col rounded-xl border border-black/5 bg-white">
+        <div className="flex items-center justify-between border-b border-black/5 px-4 py-2.5">
+          <div className="flex items-center gap-2">
+            <div className="grid h-6 w-6 place-items-center rounded-lg bg-[oklch(0.15_0_0)] text-white">
+              <Brain className="h-3.5 w-3.5" />
             </div>
-            <div className="mt-3 flex items-center gap-1.5 text-[10px]">
-              <span className={`h-1.5 w-1.5 rounded-full ${running ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.85_0_0)]"}`} />
-              <span className="text-[oklch(0.4_0_0)]">{a.status}{running ? ` · step ${(tick % 4) + 1}/4` : ""}</span>
-            </div>
-            <div className="mt-3 h-1 overflow-hidden rounded bg-[oklch(0.95_0_0)]">
-              <div
-                className="h-full rounded transition-all duration-500"
-                style={{
-                  width: running ? `${20 + ((tick + i * 3) % 8) * 10}%` : "0%",
-                  background: a.color,
-                }}
-              />
-            </div>
+            <div className="text-xs font-semibold">Ask your business</div>
           </div>
-        );
-      })}
-
-      <div className="col-span-3 rounded-xl border border-black/5 bg-[oklch(0.13_0_0)] p-4 text-[oklch(0.92_0_0)]">
-        <div className="mb-2 flex items-center justify-between">
-          <h4 className="text-xs font-semibold">Live logs · Revenue Digest</h4>
-          <span className="flex items-center gap-1 text-[10px] text-[oklch(0.7_0_0)]">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> streaming
-          </span>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">5 sources connected</span>
         </div>
-        <div className="space-y-1 font-mono text-[11px]">
-          {shown.map((l, i) => (
-            <div key={`${l}-${tick}`} className="animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
-              <span className="text-[oklch(0.55_0_0)]">›</span> <span className={l.includes("[done]") ? "text-[oklch(0.75_0.18_145)]" : l.includes("[tool]") ? "text-[oklch(0.78_0.18_85)]" : "text-[oklch(0.92_0_0)]"}>{l}</span>
+
+        <div className="flex-1 space-y-2.5 overflow-hidden p-4 text-xs">
+          {sent && (
+            <div className="flex items-start justify-end gap-2 animate-fade-in">
+              <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[oklch(0.97_0_0)] px-3 py-2">{question}</div>
+              <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-[10px] font-semibold text-white">A</div>
             </div>
-          ))}
-          <div className="inline-block h-3 w-1.5 animate-pulse bg-[oklch(0.68_0.22_40)]" />
+          )}
+          {sent && shownWords.length > 0 && (
+            <div className="flex items-start gap-2 animate-fade-in">
+              <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[oklch(0.15_0_0)] text-white">
+                <Brain className="h-3.5 w-3.5" />
+              </div>
+              <div className="max-w-[85%] leading-relaxed">
+                {shownWords.join(" ")}
+                {shownWords.length < answerWords.length && (
+                  <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-[oklch(0.15_0_0)] align-middle" />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-black/5 p-3">
+          <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2">
+            <MessageSquare className="h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
+            <div className="min-w-0 flex-1 text-xs">
+              {sent ? <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span> : (
+                <>
+                  {typed}
+                  <span className="inline-block h-3 w-[2px] -mb-0.5 animate-pulse bg-[oklch(0.2_0_0)] align-middle" />
+                </>
+              )}
+            </div>
+            <button className={`grid h-7 w-7 place-items-center rounded-lg ${typedLen > 0 ? "bg-[oklch(0.15_0_0)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ConnectionsView() {
-  const tick = useTick(900);
-  const items = [
-    { name: "Notion", icon: FileText, color: "oklch(0.2_0_0)" },
-    { name: "GitHub", icon: Github, color: "oklch(0.2_0_0)" },
-    { name: "Slack", icon: Slack, color: "oklch(0.55_0.2_300)" },
-    { name: "Gmail", icon: Mail, color: "oklch(0.6_0.2_25)" },
-    { name: "Linear", icon: Zap, color: "oklch(0.5_0.18_270)" },
-    { name: "Stripe", icon: Send, color: "oklch(0.55_0.2_270)" },
-  ];
-  const syncing = tick % items.length;
-
-  return (
-    <div className="space-y-4">
       <div className="rounded-xl border border-black/5 bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Connections</h4>
-          <span className="text-[10px] text-[oklch(0.4_0_0)]">{items.length} connected</span>
+          <h4 className="text-xs font-semibold">Sources</h4>
+          <span className="text-[10px] text-[oklch(0.4_0_0)]">{sent ? "3 used" : "—"}</span>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {items.map((it, i) => {
-            const isSync = i === syncing;
-            return (
-              <div key={it.name} className="flex items-center gap-3 rounded-lg border border-black/5 p-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[oklch(0.97_0_0)]">
-                  <it.icon className="h-4 w-4" style={{ color: it.color }} />
-                </div>
-                <div className="flex-1">
-                  <div className="text-xs font-semibold">{it.name}</div>
-                  <div className="mt-0.5 flex items-center gap-1 text-[10px]">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isSync ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.75_0.18_145)]"}`} />
-                    <span className="text-[oklch(0.4_0_0)]">{isSync ? "Syncing…" : "Up to date"}</span>
-                  </div>
-                </div>
-                <Check className="h-3.5 w-3.5 text-[oklch(0.6_0.18_140)]" />
+        <div className="space-y-2">
+          {sources.map((s, i) => (
+            <div
+              key={s.name}
+              className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${
+                sent && shownWords.length > i * 4
+                  ? "border-[oklch(0.68_0.22_40)]/30 bg-[oklch(0.97_0.05_70)]"
+                  : "border-black/5 opacity-60"
+              }`}
+            >
+              <div className="grid h-7 w-7 place-items-center rounded-lg bg-[oklch(0.97_0_0)]">
+                <s.icon className="h-3.5 w-3.5" style={{ color: s.color }} />
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-black/5 bg-white p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h4 className="text-xs font-semibold">Indexing</h4>
-          <span className="text-[10px] text-[oklch(0.4_0_0)]">{items[syncing].name}</span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded bg-[oklch(0.95_0_0)]">
-          <div
-            className="h-full rounded bg-[oklch(0.68_0.22_40)] transition-all duration-700"
-            style={{ width: `${10 + (tick % 10) * 9}%` }}
-          />
-        </div>
-        <div className="mt-2 flex items-center gap-1 text-[10px] text-[oklch(0.4_0_0)]">
-          <MessageSquare className="h-3 w-3" />
-          {1200 + (tick % 30) * 11} chunks embedded
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-xs font-medium">{s.name}</div>
+                <div className="text-[10px] text-[oklch(0.4_0_0)]">cited · 2 chunks</div>
+              </div>
+              {sent && shownWords.length > i * 4 && (
+                <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" />
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
