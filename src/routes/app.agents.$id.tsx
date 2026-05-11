@@ -91,10 +91,10 @@ function AgentDetail() {
     };
     setAgent(optimistic);
     setSaving(true);
-    const update: Record<string, unknown> = { spec: nextSpec };
+    const update: { spec: AgentSpec; name?: string; description?: string | null } = { spec: nextSpec };
     if (nextName !== undefined) update.name = nextName;
     if (nextDescription !== undefined) update.description = nextDescription;
-    const { error } = await supabase.from("agents").update(update).eq("id", id);
+    const { error } = await supabase.from("agents").update(update as never).eq("id", id);
     setSaving(false);
     if (error) {
       toast.error("Couldn't save changes");
