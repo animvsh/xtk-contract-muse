@@ -176,14 +176,14 @@ function useTick(ms: number) {
 }
 
 function DashboardPreview() {
-  const [view, setView] = useState<ViewKey>("brain");
+  const [view, setView] = useState<ViewKey>("files");
   const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean }>({ x: 110, y: 168, click: false });
-  const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({ brain: null, agents: null, connections: null });
+  const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({ files: null, agents: null, brain: null });
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   // Cycle views with a moving cursor
   useEffect(() => {
-    const order: ViewKey[] = ["brain", "agents", "connections"];
+    const order: ViewKey[] = ["files", "agents", "brain"];
     let i = 0;
     let timers: ReturnType<typeof setTimeout>[] = [];
     const cycle = () => {
