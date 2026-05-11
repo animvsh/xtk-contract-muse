@@ -22,6 +22,8 @@ import {
   Check,
   ArrowUpDown,
   X as XIcon,
+  StickyNote,
+  Filter,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +31,7 @@ import { useAuth } from "@/hooks/use-auth";
 const ADMIN_EMAIL = "aalang@ucsc.edu";
 const STAR_KEY = "beevr.admin.starred";
 const DONE_KEY = "beevr.admin.contacted";
+const NOTES_KEY = "beevr.admin.notes";
 
 type Submission = {
   id: string;
@@ -62,6 +65,18 @@ function saveSet(key: string, set: Set<string>) {
   if (typeof window === "undefined") return;
   localStorage.setItem(key, JSON.stringify([...set]));
 }
+function loadNotes(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveNotes(n: Record<string, string>) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(NOTES_KEY, JSON.stringify(n));
+}
 
 function AdminPage() {
   const { user, loading } = useAuth();
@@ -72,12 +87,15 @@ function AdminPage() {
   const [selected, setSelected] = useState<Submission | null>(null);
   const [starred, setStarred] = useState<Set<string>>(new Set());
   const [contacted, setContacted] = useState<Set<string>>(new Set());
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [sort, setSort] = useState<SortKey>("newest");
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     setStarred(loadSet(STAR_KEY));
     setContacted(loadSet(DONE_KEY));
+    setNotes(loadNotes());
   }, []);
 
   useEffect(() => {
@@ -111,6 +129,13 @@ function AdminPage() {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       saveSet(DONE_KEY, next);
+      return next;
+    });
+  const updateNote = (id: string, value: string) =>
+    setNotes((prev) => {
+      const next = { ...prev, [id]: value };
+      if (!value) delete next[id];
+      saveNotes(next);
       return next;
     });
 
@@ -177,27 +202,27 @@ function AdminPage() {
   const goNext = () => selectedIdx >= 0 && selectedIdx < filtered.length - 1 && setSelected(filtered[selectedIdx + 1]);
 
   return (
-    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-4 py-8 md:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
+    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-3 py-5 sm:px-4 sm:py-8 md:px-6">
+      <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/20 bg-[oklch(0.68_0.22_40)]/10 px-3 py-1 text-xs font-semibold text-[oklch(0.55_0.22_40)]">
             <Shield className="h-3 w-3" /> Admin
           </div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-[oklch(0.18_0_0)]">Waitlist applicants</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-[oklch(0.18_0_0)] sm:text-3xl">Waitlist applicants</h1>
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
-            Triage applicants. Star, mark as contacted, search and export.
+            Triage applicants. Star, mark as contacted, take notes and export.
           </p>
         </div>
         <button
           onClick={exportCsv}
           disabled={rows.length === 0}
-          className="clicky ripple inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0_0)] disabled:opacity-50"
+          className="clicky ripple inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0_0)] disabled:opacity-50 sm:w-auto"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-3 md:grid-cols-5">
         <StatCard icon={Users} label="Total" value={stats.total} accent="oklch(0.68 0.22 40)" />
         <StatCard icon={TrendingUp} label="Last 7d" value={stats.last7} accent="oklch(0.7 0.16 145)" />
         <StatCard icon={Calendar} label="Last 24h" value={stats.last24} accent="oklch(0.68 0.18 250)" />
@@ -205,17 +230,17 @@ function AdminPage() {
         <StatCard icon={CheckCircle2} label="Contacted" value={stats.contacted} accent="oklch(0.6 0.14 160)" />
       </div>
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[220px]">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name, email, business, goal…"
+            placeholder="Search applicants…"
             className="w-full rounded-xl border border-black/10 bg-white py-2.5 pl-10 pr-3 text-sm text-[oklch(0.2_0_0)] outline-none placeholder:text-[oklch(0.55_0_0)] focus:border-[oklch(0.68_0.22_40)]/40"
           />
         </div>
-        <div className="relative inline-flex items-center">
+        <div className="relative hidden items-center sm:inline-flex">
           <ArrowUpDown className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
           <select
             value={sort}
@@ -228,28 +253,50 @@ function AdminPage() {
             <option value="starred">Starred first</option>
           </select>
         </div>
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          className={`clicky-sm inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-medium sm:hidden ${
+            filtersOpen || filter !== "all"
+              ? "border-[oklch(0.68_0.22_40)]/40 bg-[oklch(0.68_0.22_40)]/10 text-[oklch(0.55_0.22_40)]"
+              : "border-black/10 bg-white text-[oklch(0.35_0_0)]"
+          }`}
+        >
+          <Filter className="h-4 w-4" />
+        </button>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-1.5">
-        {([
-          ["all", "All"],
-          ["starred", "Starred"],
-          ["uncontacted", "Uncontacted"],
-          ["contacted", "Contacted"],
-          ["with_business", "Has business"],
-        ] as [FilterKey, string][]).map(([k, l]) => (
-          <button
-            key={k}
-            onClick={() => setFilter(k)}
-            className={`clicky-sm rounded-full px-3 py-1.5 text-xs font-medium transition ${
-              filter === k
-                ? "bg-[oklch(0.68_0.22_40)] text-white"
-                : "border border-black/10 bg-white text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
-            }`}
+      <div className={`mb-4 ${filtersOpen ? "block" : "hidden sm:block"}`}>
+        <div className="flex flex-wrap gap-1.5">
+          {([
+            ["all", "All"],
+            ["starred", "Starred"],
+            ["uncontacted", "Uncontacted"],
+            ["contacted", "Contacted"],
+            ["with_business", "Has business"],
+          ] as [FilterKey, string][]).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setFilter(k)}
+              className={`clicky-sm rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                filter === k
+                  ? "bg-[oklch(0.68_0.22_40)] text-white"
+                  : "border border-black/10 bg-white text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+              }`}
+            >
+              {l}
+            </button>
+          ))}
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[oklch(0.35_0_0)] outline-none sm:hidden"
           >
-            {l}
-          </button>
-        ))}
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name">Name A–Z</option>
+            <option value="starred">Starred</option>
+          </select>
+        </div>
       </div>
 
       {busy ? (
@@ -257,17 +304,18 @@ function AdminPage() {
           <Loader2 className="h-4 w-4 animate-spin" /> Loading applicants…
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-12 text-center text-sm text-[oklch(0.45_0_0)]">
+        <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-8 text-center text-sm text-[oklch(0.45_0_0)] sm:p-12">
           {rows.length === 0 ? "No waitlist signups yet." : "No matches."}
         </div>
       ) : (
-        <div className="grid gap-2">
+        <div className="grid gap-2 pb-6">
           {filtered.map((r) => (
             <Row
               key={r.id}
               r={r}
               starred={starred.has(r.id)}
               contacted={contacted.has(r.id)}
+              hasNote={Boolean(notes[r.id])}
               onOpen={() => setSelected(r)}
               onStar={() => toggleStar(r.id)}
               onContacted={() => toggleContacted(r.id)}
@@ -281,8 +329,10 @@ function AdminPage() {
           s={selected}
           starred={starred.has(selected.id)}
           contacted={contacted.has(selected.id)}
+          note={notes[selected.id] || ""}
           onStar={() => toggleStar(selected.id)}
           onContacted={() => toggleContacted(selected.id)}
+          onNoteChange={(v) => updateNote(selected.id, v)}
           onClose={() => setSelected(null)}
           onPrev={selectedIdx > 0 ? goPrev : undefined}
           onNext={selectedIdx < filtered.length - 1 ? goNext : undefined}
@@ -298,6 +348,7 @@ function Row({
   r,
   starred,
   contacted,
+  hasNote,
   onOpen,
   onStar,
   onContacted,
@@ -305,6 +356,7 @@ function Row({
   r: Submission;
   starred: boolean;
   contacted: boolean;
+  hasNote: boolean;
   onOpen: () => void;
   onStar: () => void;
   onContacted: () => void;
@@ -324,11 +376,11 @@ function Row({
     <div
       onClick={onOpen}
       role="button"
-      className={`clicky group flex w-full items-center gap-3 rounded-2xl border bg-white p-3.5 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 ${
+      className={`clicky group flex w-full items-center gap-2.5 rounded-2xl border bg-white p-3 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 sm:gap-3 sm:p-3.5 ${
         contacted ? "border-[oklch(0.6_0.14_160)]/30 bg-[oklch(0.97_0.04_160)]/40" : "border-black/5"
       }`}
     >
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white sm:h-11 sm:w-11">
         {(r.full_name?.[0] || r.email[0]).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
@@ -337,28 +389,35 @@ function Row({
             {r.full_name || r.email.split("@")[0]}
           </div>
           {r.business && (
-            <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] sm:inline">
+            <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] md:inline">
               {r.business.slice(0, 24)}{r.business.length > 24 ? "…" : ""}
             </span>
           )}
           {contacted && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-[oklch(0.6_0.14_160)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.14_160)]">
+            <span className="hidden items-center gap-1 rounded-md bg-[oklch(0.6_0.14_160)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.14_160)] sm:inline-flex">
               <CheckCircle2 className="h-2.5 w-2.5" /> Contacted
             </span>
           )}
+          {hasNote && (
+            <span title="Has note" className="inline-flex shrink-0 items-center text-[oklch(0.6_0.14_250)]">
+              <StickyNote className="h-3 w-3" />
+            </span>
+          )}
         </div>
-        <div className="mt-0.5 flex items-center gap-2 truncate text-xs text-[oklch(0.45_0_0)]">
+        <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-[oklch(0.45_0_0)]">
           <Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{r.email}</span>
         </div>
       </div>
-      <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] sm:flex">
+      <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] md:flex">
         <span>{new Date(r.created_at).toLocaleDateString()}</span>
         <span className="text-[10px]">{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
-      <div className="flex items-center gap-1">
-        <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
-          {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
-        </IconBtn>
+      <div className="flex items-center gap-0.5 sm:gap-1">
+        <span className="hidden sm:inline-flex">
+          <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
+            {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+          </IconBtn>
+        </span>
         <IconBtn onClick={stop(onContacted)} title={contacted ? "Mark as uncontacted" : "Mark as contacted"} active={contacted}>
           <CheckCircle2 className={`h-3.5 w-3.5 ${contacted ? "text-[oklch(0.55_0.16_160)]" : ""}`} />
         </IconBtn>
@@ -366,7 +425,7 @@ function Row({
           <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)] text-[oklch(0.6_0.16_85)]" : ""}`} />
         </IconBtn>
       </div>
-      <ChevronRight className="h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5" />
+      <ChevronRight className="hidden h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5 sm:block" />
     </div>
   );
 }
@@ -424,8 +483,10 @@ function DetailDrawer({
   s,
   starred,
   contacted,
+  note,
   onStar,
   onContacted,
+  onNoteChange,
   onClose,
   onPrev,
   onNext,
@@ -435,8 +496,10 @@ function DetailDrawer({
   s: Submission;
   starred: boolean;
   contacted: boolean;
+  note: string;
   onStar: () => void;
   onContacted: () => void;
+  onNoteChange: (v: string) => void;
   onClose: () => void;
   onPrev?: () => void;
   onNext?: () => void;
@@ -444,8 +507,13 @@ function DetailDrawer({
   total: number;
 }) {
   const [copied, setCopied] = useState(false);
+  const [draft, setDraft] = useState(note);
+  const [savedFlash, setSavedFlash] = useState(false);
+  useEffect(() => setDraft(note), [note, s.id]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft" && onPrev) onPrev();
       if (e.key === "ArrowRight" && onNext) onNext();
@@ -460,6 +528,13 @@ function DetailDrawer({
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const saveNote = () => {
+    if (draft === note) return;
+    onNoteChange(draft);
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 1200);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 animate-[fadeIn_150ms_ease-out]" />
@@ -467,27 +542,27 @@ function DetailDrawer({
         className="relative flex h-full w-full max-w-lg flex-col overflow-y-auto bg-white animate-[slideInRight_220ms_cubic-bezier(0.22,1,0.36,1)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
+        <div className="sticky top-0 z-10 border-b border-black/5 bg-white px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
                 {(s.full_name?.[0] || s.email[0]).toUpperCase()}
               </div>
-              <div>
-                <div className="font-semibold text-[oklch(0.18_0_0)]">{s.full_name || s.email}</div>
-                <div className="text-xs text-[oklch(0.5_0_0)]">
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-[oklch(0.18_0_0)]">{s.full_name || s.email}</div>
+                <div className="truncate text-xs text-[oklch(0.5_0_0)]">
                   Applied {new Date(s.created_at).toLocaleString()}
                 </div>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="clicky-sm rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
+              className="clicky-sm shrink-0 rounded-lg p-1.5 text-[oklch(0.4_0_0)] hover:bg-black/5"
             >
               <XIcon className="h-4 w-4" />
             </button>
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
             <button
               onClick={onStar}
               className={`clicky-sm inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
@@ -513,7 +588,7 @@ function DetailDrawer({
               className="clicky-sm inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
             >
               {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy email"}
+              <span className="hidden sm:inline">{copied ? "Copied" : "Copy email"}</span>
             </button>
             <a
               href={`mailto:${s.email}`}
@@ -543,7 +618,7 @@ function DetailDrawer({
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 p-6">
+        <div className="flex flex-col gap-3 p-4 sm:gap-4 sm:p-6">
           <Field icon={Mail} label="Email" value={s.email} href={`mailto:${s.email}`} />
           {s.phone && <Field icon={Phone} label="Phone" value={s.phone} href={`tel:${s.phone}`} />}
           {s.linkedin && (
@@ -558,6 +633,36 @@ function DetailDrawer({
           {s.business && <LongField icon={Briefcase} label="Business" value={s.business} />}
           {s.goal && <LongField icon={Sparkles} label="Goal" value={s.goal} />}
           {s.referral_source && <Field icon={Users} label="Referral source" value={s.referral_source} />}
+
+          <div className="rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">
+                <StickyNote className="h-3 w-3" /> Private notes
+              </div>
+              {savedFlash && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[oklch(0.55_0.18_145)]">
+                  <Check className="h-3 w-3" /> Saved
+                </span>
+              )}
+            </div>
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={saveNote}
+              placeholder="Add notes about this applicant…"
+              rows={4}
+              className="mt-2 w-full resize-y rounded-lg border border-black/10 bg-white p-2 text-sm text-[oklch(0.18_0_0)] outline-none placeholder:text-[oklch(0.55_0_0)] focus:border-[oklch(0.68_0.22_40)]/40"
+            />
+            <div className="mt-2 flex justify-end">
+              <button
+                onClick={saveNote}
+                disabled={draft === note}
+                className="clicky-sm rounded-lg bg-[oklch(0.18_0_0)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+              >
+                Save note
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
