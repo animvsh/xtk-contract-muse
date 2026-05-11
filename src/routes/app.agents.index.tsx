@@ -4,7 +4,7 @@ import { Bot, Plus, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 
-export const Route = createFileRoute("/app/agents")({
+export const Route = createFileRoute("/app/agents/")({
   component: Agents,
 });
 
