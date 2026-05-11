@@ -613,6 +613,7 @@ function Files() {
           {Math.round(zoom * 100)}%
         </div>
       </div>
+      )}
 
       {open && <FileViewer file={open} onClose={() => setOpenId(null)} />}
     </div>
