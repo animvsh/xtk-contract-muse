@@ -259,9 +259,9 @@ function DashboardPreview() {
 
         {/* Content — animated swap */}
         <div key={view} className="flex-1 animate-fade-in p-5">
-          {view === "brain" && <BrainView />}
+          {view === "files" && <FilesView />}
           {view === "agents" && <AgentsView />}
-          {view === "connections" && <ConnectionsView />}
+          {view === "brain" && <BrainView />}
         </div>
       </div>
 
