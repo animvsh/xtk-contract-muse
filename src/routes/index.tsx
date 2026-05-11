@@ -203,9 +203,9 @@ function DashboardPreview() {
           setCursor((c) => ({ ...c, click: false }));
         }, 850));
       }
-      timers.push(setTimeout(cycle, 4200));
+      timers.push(setTimeout(cycle, 7500));
     };
-    timers.push(setTimeout(cycle, 3500));
+    timers.push(setTimeout(cycle, 6500));
     return () => timers.forEach(clearTimeout);
   }, []);
 
