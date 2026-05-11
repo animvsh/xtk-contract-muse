@@ -203,9 +203,9 @@ function DashboardPreview() {
           setCursor((c) => ({ ...c, click: false }));
         }, 850));
       }
-      timers.push(setTimeout(cycle, 4200));
+      timers.push(setTimeout(cycle, 7500));
     };
-    timers.push(setTimeout(cycle, 3500));
+    timers.push(setTimeout(cycle, 6500));
     return () => timers.forEach(clearTimeout);
   }, []);
 
@@ -385,12 +385,12 @@ function FilesView() {
 
 // === AGENTS VIEW: chat-to-build an agent ===
 function AgentsView() {
-  const tick = useTick(700);
-  const cycle = tick % 18;
+  const tick = useTick(280);
+  const cycle = tick;
   const fullPrompt = "Create an agent that summarizes Stripe revenue every Monday at 9am and posts it to #revenue in Slack.";
-  const typedLen = Math.min(fullPrompt.length, cycle * 8);
+  const typedLen = Math.min(fullPrompt.length, cycle * 10);
   const typed = fullPrompt.slice(0, typedLen);
-  const sent = cycle >= 8;
+  const sent = typedLen >= fullPrompt.length;
   const replyLines = [
     "Got it — I'll spin up an agent for that:",
     "  · trigger: every Mon · 9:00 AM",
@@ -399,8 +399,9 @@ function AgentsView() {
     "  · post → slack.#revenue",
     "Ready to deploy?",
   ];
-  const visibleReply = sent ? replyLines.slice(0, Math.min(replyLines.length, cycle - 7)) : [];
-  const created = cycle >= 14;
+  const replyStart = Math.ceil(fullPrompt.length / 10) + 1;
+  const visibleReply = sent ? replyLines.slice(0, Math.max(0, Math.min(replyLines.length, cycle - replyStart))) : [];
+  const created = sent && cycle - replyStart > replyLines.length + 1;
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -505,14 +506,15 @@ function AgentRow({ name, sub, running }: { name: string; sub: string; running?:
 
 // === BRAIN VIEW: ask-anything chat with sources ===
 function BrainView() {
-  const tick = useTick(650);
-  const cycle = tick % 16;
+  const tick = useTick(260);
+  const cycle = tick;
   const question = "What's our MRR this month and which segment is growing fastest?";
-  const typedLen = Math.min(question.length, cycle * 9);
+  const typedLen = Math.min(question.length, cycle * 10);
   const typed = question.slice(0, typedLen);
-  const sent = cycle >= 8;
+  const sent = typedLen >= question.length;
   const answerWords = "MRR is $284k, up 12% MoM. The Mid-market segment is leading growth at +28% — driven by 14 new SaaS customers. Enterprise is flat; SMB churn is down 2pts.".split(" ");
-  const shownWords = sent ? answerWords.slice(0, Math.min(answerWords.length, (cycle - 7) * 6)) : [];
+  const answerStart = Math.ceil(question.length / 10) + 1;
+  const shownWords = sent ? answerWords.slice(0, Math.max(0, Math.min(answerWords.length, (cycle - answerStart) * 4))) : [];
   const sources = [
     { name: "Stripe · Invoices", icon: Send, color: "oklch(0.55_0.2_270)" },
     { name: "Hubspot · Deals", icon: Mail, color: "oklch(0.6_0.2_25)" },
