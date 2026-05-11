@@ -55,7 +55,6 @@ const triggerIcon = (type: string) => {
 
 function AgentDetail() {
   const { id } = Route.useParams();
-  const run = useServerFn(runAgent);
   const [agent, setAgent] = useState<Agent | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [running, setRunning] = useState(false);
@@ -69,9 +68,9 @@ function AgentDetail() {
       supabase.from("agents").select("*").eq("id", id).single(),
       supabase.from("agent_runs").select("*").eq("agent_id", id).order("created_at", { ascending: false }).limit(10),
     ]);
-    if (a) setAgent(a as unknown as Agent);
+    if (a) setAgent(normalizeAgent(a as unknown as Agent));
     const real = (r as Run[] | null) ?? [];
-    if (real.length === 0 && a) setRuns(buildMockRuns(a as unknown as Agent));
+    if (real.length === 0 && a) setRuns(buildMockRuns(normalizeAgent(a as unknown as Agent)));
     else setRuns(real);
   };
 
