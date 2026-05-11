@@ -33,8 +33,8 @@ export const Route = createFileRoute("/app/agents/$id")({
   component: AgentDetail,
 });
 
-type AgentStep = { title: string; integration: string; action: string };
-type AgentTrigger = { type: string; description: string };
+type AgentStep = { title: string; integration: string; action: string; x?: number; y?: number };
+type AgentTrigger = { type: string; description: string; x?: number; y?: number };
 type AgentSpec = { trigger: AgentTrigger; steps: AgentStep[] };
 type Agent = {
   id: string;
