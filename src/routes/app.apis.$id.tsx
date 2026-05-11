@@ -151,6 +151,8 @@ function ApiPlaygroundPage() {
         {([
           { id: "playground", label: "Playground", icon: Play },
           { id: "docs", label: "Docs", icon: BookOpen },
+          { id: "usage", label: "Usage", icon: BarChart3 },
+          { id: "keys", label: "Keys", icon: KeyRound },
           { id: "snippets", label: "Snippets", icon: Code2 },
           { id: "history", label: "History", icon: History },
           { id: "schema", label: "Schema", icon: Settings },
@@ -175,6 +177,8 @@ function ApiPlaygroundPage() {
       <div className="flex-1 overflow-auto bg-muted/10">
         {tab === "playground" && <Playground api={api} onRun={refreshHistory} />}
         {tab === "docs" && <Docs api={api} />}
+        {tab === "usage" && <Usage api={api} />}
+        {tab === "keys" && <Keys api={api} />}
         {tab === "snippets" && <Snippets api={api} />}
         {tab === "history" && <HistoryView rows={history} />}
         {tab === "schema" && <SchemaEditor api={api} onSave={(spec) => setApi({ ...api, spec })} />}
