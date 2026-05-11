@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/use-auth";
 const ADMIN_EMAIL = "aalang@ucsc.edu";
 const STAR_KEY = "beevr.admin.starred";
 const DONE_KEY = "beevr.admin.contacted";
+const NOTES_KEY = "beevr.admin.notes";
 
 type Submission = {
   id: string;
@@ -63,6 +64,18 @@ function loadSet(key: string): Set<string> {
 function saveSet(key: string, set: Set<string>) {
   if (typeof window === "undefined") return;
   localStorage.setItem(key, JSON.stringify([...set]));
+}
+function loadNotes(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveNotes(n: Record<string, string>) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(NOTES_KEY, JSON.stringify(n));
 }
 
 function AdminPage() {
