@@ -54,16 +54,10 @@ function Landing() {
           {/* Hero */}
           <section className="px-10 pb-20 pt-12 text-center">
             <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
-              <img
-                src={ycLogo}
-                alt="Y Combinator"
-                width={20}
-                height={20}
-                className="h-5 w-5 rounded-[4px] object-contain"
-                loading="eager"
-                decoding="sync"
-              />
-              Not backed by Y Combinator (yet)
+              <span className="grid h-5 w-5 place-items-center rounded-[4px] bg-[oklch(0.18_0_0)] text-[10px] font-bold tracking-tight text-white">
+                Fi
+              </span>
+              Backed by Founders Inc
             </div>
 
             <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
