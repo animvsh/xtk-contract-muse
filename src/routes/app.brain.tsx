@@ -1252,6 +1252,18 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<{ id: string } | null>(null);
+  if (!draft) return null;
+  const safeDraft = {
+    ...draft,
+    name: draft.name ?? "Untitled API",
+    description: draft.description ?? "",
+    emoji: draft.emoji ?? "🔌",
+    kind: draft.kind ?? "rest",
+    method: draft.method ?? "GET",
+    path: draft.path ?? "/",
+    params: Array.isArray(draft.params) ? draft.params : [],
+    endpoints: Array.isArray(draft.endpoints) ? draft.endpoints : [],
+  };
 
   const save = async () => {
     setBusy(true);
