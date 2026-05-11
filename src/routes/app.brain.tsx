@@ -591,6 +591,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
       return;
     }
 
+    if (name === "clarify") {
+      const input = tp.input as ClarifyDraft | undefined;
+      if (input && Array.isArray(input.questions) && input.questions.length > 0) {
+        units.push({ kind: "clarify", key: `c${idx}`, draft: input });
+      }
+      return;
+    }
+
     if (name === "createPlan") {
       const input = tp.input as { tasks?: PlanTask[] } | undefined;
       const tasks = input?.tasks ?? [];
