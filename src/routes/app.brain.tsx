@@ -1377,6 +1377,12 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
 }
 
 function McpProposalCard({ draft }: { draft: McpDraft }) {
+  const tools = Array.isArray(draft?.tools) ? draft.tools : [];
+  const resources = Array.isArray(draft?.resources) ? draft.resources : [];
+  const transport = draft?.transport || "http";
+  const emoji = draft?.emoji || "🧩";
+  const name = draft?.name || "Untitled MCP";
+  const description = draft?.description || "Mock MCP server generated for your workspace.";
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [openTool, setOpenTool] = useState<number | null>(0);
