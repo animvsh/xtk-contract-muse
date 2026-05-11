@@ -1,11 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-// removed useServerFn — runs are mocked client-side
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Play,
   Loader2,
-  Activity,
   Plus,
   Trash2,
   MessageSquare,
@@ -21,6 +19,10 @@ import {
   X,
   Save,
   GitBranch,
+  CircleDot,
+  ChevronDown,
+  ChevronRight,
+  Maximize2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ReasoningSteps } from "@/components/reasoning-steps";
