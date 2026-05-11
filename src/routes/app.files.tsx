@@ -472,7 +472,7 @@ function Files() {
 
       <div
         ref={containerRef}
-        onWheel={onWheel}
+        
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={endDrag}
