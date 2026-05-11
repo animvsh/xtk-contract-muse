@@ -905,14 +905,32 @@ function buildPlan(d: AgentDraft): BuildStep[] {
   return steps;
 }
 
+function normalizeAgentDraft(input: Partial<AgentDraft> | undefined | null): AgentDraft {
+  const src = (input ?? {}) as Partial<AgentDraft>;
+  const cadence = src.schedule?.cadence ?? "daily";
+  const channel = (src.channel && CHANNEL_META[src.channel as AgentDraft["channel"]]) ? src.channel as AgentDraft["channel"] : "in-app";
+  return {
+    name: src.name ?? "Untitled agent",
+    description: src.description ?? "",
+    emoji: src.emoji ?? "🤖",
+    schedule: { cadence, timeOfDay: src.schedule?.timeOfDay ?? "09:00" },
+    trigger: src.trigger ?? "On schedule",
+    action: src.action ?? "",
+    dataSources: Array.isArray(src.dataSources) ? src.dataSources : [],
+    channel,
+    recipient: src.recipient,
+    tools: Array.isArray(src.tools) ? src.tools : [],
+  };
+}
+
 function AgentProposalCard({ draft }: { draft: AgentDraft }) {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState<{ id: string } | null>(null);
-  const [d, setD] = useState<AgentDraft>(draft);
+  const [d, setD] = useState<AgentDraft>(() => normalizeAgentDraft(draft));
   const [building, setBuilding] = useState(false);
   const [steps, setSteps] = useState<BuildStep[]>([]);
-  const channel = CHANNEL_META[d.channel];
+  const channel = CHANNEL_META[d.channel] ?? CHANNEL_META["in-app"];
   const ChannelIcon = channel.icon;
 
   const update = <K extends keyof AgentDraft>(k: K, v: AgentDraft[K]) =>
@@ -1234,6 +1252,7 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<{ id: string } | null>(null);
+  if (!draft || !draft.name) return null;
 
   const save = async () => {
     setBusy(true);
@@ -1327,7 +1346,7 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
         <div className="space-y-1.5">
           {endpoints.slice(0, 6).map((ep, i) => (
             <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
-              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method]}`}>
+              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
                 {ep.method}
               </span>
               <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
