@@ -647,7 +647,13 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
           if (u.kind === "api") {
             return <ApiProposalCard key={u.key} draft={u.draft} />;
           }
-          return <ToolPart key={u.key} part={u.part} />;
+          if (u.kind === "mcp") {
+            return <McpProposalCard key={u.key} draft={u.draft} />;
+          }
+          if (u.kind === "tool") {
+            return <ToolPart key={u.key} part={u.part} />;
+          }
+          return null;
         })}
       </div>
     </div>
