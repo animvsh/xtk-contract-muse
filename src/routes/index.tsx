@@ -385,12 +385,12 @@ function FilesView() {
 
 // === AGENTS VIEW: chat-to-build an agent ===
 function AgentsView() {
-  const tick = useTick(700);
-  const cycle = tick % 18;
+  const tick = useTick(280);
+  const cycle = tick;
   const fullPrompt = "Create an agent that summarizes Stripe revenue every Monday at 9am and posts it to #revenue in Slack.";
-  const typedLen = Math.min(fullPrompt.length, cycle * 8);
+  const typedLen = Math.min(fullPrompt.length, cycle * 10);
   const typed = fullPrompt.slice(0, typedLen);
-  const sent = cycle >= 8;
+  const sent = typedLen >= fullPrompt.length;
   const replyLines = [
     "Got it — I'll spin up an agent for that:",
     "  · trigger: every Mon · 9:00 AM",
@@ -399,8 +399,9 @@ function AgentsView() {
     "  · post → slack.#revenue",
     "Ready to deploy?",
   ];
-  const visibleReply = sent ? replyLines.slice(0, Math.min(replyLines.length, cycle - 7)) : [];
-  const created = cycle >= 14;
+  const replyStart = Math.ceil(fullPrompt.length / 10) + 1;
+  const visibleReply = sent ? replyLines.slice(0, Math.max(0, Math.min(replyLines.length, cycle - replyStart))) : [];
+  const created = sent && cycle - replyStart > replyLines.length + 1;
 
   return (
     <div className="grid grid-cols-3 gap-4">
