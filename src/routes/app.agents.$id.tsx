@@ -57,6 +57,8 @@ function AgentDetail() {
   const { id } = Route.useParams();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
   const [tab, setTab] = useState<"logs" | "chat">("logs");
@@ -64,14 +66,24 @@ function AgentDetail() {
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
-    const [{ data: a }, { data: r }] = await Promise.all([
+    setLoading(true);
+    setLoadError(null);
+    const [{ data: a, error: agentError }, { data: r, error: runsError }] = await Promise.all([
       supabase.from("agents").select("*").eq("id", id).single(),
       supabase.from("agent_runs").select("*").eq("agent_id", id).order("created_at", { ascending: false }).limit(10),
     ]);
-    if (a) setAgent(normalizeAgent(a as unknown as Agent));
-    const real = (r as Run[] | null) ?? [];
-    if (real.length === 0 && a) setRuns(buildMockRuns(normalizeAgent(a as unknown as Agent)));
-    else setRuns(real);
+    if (agentError || !a) {
+      setAgent(null);
+      setRuns([]);
+      setLoadError("Agent not found or you don't have access to it.");
+      setLoading(false);
+      return;
+    }
+    const normalized = normalizeAgent(a as unknown as Agent);
+    setAgent(normalized);
+    const real = runsError ? [] : ((r as Run[] | null) ?? []);
+    setRuns(real.length === 0 ? buildMockRuns(normalized) : real);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -190,10 +202,25 @@ function AgentDetail() {
     persistSpec({ ...agent.spec, trigger: { ...agent.spec.trigger, ...patch } });
   };
 
-  if (!agent) {
+  if (loading) {
     return (
       <div className="mx-auto flex w-full max-w-5xl items-center justify-center px-6 py-20 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!agent) {
+    return (
+      <div className="mx-auto w-full max-w-3xl px-6 py-10">
+        <Link to="/app/agents" className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-3 w-3" /> Agents
+        </Link>
+        <div className="rounded-2xl border border-dashed border-black/[0.08] bg-white/60 p-10 text-center">
+          <Bot className="mx-auto h-8 w-8 text-muted-foreground/50" />
+          <h1 className="mt-3 text-lg font-semibold">Agent unavailable</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{loadError ?? "This agent couldn't be loaded."}</p>
+        </div>
       </div>
     );
   }
