@@ -131,6 +131,13 @@ function AdminPage() {
       saveSet(DONE_KEY, next);
       return next;
     });
+  const updateNote = (id: string, value: string) =>
+    setNotes((prev) => {
+      const next = { ...prev, [id]: value };
+      if (!value) delete next[id];
+      saveNotes(next);
+      return next;
+    });
 
   const filtered = useMemo(() => {
     let list = rows.filter((r) => {
