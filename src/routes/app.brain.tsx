@@ -95,9 +95,66 @@ type ApiDraft = {
 };
 
 
+type StagedFile = {
+  id: string;
+  file: File;
+  kind: "image" | "text" | "pdf" | "other";
+  preview?: string; // data URL for images
+  textContent?: string; // for text-like files
+};
+
+const TEXT_EXT = /\.(txt|md|markdown|json|csv|tsv|ya?ml|toml|ini|env|log|html?|css|scss|tsx?|jsx?|py|rb|go|rs|java|c|cpp|h|sh|bash|sql|xml|svg)$/i;
+
+function classifyFile(f: File): StagedFile["kind"] {
+  if (f.type.startsWith("image/")) return "image";
+  if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) return "pdf";
+  if (f.type.startsWith("text/") || /^application\/(json|xml|x-yaml|toml)/.test(f.type) || TEXT_EXT.test(f.name)) return "text";
+  return "other";
+}
+
+function readFileAsDataURL(f: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(f);
+  });
+}
+function readFileAsText(f: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsText(f);
+  });
+}
+
+async function stageFile(f: File): Promise<StagedFile> {
+  const kind = classifyFile(f);
+  const id = `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 8)}`;
+  if (kind === "image") {
+    return { id, file: f, kind, preview: await readFileAsDataURL(f) };
+  }
+  if (kind === "text") {
+    const text = await readFileAsText(f);
+    return { id, file: f, kind, textContent: text.slice(0, 60_000) };
+  }
+  return { id, file: f, kind };
+}
+
+function formatBytes(n: number) {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1)} MB`;
+}
+
 function BrainPage() {
   const { q } = Route.useSearch();
   const [input, setInput] = useState("");
+  const [pending, setPending] = useState<StagedFile[]>([]);
+  const [dragOver, setDragOver] = useState(false);
+  const dragDepth = useRef(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const transport = useRef(new DefaultChatTransport({ api: "/api/chat" })).current;
   const { messages, sendMessage, status, error } = useChat({
     transport,
@@ -127,16 +184,99 @@ function BrainPage() {
 
   const isLoading = status === "submitted" || status === "streaming";
 
+  const addFiles = async (files: FileList | File[]) => {
+    const arr = Array.from(files).slice(0, 10);
+    const accepted: StagedFile[] = [];
+    for (const f of arr) {
+      if (f.size > 20 * 1024 * 1024) {
+        toast.error(`${f.name} is over 20MB`);
+        continue;
+      }
+      try {
+        accepted.push(await stageFile(f));
+      } catch {
+        toast.error(`Couldn't read ${f.name}`);
+      }
+    }
+    if (accepted.length) {
+      setPending((p) => [...p, ...accepted].slice(0, 10));
+      toast.success(`Attached ${accepted.length} file${accepted.length > 1 ? "s" : ""}`);
+    }
+  };
+
+  const removePending = (id: string) => setPending((p) => p.filter((f) => f.id !== id));
+
   const handleSend = () => {
-    if (!input.trim() || isLoading) return;
-    sendMessage({ text: input.trim() });
+    if ((!input.trim() && pending.length === 0) || isLoading) return;
+
+    // Build text: append text-file contents inline so the model can reference them.
+    const textParts: string[] = [];
+    if (input.trim()) textParts.push(input.trim());
+    for (const sf of pending) {
+      if (sf.kind === "text" && sf.textContent) {
+        textParts.push(`\n\n--- File: ${sf.file.name} (${formatBytes(sf.file.size)}) ---\n${sf.textContent}\n--- end of ${sf.file.name} ---`);
+      } else if (sf.kind === "pdf") {
+        textParts.push(`\n[Attached PDF: ${sf.file.name} (${formatBytes(sf.file.size)})]`);
+      } else if (sf.kind === "other") {
+        textParts.push(`\n[Attached file: ${sf.file.name} (${sf.file.type || "unknown"}, ${formatBytes(sf.file.size)})]`);
+      }
+    }
+
+    // Image file parts go to the model as multimodal content.
+    const fileParts = pending
+      .filter((sf) => sf.kind === "image" && sf.preview)
+      .map((sf) => ({
+        type: "file" as const,
+        mediaType: sf.file.type || "image/png",
+        url: sf.preview!,
+        filename: sf.file.name,
+      }));
+
+    sendMessage({
+      text: textParts.join("") || " ",
+      files: fileParts.length ? fileParts : undefined,
+    });
     setInput("");
+    setPending([]);
+  };
+
+  const onDragEnter = (e: React.DragEvent) => {
+    if (!Array.from(e.dataTransfer.types).includes("Files")) return;
+    dragDepth.current += 1;
+    setDragOver(true);
+  };
+  const onDragLeave = () => {
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragOver(false);
+  };
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    dragDepth.current = 0;
+    setDragOver(false);
+    if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
   };
 
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <div
+      className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden"
+      onDragEnter={onDragEnter}
+      onDragOver={(e) => {
+        if (Array.from(e.dataTransfer.types).includes("Files")) e.preventDefault();
+      }}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      {dragOver && (
+        <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-primary/10 backdrop-blur-sm">
+          <div className="animate-pop flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-primary/60 bg-white/90 px-10 py-8 shadow-xl">
+            <UploadCloud className="h-10 w-10 text-primary" />
+            <div className="text-base font-medium text-foreground">Drop to attach</div>
+            <div className="text-xs text-muted-foreground">Images, PDFs, text and code files · up to 20MB each</div>
+          </div>
+        </div>
+      )}
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">
         <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
           {isEmpty && (
@@ -146,7 +286,7 @@ function BrainPage() {
               </div>
               <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
               <p className="mt-2 text-base text-muted-foreground">
-                Connected to Notion, Gmail contacts, document drafting, and email.
+                Connected to Notion, Gmail contacts, document drafting, and email. Drag and drop files to reference them.
               </p>
               <div className="stagger mt-8 grid gap-2 text-sm sm:grid-cols-2">
                 {[
@@ -171,13 +311,7 @@ function BrainPage() {
           <div className="space-y-6">
             {messages.map((msg) =>
               msg.role === "user" ? (
-                <div key={msg.id} className="flex justify-end">
-                  <div className="slide-in-right max-w-[80%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[15px] leading-relaxed text-primary-foreground shadow-sm">
-                    {msg.parts
-                      .map((p) => (p.type === "text" ? p.text : ""))
-                      .join("")}
-                  </div>
-                </div>
+                <UserMessage key={msg.id} msg={msg} />
               ) : (
                 <AssistantMessage key={msg.id} msg={msg} />
               ),
@@ -210,40 +344,143 @@ function BrainPage() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
         <div className="h-4 bg-white" />
         <div className="pointer-events-auto bg-white/80 px-6 pb-5 pt-2 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-black/10 bg-white p-2 shadow-lg shadow-black/5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              rows={1}
-              placeholder="Ask anything about your company…"
-              className="max-h-40 flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] outline-none placeholder:text-muted-foreground"
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="clicky clicky-sm flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-all hover:shadow-md disabled:opacity-40"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </button>
+          <div className="mx-auto max-w-3xl">
+            {pending.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {pending.map((sf) => (
+                  <div
+                    key={sf.id}
+                    className="animate-pop group relative flex items-center gap-2 rounded-xl border border-black/10 bg-white py-1.5 pl-1.5 pr-2 shadow-sm"
+                  >
+                    {sf.kind === "image" && sf.preview ? (
+                      <img src={sf.preview} alt={sf.file.name} className="h-9 w-9 rounded-md object-cover" />
+                    ) : (
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-md ${sf.kind === "pdf" ? "bg-rose-500/10 text-rose-600" : sf.kind === "text" ? "bg-blue-500/10 text-blue-600" : "bg-muted text-muted-foreground"}`}>
+                        {sf.kind === "pdf" ? <FileText className="h-4 w-4" /> : sf.kind === "text" ? <Code2 className="h-4 w-4" /> : <FileIcon className="h-4 w-4" />}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="max-w-[180px] truncate text-xs font-medium text-foreground">{sf.file.name}</div>
+                      <div className="text-[10px] text-muted-foreground">{formatBytes(sf.file.size)}</div>
+                    </div>
+                    <button
+                      onClick={() => removePending(sf.id)}
+                      className="ml-1 flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      aria-label="Remove file"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex items-end gap-2 rounded-2xl border border-black/10 bg-white p-2 shadow-lg shadow-black/5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_15%,transparent)]">
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.length) addFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="clicky-sm flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Attach files"
+                title="Attach files"
+              >
+                <Paperclip className="h-4 w-4" />
+              </button>
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onPaste={(e) => {
+                  const files = Array.from(e.clipboardData.files);
+                  if (files.length) {
+                    e.preventDefault();
+                    addFiles(files);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                rows={1}
+                placeholder="Ask anything · drag, drop or paste files"
+                className="max-h-40 flex-1 resize-none bg-transparent px-1 py-2.5 text-[15px] outline-none placeholder:text-muted-foreground"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading || (!input.trim() && pending.length === 0)}
+                className="clicky clicky-sm flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-all hover:shadow-md disabled:opacity-40"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground/70">
+              Enter to send · Shift + Enter newline · Drop or paste files to attach
+            </p>
           </div>
-          <p className="mx-auto mt-2 max-w-3xl text-center text-[11px] text-muted-foreground/70">
-            Press Enter to send · Shift + Enter for new line
-          </p>
         </div>
       </div>
 
+    </div>
+  );
+}
+
+function UserMessage({ msg }: { msg: UIMsg }) {
+  const text = msg.parts
+    .filter((p) => p.type === "text")
+    .map((p) => (p as { text: string }).text)
+    .join("");
+  const files = msg.parts.filter((p) => p.type === "file") as Array<{
+    type: "file";
+    mediaType?: string;
+    url: string;
+    filename?: string;
+  }>;
+  // Hide raw inline file dumps from the bubble (they were prepended for the model).
+  const visibleText = text.replace(/\n*--- File: [\s\S]*?--- end of [^\n]+---/g, "").replace(/\n\[Attached (PDF|file): [^\]]+\]/g, "").trim();
+
+  return (
+    <div className="flex justify-end">
+      <div className="slide-in-right max-w-[80%] space-y-2">
+        {files.length > 0 && (
+          <div className="flex flex-wrap justify-end gap-2">
+            {files.map((f, i) =>
+              f.mediaType?.startsWith("image/") ? (
+                <img
+                  key={i}
+                  src={f.url}
+                  alt={f.filename ?? "attachment"}
+                  className="max-h-48 max-w-[240px] rounded-xl border border-black/10 object-cover shadow-sm"
+                />
+              ) : (
+                <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs shadow-sm">
+                  <FileIcon className="h-4 w-4 text-muted-foreground" />
+                  <span className="max-w-[160px] truncate font-medium text-foreground">{f.filename ?? "file"}</span>
+                </div>
+              ),
+            )}
+          </div>
+        )}
+        {visibleText && (
+          <div className="rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[15px] leading-relaxed text-primary-foreground shadow-sm">
+            {visibleText}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
