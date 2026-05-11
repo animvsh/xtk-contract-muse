@@ -30,7 +30,6 @@ import {
   Paperclip,
   X,
   UploadCloud,
-  Image as ImageIcon,
   File as FileIcon,
 } from "lucide-react";
 
