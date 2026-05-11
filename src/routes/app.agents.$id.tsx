@@ -37,7 +37,12 @@ function AgentDetail() {
       supabase.from("agent_runs").select("*").eq("agent_id", id).order("created_at", { ascending: false }).limit(10),
     ]);
     if (a) setAgent(a as unknown as Agent);
-    if (r) setRuns(r as Run[]);
+    const real = (r as Run[] | null) ?? [];
+    if (real.length === 0 && a) {
+      setRuns(buildMockRuns(a as unknown as Agent));
+    } else {
+      setRuns(real);
+    }
   };
 
   useEffect(() => {
