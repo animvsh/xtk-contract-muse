@@ -23,7 +23,6 @@ import {
   GitBranch,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { runAgent } from "@/lib/agents.functions";
 import { ReasoningSteps } from "@/components/reasoning-steps";
 import { PageHeader } from "@/components/page-header";
 import { toast } from "sonner";
