@@ -95,7 +95,7 @@ export const listAccessKeys = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return data;
+    return data ?? [];
   });
 
 export const getAccessKey = createServerFn({ method: "POST" })
