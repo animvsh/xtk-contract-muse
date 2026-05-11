@@ -1377,6 +1377,12 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
 }
 
 function McpProposalCard({ draft }: { draft: McpDraft }) {
+  const tools = Array.isArray(draft?.tools) ? draft.tools : [];
+  const resources = Array.isArray(draft?.resources) ? draft.resources : [];
+  const transport = draft?.transport || "http";
+  const emoji = draft?.emoji || "🧩";
+  const name = draft?.name || "Untitled MCP";
+  const description = draft?.description || "Mock MCP server generated for your workspace.";
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [openTool, setOpenTool] = useState<number | null>(0);
@@ -1387,19 +1393,19 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
       const { data: userRes } = await supabase.auth.getUser();
       const user = userRes.user;
       if (!user) throw new Error("Sign in required");
-      const slug = (draft.slug || slugify(draft.name) || "mcp").toLowerCase();
+      const slug = (draft.slug || slugify(name) || "mcp").toLowerCase();
       const { error } = await supabase.from("mcps").insert({
         user_id: user.id,
-        name: draft.name,
+        name,
         slug,
-        description: draft.description,
-        emoji: draft.emoji,
-        spec: draft as never,
+        description,
+        emoji,
+        spec: { ...draft, tools, resources, transport } as never,
       });
       if (error) throw error;
       setSaved(true);
-      toast.success(`${draft.emoji} ${draft.name} installed`, {
-        description: `mcp.beevr.dev/${slug} — ${draft.tools.length} tools`,
+      toast.success(`${emoji} ${name} installed`, {
+        description: `mcp.beevr.dev/${slug} — ${tools.length} tools`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save MCP");
@@ -1408,7 +1414,7 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
     }
   };
 
-  const url = `https://mcp.beevr.dev/${draft.slug || slugify(draft.name)}`;
+  const url = `https://mcp.beevr.dev/${draft.slug || slugify(name)}`;
 
   if (saved) {
     return (
@@ -1419,8 +1425,8 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-2xl leading-none">{draft.emoji}</span>
-              <h3 className="text-base font-semibold">{draft.name} is live</h3>
+              <span className="text-2xl leading-none">{emoji}</span>
+              <h3 className="text-base font-semibold">{name} is live</h3>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Connect from Claude Code, Cursor or Codex with the URL below.</p>
             <code className="mt-2 inline-block rounded-md bg-muted px-2 py-1 font-mono text-[11px]">{url}</code>
@@ -1436,27 +1442,34 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
         <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative flex items-start gap-3">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
-            <span aria-hidden>{draft.emoji}</span>
+            <span aria-hidden>{emoji}</span>
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
               <Plug className="h-3 w-3" /> New MCP draft
               <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-                {draft.transport}
+                {transport}
               </span>
             </div>
-            <h3 className="mt-0.5 truncate text-base font-semibold">{draft.name}</h3>
-            <p className="mt-0.5 text-sm text-muted-foreground">{draft.description}</p>
+            <h3 className="mt-0.5 truncate text-base font-semibold">{name}</h3>
+            <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
             <code className="mt-2 inline-block rounded-md bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground">{url}</code>
           </div>
         </div>
       </div>
 
       <div className="border-t border-black/5 bg-muted/20 p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Tools ({draft.tools.length})</div>
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Tools ({tools.length})</div>
+        {tools.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-black/10 bg-white px-3 py-4 text-center text-[11px] text-muted-foreground">
+            No tools defined yet.
+          </div>
+        ) : (
         <div className="space-y-1.5">
-          {draft.tools.map((t, i) => (
-            <div key={t.name} className="overflow-hidden rounded-lg border border-black/5 bg-white">
+          {tools.map((t, i) => {
+            const params = Array.isArray(t?.params) ? t.params : [];
+            return (
+            <div key={t.name ?? i} className="overflow-hidden rounded-lg border border-black/5 bg-white">
               <button
                 onClick={() => setOpenTool(openTool === i ? null : i)}
                 className="flex w-full items-center gap-2 px-2.5 py-2 text-left text-xs hover:bg-muted/30"
@@ -1468,9 +1481,9 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
               </button>
               {openTool === i && (
                 <div className="border-t border-black/5 bg-muted/10 px-3 py-2 text-[11px]">
-                  {t.params.length > 0 && (
+                  {params.length > 0 && (
                     <div className="mb-2 flex flex-wrap gap-1">
-                      {t.params.map((p) => (
+                      {params.map((p) => (
                         <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-1.5 py-0.5">
                           <code className="font-mono">{p.name}</code>
                           <span className="text-muted-foreground">{p.type}</span>
@@ -1480,13 +1493,15 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
                     </div>
                   )}
                   <pre className="overflow-auto rounded bg-[oklch(0.18_0_0)] p-2 font-mono text-[10px] leading-relaxed text-emerald-200">
-{prettifyJson(t.sampleResult)}
+{prettifyJson(t.sampleResult ?? "{}")}
                   </pre>
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
