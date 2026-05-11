@@ -87,12 +87,15 @@ function AdminPage() {
   const [selected, setSelected] = useState<Submission | null>(null);
   const [starred, setStarred] = useState<Set<string>>(new Set());
   const [contacted, setContacted] = useState<Set<string>>(new Set());
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [sort, setSort] = useState<SortKey>("newest");
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     setStarred(loadSet(STAR_KEY));
     setContacted(loadSet(DONE_KEY));
+    setNotes(loadNotes());
   }, []);
 
   useEffect(() => {
