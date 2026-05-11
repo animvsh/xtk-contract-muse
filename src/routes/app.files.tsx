@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FileText,
   Search,
@@ -16,6 +16,10 @@ import {
   FileType,
   Folder,
   Clock,
+  Building2,
+  Maximize2,
+  Plus,
+  Minus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/files")({
