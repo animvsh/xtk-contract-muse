@@ -325,18 +325,30 @@ function Files() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, view]);
 
-  const onWheel = (e: React.WheelEvent) => {
-    const delta = -e.deltaY * 0.0015;
-    const next = Math.min(1.4, Math.max(0.25, zoom + delta));
-    if (!containerRef.current) return setZoom(next);
-    const r = containerRef.current.getBoundingClientRect();
-    const mx = e.clientX - r.left;
-    const my = e.clientY - r.top;
-    const wx = (mx - pan.x) / zoom;
-    const wy = (my - pan.y) / zoom;
-    setPan({ x: mx - wx * next, y: my - wy * next });
-    setZoom(next);
-  };
+  // Native non-passive wheel listener so we can preventDefault and stop the
+  // page from scrolling while zooming inside the graph.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || view !== "graph") return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = -e.deltaY * 0.0015;
+      setZoom((z) => {
+        const next = Math.min(1.4, Math.max(0.25, z + delta));
+        const r = el.getBoundingClientRect();
+        const mx = e.clientX - r.left;
+        const my = e.clientY - r.top;
+        setPan((p) => {
+          const wx = (mx - p.x) / z;
+          const wy = (my - p.y) / z;
+          return { x: mx - wx * next, y: my - wy * next };
+        });
+        return next;
+      });
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [view]);
   const onMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("[data-node]")) return;
     setAnimating(false);
