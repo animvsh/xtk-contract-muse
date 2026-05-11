@@ -60,7 +60,7 @@ const METHOD_TONE: Record<string, string> = {
   DELETE: "bg-rose-500/10 text-rose-700 border-rose-500/30",
 };
 
-type Tab = "playground" | "docs" | "snippets" | "history" | "schema";
+type Tab = "playground" | "docs" | "snippets" | "history" | "usage" | "keys" | "schema";
 
 function ApiPlaygroundPage() {
   const { id } = Route.useParams();
