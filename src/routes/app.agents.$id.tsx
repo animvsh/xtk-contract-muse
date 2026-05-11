@@ -738,23 +738,55 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function LogsPanel({ runs }: { runs: Run[] }) {
+  const [openId, setOpenId] = useState<string | null>(runs[0]?.id ?? null);
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto p-3">
-      <div className="mb-2 flex items-center gap-1.5 px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
-        <Activity className="h-3 w-3" /> Recent runs
-      </div>
+    <div className="min-h-0 flex-1 overflow-y-auto">
       {runs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-black/[0.08] bg-white/40 p-6 text-center text-xs text-muted-foreground">
+        <div className="m-3 rounded-xl border border-dashed border-black/[0.08] bg-white/40 p-6 text-center text-xs text-muted-foreground">
           No runs yet — hit Run to try it.
         </div>
       ) : (
-        <div className="space-y-2">
-          {runs.map((r, idx) => (
-            <div key={r.id} className="space-y-1">
-              <div className="px-1 text-[10px] uppercase tracking-wider text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
-              <ReasoningSteps log={r.log} live={idx === 0} />
-            </div>
-          ))}
+        <div className="divide-y divide-black/[0.05]">
+          {runs.map((r, idx) => {
+            const open = openId === r.id;
+            const lines = r.log.split("\n").map((l) => l.trim()).filter(Boolean);
+            const summary = lines[0]?.startsWith("•") ? "Run completed" : (lines[0] ?? "Run");
+            const body = lines.filter((l) => l !== summary);
+            const isLive = idx === 0;
+            return (
+              <div key={r.id}>
+                <button
+                  onClick={() => setOpenId(open ? null : r.id)}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-black/[0.02]"
+                >
+                  {open ? <ChevronDown className="h-3 w-3 text-muted-foreground" /> : <ChevronRight className="h-3 w-3 text-muted-foreground" />}
+                  <CircleDot className={`h-2.5 w-2.5 shrink-0 ${isLive ? "animate-pulse text-[oklch(0.72_0.21_45)]" : "text-emerald-500"}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs font-medium text-foreground">{summary}</div>
+                  </div>
+                  <div className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
+                    {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  </div>
+                </button>
+                {open && (
+                  <div className="bg-[oklch(0.16_0.01_60)] px-3 py-2 font-mono text-[11px] leading-relaxed text-[oklch(0.92_0.02_85)]">
+                    {body.map((b, i) => {
+                      const isSub = b.startsWith("↳") || /^\s*↳/.test(b);
+                      const time = b.match(/\[([^\]]+)\]/)?.[1];
+                      const text = b.replace(/^•\s*/, "").replace(/^\[[^\]]+\]\s*/, "");
+                      return (
+                        <div key={i} className={`flex gap-2 ${isSub ? "pl-5 text-[oklch(0.7_0.05_85)]" : ""}`}>
+                          {time && <span className="shrink-0 text-[oklch(0.55_0.05_85)]">{time}</span>}
+                          <span className="break-all">{text || b}</span>
+                        </div>
+                      );
+                    })}
+                    {body.length === 0 && <div className="text-[oklch(0.6_0.05_85)]">No detail.</div>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
