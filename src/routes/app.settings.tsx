@@ -430,3 +430,205 @@ function WorkspaceRow({
     </li>
   );
 }
+
+import { useWorkspaceMembers, type MemberRole, type WorkspaceMember } from "@/hooks/use-workspace-members";
+import { Users as UsersIcon, Mail, MoreHorizontal, Activity } from "lucide-react";
+
+const ROLES: { value: MemberRole; label: string; desc: string }[] = [
+  { value: "owner", label: "Owner", desc: "Full control, billing, delete workspace" },
+  { value: "admin", label: "Admin", desc: "Manage members, settings, all resources" },
+  { value: "editor", label: "Editor", desc: "Create and edit agents, APIs, files" },
+  { value: "viewer", label: "Viewer", desc: "Read-only access to everything" },
+];
+
+function MembersSection() {
+  const { user } = useAuth();
+  const { current } = useWorkspaces();
+  const { members, invite, remove, setRole, resend } = useWorkspaceMembers(current?.id, user?.email ?? undefined);
+  const [email, setEmail] = useState("");
+  const [role, setRoleDraft] = useState<MemberRole>("editor");
+
+  function handleInvite() {
+    const trimmed = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+    if (members.some((m) => m.email.toLowerCase() === trimmed)) {
+      toast.error("That person is already in this workspace");
+      return;
+    }
+    invite(trimmed, role);
+    toast.success(`Invited ${trimmed} as ${role}`);
+    setEmail("");
+  }
+
+  const totals = members.reduce(
+    (acc, m) => ({
+      runs: acc.runs + m.usage.agentRuns,
+      api: acc.api + m.usage.apiCalls,
+      mb: acc.mb + m.usage.storageMB,
+    }),
+    { runs: 0, api: 0, mb: 0 },
+  );
+
+  return (
+    <section className="mt-6 rounded-2xl border border-black/5 bg-white/70 p-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <UsersIcon className="h-4 w-4" /> Members & permissions
+        </div>
+        <span className="text-xs text-[oklch(0.45_0_0)]">{current?.name}</span>
+      </div>
+      <p className="mt-1 text-xs text-[oklch(0.45_0_0)]">
+        Add or remove people, set their role, and see usage across the team.
+      </p>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <Stat label="Agent runs" value={totals.runs.toLocaleString()} />
+        <Stat label="API calls" value={totals.api.toLocaleString()} />
+        <Stat label="Storage" value={`${totals.mb} MB`} />
+      </div>
+
+      <div className="mt-5 rounded-xl border border-dashed border-black/15 bg-white/80 p-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="relative flex-1">
+            <Mail className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleInvite()}
+              placeholder="teammate@company.com"
+              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 pl-8 text-sm outline-none focus:border-[oklch(0.68_0.22_40)] focus:ring-2 focus:ring-[oklch(0.68_0.22_40)]/20"
+            />
+          </div>
+          <select
+            value={role}
+            onChange={(e) => setRoleDraft(e.target.value as MemberRole)}
+            className="rounded-lg border border-black/10 bg-white px-2.5 py-2 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]"
+          >
+            {ROLES.filter((r) => r.value !== "owner").map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleInvite}
+            className="clicky inline-flex items-center justify-center gap-1.5 rounded-lg bg-[oklch(0.68_0.22_40)] px-4 py-2 text-sm font-medium text-white hover:bg-[oklch(0.62_0.22_40)]"
+          >
+            <Plus className="h-4 w-4" /> Invite
+          </button>
+        </div>
+        <div className="mt-2 text-[11px] text-[oklch(0.5_0_0)]">
+          {ROLES.find((r) => r.value === role)?.desc}
+        </div>
+      </div>
+
+      <ul className="mt-4 divide-y divide-black/5 rounded-xl border border-black/5">
+        {members.map((m) => (
+          <MemberRow
+            key={m.id}
+            member={m}
+            isSelf={m.email.toLowerCase() === (user?.email ?? "").toLowerCase()}
+            onRoleChange={(r) => {
+              setRole(m.id, r);
+              toast.success(`Updated role to ${r}`);
+            }}
+            onRemove={() => {
+              remove(m.id);
+              toast.success("Member removed");
+            }}
+            onResend={() => {
+              resend(m.id);
+              toast.success("Invite resent");
+            }}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-black/5 bg-white/80 p-3">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.5_0_0)]">{label}</div>
+      <div className="mt-1 text-lg font-bold tracking-tight">{value}</div>
+    </div>
+  );
+}
+
+function MemberRow({
+  member,
+  isSelf,
+  onRoleChange,
+  onRemove,
+  onResend,
+}: {
+  member: WorkspaceMember;
+  isSelf: boolean;
+  onRoleChange: (r: MemberRole) => void;
+  onRemove: () => void;
+  onResend: () => void;
+}) {
+  const [confirmDel, setConfirmDel] = useState(false);
+  const isOwner = member.role === "owner";
+  const initial = member.name.charAt(0).toUpperCase();
+  const lastActive = new Date(member.usage.lastActiveAt);
+  const daysAgo = Math.floor((Date.now() - lastActive.getTime()) / 86400000);
+  const lastActiveLabel = daysAgo === 0 ? "Today" : daysAgo === 1 ? "Yesterday" : `${daysAgo}d ago`;
+
+  return (
+    <li className="p-4">
+      <div className="flex items-start gap-3">
+        <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-sm font-semibold text-white">
+          {initial}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="truncate text-sm font-semibold">{member.name}</span>
+            {isSelf && <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.4_0_0)]">You</span>}
+            {member.status === "invited" && <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">Invited</span>}
+          </div>
+          <div className="mt-0.5 truncate text-xs text-[oklch(0.45_0_0)]">{member.email}</div>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-[oklch(0.45_0_0)]">
+            <span className="inline-flex items-center gap-1"><Activity className="h-3 w-3" /> {member.usage.agentRuns} runs</span>
+            <span>{member.usage.apiCalls.toLocaleString()} API calls</span>
+            <span>{member.usage.storageMB} MB</span>
+            <span>· Active {lastActiveLabel}</span>
+          </div>
+        </div>
+        <div className="flex flex-shrink-0 flex-col items-end gap-2">
+          <select
+            value={member.role}
+            disabled={isOwner}
+            onChange={(e) => onRoleChange(e.target.value as MemberRole)}
+            className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs outline-none focus:border-[oklch(0.68_0.22_40)] disabled:cursor-not-allowed disabled:bg-black/5"
+          >
+            {ROLES.map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+          <div className="flex items-center gap-1.5">
+            {member.status === "invited" && !isOwner && (
+              <button onClick={onResend} className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5">Resend</button>
+            )}
+            {!isOwner && !isSelf && (
+              confirmDel ? (
+                <>
+                  <button onClick={onRemove} className="clicky inline-flex items-center gap-1 rounded-lg bg-rose-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-rose-700">
+                    <Trash2 className="h-3 w-3" /> Confirm
+                  </button>
+                  <button onClick={() => setConfirmDel(false)} className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5">Cancel</button>
+                </>
+              ) : (
+                <button onClick={() => setConfirmDel(true)} className="clicky inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50">
+                  <Trash2 className="h-3 w-3" /> Remove
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+}
