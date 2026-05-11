@@ -278,6 +278,7 @@ function AppLayout() {
           </div>
         </main>
       </div>
+      <GlobalUploader />
     </div>
   );
 }
