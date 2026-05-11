@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 // removed useServerFn — runs are mocked client-side
 import {
@@ -55,6 +55,7 @@ const triggerIcon = (type: string) => {
 
 function AgentDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,8 +76,10 @@ function AgentDetail() {
     if (agentError || !a) {
       setAgent(null);
       setRuns([]);
-      setLoadError("Agent not found or you don't have access to it.");
+      setLoadError("Agent not found — redirecting to your agents.");
       setLoading(false);
+      toast.error("Agent not found");
+      navigate({ to: "/app/agents", replace: true });
       return;
     }
     const normalized = normalizeAgent(a as unknown as Agent);
