@@ -81,6 +81,7 @@ type ApiParam = {
   example?: string;
 };
 type ApiEndpoint = { method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; path: string; summary: string };
+type ApiError = { status: number; code: string; message: string };
 type ApiDraft = {
   name: string;
   description: string;
@@ -91,6 +92,34 @@ type ApiDraft = {
   params: ApiParam[];
   sampleResponse: string;
   endpoints: ApiEndpoint[];
+  authentication?: "none" | "api-key" | "bearer";
+  errors?: ApiError[];
+  docsMarkdown?: string;
+};
+
+type McpToolParam = {
+  name: string;
+  type: "string" | "number" | "boolean" | "array" | "object";
+  required: boolean;
+  description: string;
+  example?: string;
+};
+type McpTool = {
+  name: string;
+  description: string;
+  params: McpToolParam[];
+  sampleResult: string;
+};
+type McpResource = { uri: string; name: string; description: string };
+type McpDraft = {
+  name: string;
+  slug: string;
+  description: string;
+  emoji: string;
+  transport: "http" | "sse" | "stdio";
+  tools: McpTool[];
+  resources: McpResource[];
+  docsMarkdown: string;
 };
 
 
