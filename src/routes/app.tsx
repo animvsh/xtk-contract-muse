@@ -15,6 +15,7 @@ import { LiveFeed } from "@/components/live-feed";
 import { useAuth } from "@/hooks/use-auth";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { useWorkspaces } from "@/hooks/use-workspaces";
+import { GlobalUploader } from "@/components/global-uploader";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -277,6 +278,7 @@ function AppLayout() {
           </div>
         </main>
       </div>
+      <GlobalUploader />
     </div>
   );
 }
