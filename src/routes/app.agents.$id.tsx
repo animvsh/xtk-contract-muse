@@ -124,3 +124,33 @@ function AgentDetail() {
     </div>
   );
 }
+
+function buildMockRuns(agent: Agent): Run[] {
+  const steps = agent.spec.steps ?? [];
+  const trig = agent.spec.trigger?.description ?? "Triggered";
+  const now = Date.now();
+  const samples: Array<{ summary: string; detail: (s: { title: string; integration: string; action: string }) => string }> = [
+    {
+      summary: `${trig} — completed in 1.4s`,
+      detail: (s) => `${s.integration}: ${s.action} → ok`,
+    },
+    {
+      summary: `Scheduled run · processed 12 items`,
+      detail: (s) => `${s.title} via ${s.integration} (${s.action})`,
+    },
+    {
+      summary: `Manual run by you — 8 records updated`,
+      detail: (s) => `${s.integration} • ${s.action} • 200 OK`,
+    },
+  ];
+  return samples.map((sample, i) => {
+    const lines = steps.length
+      ? steps.map((s) => `• ${sample.detail(s)}`)
+      : ["• Trigger received", "• Processed payload", "• Wrote results"];
+    return {
+      id: `mock-${i}`,
+      created_at: new Date(now - (i + 1) * 1000 * 60 * 47).toISOString(),
+      log: `${sample.summary}\n\n${lines.join("\n")}`,
+    };
+  });
+}
