@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, Plug, FileText, MessageSquare, Github, Mail, Slack, Send } from "lucide-react";
+import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, Plug, FileText, MessageSquare, Github, Mail, Slack, Send, Upload, FileStack, Paperclip, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import foundersIncLogo from "@/assets/founders-inc.png";
