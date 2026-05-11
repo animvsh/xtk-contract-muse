@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FileText,
   Search,
@@ -16,6 +16,10 @@ import {
   FileType,
   Folder,
   Clock,
+  Building2,
+  Maximize2,
+  Plus,
+  Minus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/files")({
@@ -203,95 +207,306 @@ function matches(f: FileItem, q: string, filter: (typeof FILTERS)[number]) {
   return true;
 }
 
+type GraphNode = {
+  id: string;
+  kind: "center" | "source" | "file";
+  x: number;
+  y: number;
+  label: string;
+  sublabel?: string;
+  source?: string;
+  file?: FileItem;
+};
+
+type GraphEdge = { from: string; to: string };
+
+const SOURCE_TONE: Record<string, string> = {
+  Notion: "oklch(0.45 0.05 250)",
+  Drive: "oklch(0.6 0.18 145)",
+  Figma: "oklch(0.65 0.2 320)",
+  Dropbox: "oklch(0.55 0.2 250)",
+  Local: "oklch(0.55 0.05 60)",
+  GitHub: "oklch(0.3 0.02 250)",
+};
+
+function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const cx = 1400;
+  const cy = 1000;
+  const nodes: GraphNode[] = [
+    { id: "center", kind: "center", x: cx, y: cy, label: "Workspace", sublabel: "Beevr" },
+  ];
+  const edges: GraphEdge[] = [];
+  const sources = Array.from(new Set(files.map((f) => f.source)));
+  const sourceRadius = 480;
+  sources.forEach((src, i) => {
+    const a = (i / sources.length) * Math.PI * 2 - Math.PI / 2;
+    const sx = cx + Math.cos(a) * sourceRadius;
+    const sy = cy + Math.sin(a) * sourceRadius;
+    const sId = `src_${src}`;
+    nodes.push({ id: sId, kind: "source", x: sx, y: sy, label: src, source: src });
+    edges.push({ from: "center", to: sId });
+    const inSource = files.filter((f) => f.source === src);
+    const fileRadius = 300;
+    const spread = Math.PI * 0.9;
+    inSource.forEach((f, j) => {
+      const t = inSource.length === 1 ? 0 : j / (inSource.length - 1) - 0.5;
+      const fa = a + t * spread;
+      nodes.push({
+        id: f.id,
+        kind: "file",
+        x: sx + Math.cos(fa) * fileRadius,
+        y: sy + Math.sin(fa) * fileRadius,
+        label: f.name,
+        source: src,
+        file: f,
+      });
+      edges.push({ from: sId, to: f.id });
+    });
+  });
+  return { nodes, edges };
+}
+
 function Files() {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(0.55);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const dragging = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const visible = useMemo(() => FILES.filter((f) => matches(f, query, filter)), [query, filter]);
+  const matchedIds = useMemo(() => {
+    if (!query) return new Set(FILES.map((f) => f.id));
+    const q = query.toLowerCase();
+    return new Set(
+      FILES.filter(
+        (f) =>
+          f.name.toLowerCase().includes(q) ||
+          f.owner.toLowerCase().includes(q) ||
+          f.source.toLowerCase().includes(q),
+      ).map((f) => f.id),
+    );
+  }, [query]);
+  const { nodes, edges } = useMemo(() => buildGraph(FILES), []);
   const open = openId ? FILES.find((f) => f.id === openId) ?? null : null;
 
-  return (
-    <div className="mx-auto w-full max-w-5xl flex-1 overflow-y-auto px-6 py-8">
-      <div>
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[oklch(0.68_0.22_40)]">
-          <Folder className="h-3.5 w-3.5" /> Workspace files
-        </div>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">Files</h1>
-        <p className="mt-1 text-sm text-[oklch(0.4_0_0)]">
-          Every file your workspace has indexed. Click one to open it.
-        </p>
-      </div>
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    setPan({ x: r.width / 2 - 1400 * zoom, y: r.height / 2 - 1000 * zoom });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <div className="flex flex-1 items-center gap-2 rounded-xl border border-black/10 bg-white/80 px-3 py-2 shadow-sm focus-within:border-[oklch(0.68_0.22_40)]/40">
+  const onWheel = (e: React.WheelEvent) => {
+    const delta = -e.deltaY * 0.0015;
+    const next = Math.min(1.4, Math.max(0.25, zoom + delta));
+    if (!containerRef.current) return setZoom(next);
+    const r = containerRef.current.getBoundingClientRect();
+    const mx = e.clientX - r.left;
+    const my = e.clientY - r.top;
+    const wx = (mx - pan.x) / zoom;
+    const wy = (my - pan.y) / zoom;
+    setPan({ x: mx - wx * next, y: my - wy * next });
+    setZoom(next);
+  };
+  const onMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("[data-node]")) return;
+    dragging.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragging.current) return;
+    setPan({
+      x: dragging.current.px + (e.clientX - dragging.current.x),
+      y: dragging.current.py + (e.clientY - dragging.current.y),
+    });
+  };
+  const endDrag = () => {
+    dragging.current = null;
+  };
+  const fit = () => {
+    if (!containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    const z = 0.55;
+    setZoom(z);
+    setPan({ x: r.width / 2 - 1400 * z, y: r.height / 2 - 1000 * z });
+  };
+
+  return (
+    <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 flex items-start justify-between gap-3 p-4 sm:p-6">
+        <div className="pointer-events-auto max-w-md">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[oklch(0.68_0.22_40)]">
+            <Folder className="h-3.5 w-3.5" /> Knowledge graph
+          </div>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Files</h1>
+          <p className="mt-1 hidden text-sm text-[oklch(0.4_0_0)] sm:block">
+            Every source and file connected to your workspace. Drag to pan, scroll to zoom.
+          </p>
+        </div>
+        <div className="pointer-events-auto flex w-full max-w-xs items-center gap-2 rounded-xl border border-black/10 bg-white/90 px-3 py-2 shadow-sm backdrop-blur focus-within:border-[oklch(0.68_0.22_40)]/40">
           <Search className="h-4 w-4 text-[oklch(0.5_0_0)]" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search files or owners…"
+            placeholder="Search the graph…"
             className="w-full bg-transparent text-sm outline-none placeholder:text-[oklch(0.55_0_0)]"
           />
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`clicky clicky-sm rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-              filter === f
-                ? "border-[oklch(0.68_0.22_40)] bg-[oklch(0.68_0.22_40)] text-white"
-                : "border-black/10 bg-white/70 text-[oklch(0.3_0_0)] hover:bg-white"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      <div
+        ref={containerRef}
+        onWheel={onWheel}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={endDrag}
+        onMouseLeave={endDrag}
+        className="relative flex-1 cursor-grab overflow-hidden bg-[oklch(0.985_0.005_85)] active:cursor-grabbing"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, oklch(0.85 0.01 85) 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+        }}
+      >
+        <div
+          className="absolute left-0 top-0 origin-top-left"
+          style={{
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+            width: 2800,
+            height: 2000,
+          }}
+        >
+          <svg width={2800} height={2000} className="pointer-events-none absolute inset-0">
+            <defs>
+              <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <circle cx={1400} cy={1000} r={520} fill="url(#centerGlow)" />
+            {edges.map((e, i) => {
+              const a = nodes.find((n) => n.id === e.from)!;
+              const b = nodes.find((n) => n.id === e.to)!;
+              const isMatch = b.kind !== "file" || matchedIds.has(b.id);
+              const active = hoverId === a.id || hoverId === b.id;
+              return (
+                <line
+                  key={i}
+                  x1={a.x}
+                  y1={a.y}
+                  x2={b.x}
+                  y2={b.y}
+                  stroke={active ? "oklch(0.68 0.22 40)" : "oklch(0.7 0.02 85)"}
+                  strokeWidth={active ? 2.5 : 1.25}
+                  strokeOpacity={isMatch ? (active ? 0.9 : 0.45) : 0.08}
+                  strokeDasharray={a.kind === "center" ? "0" : "4 6"}
+                />
+              );
+            })}
+          </svg>
 
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((f) => {
-          const meta = KIND_META[f.kind];
-          const Icon = meta.icon;
-          return (
-            <button
-              key={f.id}
-              onClick={() => setOpenId(f.id)}
-              className="clicky group relative flex flex-col gap-3 rounded-2xl border border-black/5 bg-white/70 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/30 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between">
+          {nodes.map((n) => {
+            if (n.kind === "center") {
+              return (
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-sm"
-                  style={{ background: meta.tone }}
+                  key={n.id}
+                  data-node
+                  className="absolute -translate-x-1/2 -translate-y-1/2"
+                  style={{ left: n.x, top: n.y }}
                 >
-                  <Icon className="h-5 w-5" />
+                  <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.72_0.22_40)] to-[oklch(0.6_0.22_30)] text-white shadow-[0_20px_60px_-15px_oklch(0.68_0.22_40_/_0.6)] ring-4 ring-white">
+                    <Building2 className="h-7 w-7" />
+                    <div className="mt-1 text-xs font-semibold tracking-wide">{n.label}</div>
+                    <div className="text-[10px] opacity-80">{n.sublabel}</div>
+                  </div>
                 </div>
-                {f.starred && (
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                )}
-              </div>
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-[oklch(0.2_0_0)]">{f.name}</div>
-                <div className="mt-0.5 text-[11px] text-[oklch(0.5_0_0)]">
-                  {f.source} · {f.owner}
+              );
+            }
+            if (n.kind === "source") {
+              const tone = SOURCE_TONE[n.source!] ?? "oklch(0.5 0 0)";
+              return (
+                <div
+                  key={n.id}
+                  data-node
+                  onMouseEnter={() => setHoverId(n.id)}
+                  onMouseLeave={() => setHoverId(null)}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  style={{ left: n.x, top: n.y }}
+                >
+                  <div
+                    className="flex h-20 w-20 flex-col items-center justify-center rounded-2xl text-white shadow-lg ring-4 ring-white transition-transform hover:scale-105"
+                    style={{ background: tone }}
+                  >
+                    <Folder className="h-6 w-6" />
+                    <div className="mt-0.5 text-[10px] font-semibold">{n.label}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-auto flex items-center justify-between text-[11px] text-[oklch(0.5_0_0)]">
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> {f.updated}
-                </span>
-                <span>{f.size}</span>
-              </div>
-            </button>
-          );
-        })}
-        {visible.length === 0 && (
-          <div className="col-span-full rounded-2xl border border-dashed border-black/10 bg-white/40 p-10 text-center text-sm text-[oklch(0.45_0_0)]">
-            No files match.
-          </div>
-        )}
+              );
+            }
+            const f = n.file!;
+            const meta = KIND_META[f.kind];
+            const Icon = meta.icon;
+            const dim = !matchedIds.has(f.id);
+            return (
+              <button
+                key={n.id}
+                data-node
+                onMouseEnter={() => setHoverId(n.id)}
+                onMouseLeave={() => setHoverId(null)}
+                onClick={() => setOpenId(f.id)}
+                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/5 bg-white/95 p-3 text-left shadow-md backdrop-blur transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-xl ${dim ? "opacity-25" : ""}`}
+                style={{ left: n.x, top: n.y }}
+              >
+                <div className="flex items-start justify-between">
+                  <div
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-white shadow-sm"
+                    style={{ background: meta.tone }}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  {f.starred && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-[12px] font-semibold text-[oklch(0.2_0_0)]">{f.name}</div>
+                  <div className="mt-0.5 flex items-center justify-between text-[10px] text-[oklch(0.5_0_0)]">
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="h-2.5 w-2.5" /> {f.updated}
+                    </span>
+                    <span>{f.size}</span>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1 rounded-xl border border-black/10 bg-white/90 p-1 shadow-md backdrop-blur">
+          <button
+            onClick={() => setZoom((z) => Math.min(1.4, z + 0.15))}
+            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+            title="Zoom in"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setZoom((z) => Math.max(0.25, z - 0.15))}
+            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+            title="Zoom out"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <button
+            onClick={fit}
+            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+            title="Recenter"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="pointer-events-none absolute bottom-4 left-4 z-20 rounded-lg bg-white/80 px-2.5 py-1 text-[10px] font-medium text-[oklch(0.45_0_0)] shadow-sm backdrop-blur">
+          {Math.round(zoom * 100)}%
+        </div>
       </div>
 
       {open && <FileViewer file={open} onClose={() => setOpenId(null)} />}
