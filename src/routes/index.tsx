@@ -158,12 +158,12 @@ function Landing() {
   );
 }
 
-type ViewKey = "brain" | "agents" | "connections";
+type ViewKey = "files" | "agents" | "brain";
 
 const NAV: { key: ViewKey; label: string; icon: typeof Brain }[] = [
-  { key: "brain", label: "Brain", icon: Brain },
+  { key: "files", label: "Files", icon: FileStack },
   { key: "agents", label: "Agents", icon: Bot },
-  { key: "connections", label: "Connections", icon: Plug },
+  { key: "brain", label: "Brain", icon: Brain },
 ];
 
 function useTick(ms: number) {
