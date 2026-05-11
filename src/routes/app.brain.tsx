@@ -122,6 +122,10 @@ type McpDraft = {
   docsMarkdown: string;
 };
 
+type ClarifyOption = { value: string; label: string; description?: string };
+type ClarifyQuestion = { id: string; question: string; options: ClarifyOption[]; multi?: boolean; allowOther?: boolean };
+type ClarifyDraft = { intent: "agent" | "api" | "mcp"; summary: string; questions: ClarifyQuestion[] };
+
 
 type StagedFile = {
   id: string;
@@ -352,7 +356,7 @@ function BrainPage() {
               msg.role === "user" ? (
                 <UserMessage key={msg.id} msg={msg} />
               ) : (
-                <AssistantMessage key={msg.id} msg={msg} />
+                <AssistantMessage key={msg.id} msg={msg} onSend={(text) => sendMessage({ text })} />
               ),
             )}
             {status === "submitted" && (
@@ -535,7 +539,7 @@ type ToolPartShape = {
   errorText?: string;
 };
 
-function AssistantMessage({ msg }: { msg: UIMsg }) {
+function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) => void }) {
   // Build the live plan + ordered render units from message parts
   const plan: PlanTask[] = [];
   const taskIndex = new Map<string, PlanTask>();
@@ -547,6 +551,7 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
     | { kind: "agent"; key: string; draft: AgentDraft }
     | { kind: "api"; key: string; draft: ApiDraft }
     | { kind: "mcp"; key: string; draft: McpDraft }
+    | { kind: "clarify"; key: string; draft: ClarifyDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
 
 
@@ -582,6 +587,14 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
       const input = tp.input as McpDraft | undefined;
       if (input && input.name) {
         units.push({ kind: "mcp", key: `mcp${idx}`, draft: input });
+      }
+      return;
+    }
+
+    if (name === "clarify") {
+      const input = tp.input as ClarifyDraft | undefined;
+      if (input && Array.isArray(input.questions) && input.questions.length > 0) {
+        units.push({ kind: "clarify", key: `c${idx}`, draft: input });
       }
       return;
     }
@@ -660,6 +673,9 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
           }
           if (u.kind === "mcp") {
             return <McpProposalCard key={u.key} draft={u.draft} />;
+          }
+          if (u.kind === "clarify") {
+            return <ClarifyCard key={u.key} draft={u.draft} onSend={onSend} />;
           }
           if (u.kind === "tool") {
             return <ToolPart key={u.key} part={u.part} />;
@@ -1559,4 +1575,164 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
 
 function prettifyJson(s: string): string {
   try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
+}
+
+function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: string) => void }) {
+  const questions = Array.isArray(draft?.questions) ? draft.questions : [];
+  const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [other, setOther] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <span className="shimmer-text">Drafting questions…</span>
+      </div>
+    );
+  }
+
+  const intentLabel = draft.intent === "agent" ? "agent" : draft.intent === "api" ? "API" : "MCP";
+
+  const toggle = (qid: string, value: string, multi: boolean) => {
+    setAnswers((cur) => {
+      const prev = cur[qid] ?? [];
+      if (multi) {
+        return { ...cur, [qid]: prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value] };
+      }
+      return { ...cur, [qid]: [value] };
+    });
+  };
+
+  const allAnswered = questions.every((q) => {
+    const a = answers[q.id] ?? [];
+    if (a.includes("__other__")) return (other[q.id] ?? "").trim().length > 0;
+    return a.length > 0;
+  });
+
+  const submit = () => {
+    const lines: string[] = [`Here are my answers (${intentLabel}):`];
+    for (const q of questions) {
+      const picks = answers[q.id] ?? [];
+      const labels = picks.map((v) => {
+        if (v === "__other__") return `Other: ${other[q.id] ?? ""}`.trim();
+        return q.options.find((o) => o.value === v)?.label ?? v;
+      });
+      lines.push(`- ${q.question} → ${labels.join(", ")}`);
+    }
+    lines.push("", "Now go ahead and create it.");
+    setSubmitted(true);
+    onSend(lines.join("\n"));
+  };
+
+  return (
+    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
+      <div className="relative px-5 pt-5 pb-3">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
+        <div className="relative flex items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-white shadow-lg shadow-primary/20">
+            <MessageSquare className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+              Quick questions · {intentLabel}
+            </div>
+            <p className="mt-0.5 text-sm text-foreground">{draft.summary}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4 border-t border-black/5 bg-muted/20 p-4">
+        {questions.map((q, qi) => {
+          const multi = !!q.multi;
+          const allowOther = q.allowOther !== false;
+          const picks = answers[q.id] ?? [];
+          return (
+            <div key={q.id} className="space-y-2">
+              <div className="text-[13px] font-semibold text-foreground">
+                <span className="mr-1.5 text-muted-foreground">{qi + 1}.</span>
+                {q.question}
+                {multi && <span className="ml-2 text-[10px] font-medium text-muted-foreground">(pick any)</span>}
+              </div>
+              <div className="grid gap-1.5 sm:grid-cols-2">
+                {q.options.map((o) => {
+                  const active = picks.includes(o.value);
+                  return (
+                    <button
+                      key={o.value}
+                      disabled={submitted}
+                      onClick={() => toggle(q.id, o.value, multi)}
+                      className={`clicky-sm group flex items-start gap-2 rounded-lg border px-3 py-2 text-left text-[13px] transition-all ${
+                        active
+                          ? "border-primary bg-primary/5 text-foreground shadow-sm"
+                          : "border-black/10 bg-white text-foreground/85 hover:border-primary/40 hover:bg-primary/5"
+                      } disabled:opacity-60`}
+                    >
+                      <span
+                        className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
+                          active ? "border-primary bg-primary text-white" : "border-black/20 bg-white"
+                        }`}
+                      >
+                        {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <div className="font-medium">{o.label}</div>
+                        {o.description && <div className="text-[11px] text-muted-foreground">{o.description}</div>}
+                      </span>
+                    </button>
+                  );
+                })}
+                {allowOther && (
+                  <button
+                    disabled={submitted}
+                    onClick={() => toggle(q.id, "__other__", multi)}
+                    className={`clicky-sm flex items-start gap-2 rounded-lg border px-3 py-2 text-left text-[13px] transition-all ${
+                      picks.includes("__other__")
+                        ? "border-primary bg-primary/5"
+                        : "border-dashed border-black/15 bg-white hover:border-primary/40"
+                    } disabled:opacity-60`}
+                  >
+                    <span
+                      className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
+                        picks.includes("__other__") ? "border-primary bg-primary text-white" : "border-black/20"
+                      }`}
+                    >
+                      {picks.includes("__other__") && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                    </span>
+                    <span className="font-medium text-foreground/80">Other…</span>
+                  </button>
+                )}
+              </div>
+              {picks.includes("__other__") && (
+                <input
+                  autoFocus
+                  disabled={submitted}
+                  value={other[q.id] ?? ""}
+                  onChange={(e) => setOther((c) => ({ ...c, [q.id]: e.target.value }))}
+                  placeholder="Type your answer…"
+                  className="w-full rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-primary"
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-end gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
+        {submitted ? (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+            <Check className="h-3.5 w-3.5" strokeWidth={3} /> Sent — building now
+          </span>
+        ) : (
+          <button
+            onClick={submit}
+            disabled={!allAnswered}
+            className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Submit answers
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }

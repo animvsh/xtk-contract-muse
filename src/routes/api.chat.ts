@@ -187,6 +187,26 @@ const tools = {
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
+  clarify: tool({
+    description:
+      "Ask the user 1-3 quick clarifying questions BEFORE creating an agent / API / MCP when critical info is missing or ambiguous (e.g. phone number for SMS agent, which metric to track, which data source to read, cadence/time, which workspace to expose). Each question shows a small UI card with multiple-choice options. After calling this, end your response with ONE short plain-text line like 'A few quick questions to get this right.' DO NOT call proposeAgent / proposeApi / proposeMcp in the same response. The user's answers will arrive as the next user message.",
+    inputSchema: z.object({
+      intent: z.enum(["agent", "api", "mcp"]).describe("What you're about to create"),
+      summary: z.string().describe("One sentence on what you're planning to build, e.g. 'Daily SMS with employee effectiveness score'"),
+      questions: z.array(z.object({
+        id: z.string().describe("kebab-case id, e.g. 'recipient'"),
+        question: z.string().describe("Short question, e.g. 'Where should I send it?'"),
+        options: z.array(z.object({
+          value: z.string().describe("Short value the assistant will see, e.g. 'sms'"),
+          label: z.string().describe("Display label, e.g. 'Text my phone'"),
+          description: z.string().optional().describe("Optional one-line clarifier"),
+        })).min(2).max(5),
+        multi: z.boolean().optional().describe("Allow multiple selections. Default false."),
+        allowOther: z.boolean().optional().describe("Show a free-text 'Other' option. Default true."),
+      })).min(1).max(3),
+    }),
+    execute: async (input) => ({ ok: true, awaiting: true, draft: input }),
+  }),
   proposeMcp: tool({
     description:
       "Use WHEN AND ONLY WHEN the user asks to create / build / make / spin up an MCP, MCP server, Model Context Protocol server, CLI tool, or 'something I can use from Claude Code / Cursor / Codex / my coding tool / terminal' to access their workspace. Render a draft MCP server the user can review and save. Do NOT call createPlan, updateStep, proposeApi, proposeAgent, or other tools alongside this — the proposal IS the response.",
@@ -259,6 +279,8 @@ export const Route = createFileRoute("/api/chat")({
             "- ALWAYS use the placeholder server URL `https://mcp.beevr.dev/{slug}` in install snippets.",
             "- Then ONE short plain-text line like 'Here's the MCP — install it in your coding tool and start calling tools.' Nothing else.",
             "- DO NOT call createPlan, updateStep, proposeAgent, proposeApi, or other tools.",
+            "",
+            "CLARIFICATION RULE (applies to MODE A / B / E): Before proposing an agent, API, or MCP, decide if there's a CRITICAL missing detail you genuinely cannot guess (e.g. SMS but no phone, ambiguous metric source, multiple plausible cadences). If yes, call `clarify` ONCE with 1-3 multiple-choice questions and end your turn with ONE short line. The user's answers will come back as the next message — only THEN call propose*. If you can make a confident assumption with a sensible default, skip clarify and propose directly.",
             "",
             "MODE C — CONVERSATIONAL. Greetings, small talk, thanks, vague non-tasks, meta questions.",
             "- ONE short, warm, plain-text reply (1-2 sentences). For greetings, briefly mention you can search Notion/Gmail, draft docs, send emails, build agents, create APIs, and spin up MCP servers.",
