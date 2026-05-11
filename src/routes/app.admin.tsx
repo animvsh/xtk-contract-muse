@@ -202,27 +202,27 @@ function AdminPage() {
   const goNext = () => selectedIdx >= 0 && selectedIdx < filtered.length - 1 && setSelected(filtered[selectedIdx + 1]);
 
   return (
-    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-4 py-8 md:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
+    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-3 py-5 sm:px-4 sm:py-8 md:px-6">
+      <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/20 bg-[oklch(0.68_0.22_40)]/10 px-3 py-1 text-xs font-semibold text-[oklch(0.55_0.22_40)]">
             <Shield className="h-3 w-3" /> Admin
           </div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-[oklch(0.18_0_0)]">Waitlist applicants</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-[oklch(0.18_0_0)] sm:text-3xl">Waitlist applicants</h1>
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
-            Triage applicants. Star, mark as contacted, search and export.
+            Triage applicants. Star, mark as contacted, take notes and export.
           </p>
         </div>
         <button
           onClick={exportCsv}
           disabled={rows.length === 0}
-          className="clicky ripple inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0_0)] disabled:opacity-50"
+          className="clicky ripple inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0_0)] disabled:opacity-50 sm:w-auto"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-3 md:grid-cols-5">
         <StatCard icon={Users} label="Total" value={stats.total} accent="oklch(0.68 0.22 40)" />
         <StatCard icon={TrendingUp} label="Last 7d" value={stats.last7} accent="oklch(0.7 0.16 145)" />
         <StatCard icon={Calendar} label="Last 24h" value={stats.last24} accent="oklch(0.68 0.18 250)" />
@@ -230,17 +230,17 @@ function AdminPage() {
         <StatCard icon={CheckCircle2} label="Contacted" value={stats.contacted} accent="oklch(0.6 0.14 160)" />
       </div>
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[220px]">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[oklch(0.5_0_0)]" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name, email, business, goal…"
+            placeholder="Search applicants…"
             className="w-full rounded-xl border border-black/10 bg-white py-2.5 pl-10 pr-3 text-sm text-[oklch(0.2_0_0)] outline-none placeholder:text-[oklch(0.55_0_0)] focus:border-[oklch(0.68_0.22_40)]/40"
           />
         </div>
-        <div className="relative inline-flex items-center">
+        <div className="relative hidden items-center sm:inline-flex">
           <ArrowUpDown className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
           <select
             value={sort}
@@ -253,28 +253,50 @@ function AdminPage() {
             <option value="starred">Starred first</option>
           </select>
         </div>
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          className={`clicky-sm inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-medium sm:hidden ${
+            filtersOpen || filter !== "all"
+              ? "border-[oklch(0.68_0.22_40)]/40 bg-[oklch(0.68_0.22_40)]/10 text-[oklch(0.55_0.22_40)]"
+              : "border-black/10 bg-white text-[oklch(0.35_0_0)]"
+          }`}
+        >
+          <Filter className="h-4 w-4" />
+        </button>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-1.5">
-        {([
-          ["all", "All"],
-          ["starred", "Starred"],
-          ["uncontacted", "Uncontacted"],
-          ["contacted", "Contacted"],
-          ["with_business", "Has business"],
-        ] as [FilterKey, string][]).map(([k, l]) => (
-          <button
-            key={k}
-            onClick={() => setFilter(k)}
-            className={`clicky-sm rounded-full px-3 py-1.5 text-xs font-medium transition ${
-              filter === k
-                ? "bg-[oklch(0.68_0.22_40)] text-white"
-                : "border border-black/10 bg-white text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
-            }`}
+      <div className={`mb-4 ${filtersOpen ? "block" : "hidden sm:block"}`}>
+        <div className="flex flex-wrap gap-1.5">
+          {([
+            ["all", "All"],
+            ["starred", "Starred"],
+            ["uncontacted", "Uncontacted"],
+            ["contacted", "Contacted"],
+            ["with_business", "Has business"],
+          ] as [FilterKey, string][]).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setFilter(k)}
+              className={`clicky-sm rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                filter === k
+                  ? "bg-[oklch(0.68_0.22_40)] text-white"
+                  : "border border-black/10 bg-white text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
+              }`}
+            >
+              {l}
+            </button>
+          ))}
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[oklch(0.35_0_0)] outline-none sm:hidden"
           >
-            {l}
-          </button>
-        ))}
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name">Name A–Z</option>
+            <option value="starred">Starred</option>
+          </select>
+        </div>
       </div>
 
       {busy ? (
@@ -282,17 +304,18 @@ function AdminPage() {
           <Loader2 className="h-4 w-4 animate-spin" /> Loading applicants…
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-12 text-center text-sm text-[oklch(0.45_0_0)]">
+        <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-8 text-center text-sm text-[oklch(0.45_0_0)] sm:p-12">
           {rows.length === 0 ? "No waitlist signups yet." : "No matches."}
         </div>
       ) : (
-        <div className="grid gap-2">
+        <div className="grid gap-2 pb-6">
           {filtered.map((r) => (
             <Row
               key={r.id}
               r={r}
               starred={starred.has(r.id)}
               contacted={contacted.has(r.id)}
+              hasNote={Boolean(notes[r.id])}
               onOpen={() => setSelected(r)}
               onStar={() => toggleStar(r.id)}
               onContacted={() => toggleContacted(r.id)}
@@ -306,8 +329,10 @@ function AdminPage() {
           s={selected}
           starred={starred.has(selected.id)}
           contacted={contacted.has(selected.id)}
+          note={notes[selected.id] || ""}
           onStar={() => toggleStar(selected.id)}
           onContacted={() => toggleContacted(selected.id)}
+          onNoteChange={(v) => updateNote(selected.id, v)}
           onClose={() => setSelected(null)}
           onPrev={selectedIdx > 0 ? goPrev : undefined}
           onNext={selectedIdx < filtered.length - 1 ? goNext : undefined}
