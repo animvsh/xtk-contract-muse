@@ -356,7 +356,7 @@ function BrainPage() {
               msg.role === "user" ? (
                 <UserMessage key={msg.id} msg={msg} />
               ) : (
-                <AssistantMessage key={msg.id} msg={msg} />
+                <AssistantMessage key={msg.id} msg={msg} onSend={(text) => sendMessage({ text })} />
               ),
             )}
             {status === "submitted" && (
