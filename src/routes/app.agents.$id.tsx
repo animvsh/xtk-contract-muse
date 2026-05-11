@@ -230,8 +230,6 @@ function AgentDetail() {
     );
   }
 
-  const steps = agent.spec.steps ?? [];
-
   return (
     <div className="mx-auto flex h-full w-full max-w-7xl flex-col px-6 py-8">
       <Link to="/app/agents" className="mb-4 inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
