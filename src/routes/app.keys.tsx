@@ -46,12 +46,13 @@ function KeysPage() {
   const list = useServerFn(listAccessKeys);
   const setStatus = useServerFn(updateAccessKeyStatus);
   const qc = useQueryClient();
-  const { data: keys = [], error, isLoading } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ["access-keys", user?.id],
     queryFn: () => list(),
     enabled: !!user,
     retry: false,
   });
+  const keys: AccessKey[] = Array.isArray(data) ? data : [];
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<AccessKey | null>(null);
 
