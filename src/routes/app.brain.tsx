@@ -551,6 +551,7 @@ function AssistantMessage({ msg }: { msg: UIMsg }) {
     | { kind: "agent"; key: string; draft: AgentDraft }
     | { kind: "api"; key: string; draft: ApiDraft }
     | { kind: "mcp"; key: string; draft: McpDraft }
+    | { kind: "clarify"; key: string; draft: ClarifyDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
 
 
