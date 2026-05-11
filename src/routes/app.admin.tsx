@@ -348,6 +348,7 @@ function Row({
   r,
   starred,
   contacted,
+  hasNote,
   onOpen,
   onStar,
   onContacted,
@@ -355,6 +356,7 @@ function Row({
   r: Submission;
   starred: boolean;
   contacted: boolean;
+  hasNote: boolean;
   onOpen: () => void;
   onStar: () => void;
   onContacted: () => void;
@@ -374,11 +376,11 @@ function Row({
     <div
       onClick={onOpen}
       role="button"
-      className={`clicky group flex w-full items-center gap-3 rounded-2xl border bg-white p-3.5 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 ${
+      className={`clicky group flex w-full items-center gap-2.5 rounded-2xl border bg-white p-3 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 sm:gap-3 sm:p-3.5 ${
         contacted ? "border-[oklch(0.6_0.14_160)]/30 bg-[oklch(0.97_0.04_160)]/40" : "border-black/5"
       }`}
     >
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white">
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white sm:h-11 sm:w-11">
         {(r.full_name?.[0] || r.email[0]).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
@@ -387,28 +389,35 @@ function Row({
             {r.full_name || r.email.split("@")[0]}
           </div>
           {r.business && (
-            <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] sm:inline">
+            <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] md:inline">
               {r.business.slice(0, 24)}{r.business.length > 24 ? "…" : ""}
             </span>
           )}
           {contacted && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-[oklch(0.6_0.14_160)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.14_160)]">
+            <span className="hidden items-center gap-1 rounded-md bg-[oklch(0.6_0.14_160)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.14_160)] sm:inline-flex">
               <CheckCircle2 className="h-2.5 w-2.5" /> Contacted
             </span>
           )}
+          {hasNote && (
+            <span title="Has note" className="inline-flex shrink-0 items-center text-[oklch(0.6_0.14_250)]">
+              <StickyNote className="h-3 w-3" />
+            </span>
+          )}
         </div>
-        <div className="mt-0.5 flex items-center gap-2 truncate text-xs text-[oklch(0.45_0_0)]">
+        <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-[oklch(0.45_0_0)]">
           <Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{r.email}</span>
         </div>
       </div>
-      <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] sm:flex">
+      <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] md:flex">
         <span>{new Date(r.created_at).toLocaleDateString()}</span>
         <span className="text-[10px]">{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
-      <div className="flex items-center gap-1">
-        <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
-          {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
-        </IconBtn>
+      <div className="flex items-center gap-0.5 sm:gap-1">
+        <span className="hidden sm:inline-flex">
+          <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
+            {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+          </IconBtn>
+        </span>
         <IconBtn onClick={stop(onContacted)} title={contacted ? "Mark as uncontacted" : "Mark as contacted"} active={contacted}>
           <CheckCircle2 className={`h-3.5 w-3.5 ${contacted ? "text-[oklch(0.55_0.16_160)]" : ""}`} />
         </IconBtn>
@@ -416,7 +425,7 @@ function Row({
           <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)] text-[oklch(0.6_0.16_85)]" : ""}`} />
         </IconBtn>
       </div>
-      <ChevronRight className="h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5" />
+      <ChevronRight className="hidden h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5 sm:block" />
     </div>
   );
 }
