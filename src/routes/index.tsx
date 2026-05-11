@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import foundersIncLogo from "@/assets/founders-inc.png";
 
 
 export const Route = createFileRoute("/")({
