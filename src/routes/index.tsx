@@ -19,12 +19,12 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-[oklch(0.04_0_0)] text-[oklch(0.15_0_0)]">
-      {/* Outer dark frame with side glow */}
+    <div className="min-h-screen bg-white text-[oklch(0.15_0_0)]">
+      {/* Outer frame */}
       <div className="relative overflow-hidden">
-        {/* Orange ambient glow */}
-        <div className="pointer-events-none absolute -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-60 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-60 blur-[120px]" />
+        {/* Soft orange ambient glow */}
+        <div className="pointer-events-none absolute -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]" />
+        <div className="pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]" />
 
         {/* Inner rounded white card */}
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
