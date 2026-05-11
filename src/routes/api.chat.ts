@@ -177,9 +177,47 @@ const tools = {
         path: z.string(),
         summary: z.string(),
       })).describe("For 'rest' kind, list 4-5 CRUD endpoints (list/get/create/update/delete). For 'function' kind, just the single endpoint."),
+      authentication: z.enum(["none", "api-key", "bearer"]).describe("Auth model. Default to 'api-key' unless the user says public."),
+      errors: z.array(z.object({
+        status: z.number().describe("HTTP status code"),
+        code: z.string().describe("Short error code, e.g. 'not_found'"),
+        message: z.string().describe("Plain-English description"),
+      })).describe("3-5 realistic error responses (400, 401, 404, 422, 500 as relevant)."),
+      docsMarkdown: z.string().describe("Rich markdown documentation (300-700 words). MUST include: ## Overview, ## Authentication, ## Endpoints (with example request and response per endpoint as fenced code blocks), ## Errors, ## Rate limits, ## Changelog. Use realistic content."),
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
+  proposeMcp: tool({
+    description:
+      "Use WHEN AND ONLY WHEN the user asks to create / build / make / spin up an MCP, MCP server, Model Context Protocol server, CLI tool, or 'something I can use from Claude Code / Cursor / Codex / my coding tool / terminal' to access their workspace. Render a draft MCP server the user can review and save. Do NOT call createPlan, updateStep, proposeApi, proposeAgent, or other tools alongside this — the proposal IS the response.",
+    inputSchema: z.object({
+      name: z.string().describe("Short human name, e.g. 'Workspace Brain MCP'"),
+      slug: z.string().describe("kebab-case slug used as the server identifier, e.g. 'workspace-brain'"),
+      description: z.string().describe("One-sentence summary of what the MCP server exposes"),
+      emoji: z.string().describe("Single fitting emoji, e.g. '🧠'"),
+      transport: z.enum(["http", "sse", "stdio"]).describe("Default to 'http' (Streamable HTTP) unless the user asks for stdio."),
+      tools: z.array(z.object({
+        name: z.string().describe("snake_case tool name, e.g. 'search_notion'"),
+        description: z.string().describe("One sentence on what the tool does"),
+        params: z.array(z.object({
+          name: z.string(),
+          type: z.enum(["string", "number", "boolean", "array", "object"]),
+          required: z.boolean(),
+          description: z.string(),
+          example: z.string().optional(),
+        })),
+        sampleResult: z.string().describe("Realistic pretty-printed JSON the tool returns"),
+      })).min(3).max(8).describe("3-8 tools the MCP exposes. Pick tools that fit the user's request."),
+      resources: z.array(z.object({
+        uri: z.string().describe("Resource URI, e.g. 'beevr://docs/handbook'"),
+        name: z.string(),
+        description: z.string(),
+      })).describe("0-4 readable resources the MCP exposes. Use [] if not relevant."),
+      docsMarkdown: z.string().describe("Rich markdown docs (300-700 words). MUST include: ## Overview, ## Install (with `claude mcp add`, Cursor settings.json snippet, and an OpenAI Codex / Cline JSON snippet — all using the placeholder URL `https://mcp.beevr.dev/{slug}`), ## Tools (one section per tool with params + example), ## Authentication (Bearer access key), ## Troubleshooting."),
+    }),
+    execute: async (input) => ({ ok: true, draft: input }),
+  }),
+
 
 };
 
