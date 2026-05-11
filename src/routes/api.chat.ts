@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import "@tanstack/react-start";
 import {
   convertToModelMessages,
+  smoothStream,
   stepCountIs,
   streamText,
   tool,
