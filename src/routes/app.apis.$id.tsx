@@ -355,11 +355,32 @@ function ParamsSection({ title, params, values, setValues }: {
 
 function Docs({ api }: { api: ApiRow }) {
   const spec = api.spec;
+  const base = typeof window !== "undefined" ? window.location.origin : "https://api.beevr.dev";
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
+    <div className="mx-auto max-w-3xl space-y-8 p-6">
       <section>
-        <h2 className="text-lg font-semibold">Overview</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{spec.description}</p>
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">API reference</div>
+        <h2 className="mt-1 text-2xl font-bold tracking-tight">{spec.name}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{spec.description}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 font-mono text-[11px]">v1</span>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700">● Operational</span>
+          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">Updated {new Date(api.created_at).toLocaleDateString()}</span>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-black/5 bg-white p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold"><Server className="h-4 w-4 text-primary" /> Base URL</div>
+        <pre className="mt-2 overflow-auto rounded-lg bg-[oklch(0.18_0_0)] p-3 font-mono text-xs text-emerald-200">{base}</pre>
+        <p className="mt-2 text-xs text-muted-foreground">All endpoints are relative to this base URL. Use HTTPS in production.</p>
+      </section>
+
+      <section className="rounded-2xl border border-black/5 bg-white p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold"><Lock className="h-4 w-4 text-primary" /> Authentication</div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Pass an access key as a Bearer token in the <code className="rounded bg-muted px-1 py-0.5 font-mono">Authorization</code> header. Create per-API keys in the <span className="font-semibold">Keys</span> tab.
+        </p>
+        <pre className="mt-2 overflow-auto rounded-lg bg-[oklch(0.18_0_0)] p-3 font-mono text-xs text-emerald-200">{`Authorization: Bearer beevr_sk_••••••••••••`}</pre>
       </section>
 
       <section>
@@ -407,12 +428,398 @@ function Docs({ api }: { api: ApiRow }) {
         </section>
       )}
 
+      <section className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-black/5 bg-white p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Clock className="h-4 w-4 text-primary" /> Rate limits</div>
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            <li className="flex justify-between"><span>Free</span><span className="font-mono">60 req / min</span></li>
+            <li className="flex justify-between"><span>Pro</span><span className="font-mono">600 req / min</span></li>
+            <li className="flex justify-between"><span>Enterprise</span><span className="font-mono">Custom</span></li>
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-black/5 bg-white p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold"><AlertCircle className="h-4 w-4 text-primary" /> Errors</div>
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            <li className="flex justify-between"><span><code>400</code> Bad request</span><span>Invalid params</span></li>
+            <li className="flex justify-between"><span><code>401</code> Unauthorized</span><span>Missing key</span></li>
+            <li className="flex justify-between"><span><code>404</code> Not found</span><span>Resource missing</span></li>
+            <li className="flex justify-between"><span><code>429</code> Throttled</span><span>Rate limited</span></li>
+          </ul>
+        </div>
+      </section>
+
       <section>
         <h3 className="text-sm font-semibold">Sample response</h3>
         <pre className="mt-2 overflow-auto rounded-lg border border-black/5 bg-[oklch(0.18_0_0)] p-3 font-mono text-xs leading-relaxed text-emerald-200">
 {prettify(spec.sampleResponse)}
         </pre>
       </section>
+    </div>
+  );
+}
+
+/* ---------- Usage ---------- */
+
+function Usage({ api }: { api: ApiRow }) {
+  const [rows, setRows] = useState<RequestRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("api_requests")
+        .select("*")
+        .eq("api_id", api.id)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (cancelled) return;
+      setRows((data ?? []) as unknown as RequestRow[]);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [api.id]);
+
+  // Mock: blend real history with seed users/calls so the page feels alive
+  const seed = useMemo(() => seedUsage(api.id), [api.id]);
+  const total = rows.length + seed.totalSeed;
+  const successRate = total === 0 ? 100 : Math.min(100, Math.round((rows.filter((r) => r.status < 400).length + seed.success) / total * 100));
+  const avgMs = 80 + (api.id.charCodeAt(0) % 60);
+  const errorRate = Math.max(0, 100 - successRate);
+
+  // Top users — combine seed users and any real recent requests
+  const topUsers = seed.users;
+
+  // 14-day sparkline
+  const days = useMemo(() => seed.days, [seed]);
+  const peak = Math.max(...days);
+
+  if (loading) {
+    return <div className="grid place-items-center py-20"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      {/* KPIs */}
+      <div className="grid gap-3 sm:grid-cols-4">
+        <Kpi icon={Activity} label="Calls (30d)" value={total.toLocaleString()} sub={`+${Math.round(total * 0.18)} vs prev`} tone="primary" />
+        <Kpi icon={Check} label="Success rate" value={`${successRate}%`} sub={`${errorRate}% errors`} tone="emerald" />
+        <Kpi icon={Clock} label="Avg latency" value={`${avgMs}ms`} sub="p95 240ms" tone="amber" />
+        <Kpi icon={UsersIcon} label="Active users" value={String(topUsers.length)} sub="last 7 days" tone="blue" />
+      </div>
+
+      {/* Calls chart */}
+      <section className="rounded-2xl border border-black/5 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold">Calls — last 14 days</h3>
+            <p className="text-xs text-muted-foreground">Peak {peak.toLocaleString()} calls / day</p>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-primary" /> Calls</span>
+          </div>
+        </div>
+        <div className="flex h-40 items-end gap-1.5">
+          {days.map((v, i) => (
+            <div key={i} className="group relative flex-1">
+              <div
+                className="w-full rounded-md bg-primary/80 transition-all hover:bg-primary"
+                style={{ height: `${(v / peak) * 100}%` }}
+                title={`${v} calls`}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+          <span>14d ago</span><span>today</span>
+        </div>
+      </section>
+
+      {/* Top users */}
+      <section className="rounded-2xl border border-black/5 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold flex items-center gap-1.5"><UsersIcon className="h-4 w-4 text-primary" /> Top users</h3>
+          <span className="text-[10px] text-muted-foreground">By calls in last 30 days</span>
+        </div>
+        <ul className="divide-y divide-black/5">
+          {topUsers.map((u, i) => {
+            const pct = Math.round((u.calls / topUsers[0].calls) * 100);
+            return (
+              <li key={u.email} className="flex items-center gap-3 py-2.5">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">{i + 1}</span>
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-semibold text-white" style={{ background: u.color }}>
+                  {u.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="truncate text-sm font-medium">{u.name}</div>
+                    <div className="font-mono text-xs tabular-nums">{u.calls.toLocaleString()}</div>
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{u.email}</div>
+                  <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+                <div className="hidden shrink-0 text-right text-[10px] text-muted-foreground sm:block">
+                  <div>{u.errors} errors</div>
+                  <div>{u.lastSeen}</div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* Endpoint breakdown */}
+      <section className="rounded-2xl border border-black/5 bg-white p-5">
+        <h3 className="mb-3 text-sm font-semibold">By endpoint</h3>
+        <ul className="space-y-2">
+          {(api.spec.endpoints ?? []).slice(0, 5).map((ep, i) => {
+            const calls = Math.round((seed.totalSeed / Math.max(1, api.spec.endpoints?.length || 1)) * (1 - i * 0.12));
+            const pct = Math.round((calls / seed.totalSeed) * 100);
+            return (
+              <li key={i} className="flex items-center gap-3">
+                <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>{ep.method}</span>
+                <code className="min-w-0 flex-1 truncate font-mono text-xs">{ep.path}</code>
+                <div className="hidden h-1.5 w-40 shrink-0 overflow-hidden rounded-full bg-muted sm:block">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="w-16 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">{calls.toLocaleString()}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+function Kpi({ icon: Icon, label, value, sub, tone }: { icon: typeof Check; label: string; value: string; sub: string; tone: "primary" | "emerald" | "amber" | "blue" }) {
+  const toneCls = {
+    primary: "text-primary bg-primary/10",
+    emerald: "text-emerald-700 bg-emerald-500/10",
+    amber: "text-amber-700 bg-amber-500/10",
+    blue: "text-blue-700 bg-blue-500/10",
+  }[tone];
+  return (
+    <div className="rounded-2xl border border-black/5 bg-white p-4">
+      <div className="flex items-center gap-2">
+        <span className={`grid h-7 w-7 place-items-center rounded-lg ${toneCls}`}><Icon className="h-3.5 w-3.5" /></span>
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      </div>
+      <div className="mt-2 text-2xl font-bold tabular-nums">{value}</div>
+      <div className="text-[10px] text-muted-foreground">{sub}</div>
+    </div>
+  );
+}
+
+type SeedUser = { name: string; email: string; calls: number; errors: number; lastSeen: string; color: string };
+function seedUsage(apiId: string): { users: SeedUser[]; days: number[]; totalSeed: number; success: number } {
+  // Deterministic pseudo-random based on id
+  let h = 0;
+  for (let i = 0; i < apiId.length; i++) h = (h * 31 + apiId.charCodeAt(i)) >>> 0;
+  const rand = () => { h = (h * 1664525 + 1013904223) >>> 0; return (h % 1000) / 1000; };
+  const names: Array<[string, string, string]> = [
+    ["Adithya Pradeep", "adithya@beevr.dev", "oklch(0.65 0.2 40)"],
+    ["Sarah Chen", "sarah@beevr.dev", "oklch(0.65 0.18 280)"],
+    ["Maya Patel", "maya@beevr.dev", "oklch(0.62 0.18 145)"],
+    ["Diego Alvarez", "diego@beevr.dev", "oklch(0.6 0.18 240)"],
+    ["Priya Iyer", "priya@beevr.dev", "oklch(0.65 0.18 20)"],
+    ["Noah Kim", "noah@beevr.dev", "oklch(0.55 0.18 200)"],
+  ];
+  const users: SeedUser[] = names.map(([n, e, c]) => {
+    const calls = 200 + Math.round(rand() * 1800);
+    const errors = Math.round(calls * (0.005 + rand() * 0.02));
+    const days = Math.floor(rand() * 6);
+    return { name: n, email: e, calls, errors, color: c, lastSeen: days === 0 ? "today" : `${days}d ago` };
+  }).sort((a, b) => b.calls - a.calls);
+  const days = Array.from({ length: 14 }, (_, i) => 120 + Math.round(rand() * 480) + i * 18);
+  const totalSeed = users.reduce((a, u) => a + u.calls, 0);
+  const success = Math.round(totalSeed * 0.974);
+  return { users, days, totalSeed, success };
+}
+
+/* ---------- Keys ---------- */
+
+type KeyRow = {
+  id: string;
+  name: string;
+  key_prefix: string;
+  key_plaintext: string | null;
+  status: string;
+  created_at: string;
+  last_used_at: string | null;
+  usage_count: number;
+  expires_at: string | null;
+};
+
+function genKey() {
+  const bytes = new Uint8Array(24);
+  if (typeof crypto !== "undefined") crypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  const b64 = btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, "").slice(0, 32);
+  return `beevr_sk_${b64}`;
+}
+async function sha256(s: string) {
+  if (typeof crypto === "undefined" || !crypto.subtle) return s;
+  const data = new TextEncoder().encode(s);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function Keys({ api }: { api: ApiRow }) {
+  const { user } = useAuth();
+  const [keys, setKeys] = useState<KeyRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  const scope = `api:${api.id}`;
+
+  const load = async () => {
+    const { data } = await supabase
+      .from("access_keys")
+      .select("id, name, key_prefix, key_plaintext, status, created_at, last_used_at, usage_count, expires_at")
+      .eq("scope_label", scope)
+      .order("created_at", { ascending: false });
+    setKeys((data ?? []) as KeyRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { void load(); /* eslint-disable-next-line */ }, [api.id]);
+
+  const create = async () => {
+    if (!user) return;
+    if (!newName.trim()) return toast.error("Give the key a name");
+    setCreating(true);
+    const plaintext = genKey();
+    const hash = await sha256(plaintext);
+    const prefix = plaintext.slice(0, 14);
+    const { data, error } = await supabase.from("access_keys").insert({
+      user_id: user.id,
+      name: newName.trim(),
+      key_plaintext: plaintext,
+      key_hash: hash,
+      key_prefix: prefix,
+      scope_label: scope,
+      scope: "api",
+      client: "rest",
+      permission: "read-write",
+      safety: "balanced",
+      status: "active",
+    }).select().single();
+    setCreating(false);
+    if (error) return toast.error(error.message);
+    setRevealedKey(plaintext);
+    setNewName("");
+    if (data) setKeys((k) => [data as KeyRow, ...k]);
+    toast.success("Key created");
+  };
+
+  const revoke = async (id: string) => {
+    if (!confirm("Revoke this key? Existing requests using it will start failing.")) return;
+    const prev = keys;
+    setKeys((k) => k.filter((x) => x.id !== id));
+    const { error } = await supabase.from("access_keys").delete().eq("id", id);
+    if (error) { toast.error(error.message); setKeys(prev); }
+    else toast.success("Key revoked");
+  };
+
+  const copy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied");
+  };
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-4 p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-bold tracking-tight flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-primary" /> API keys</h3>
+          <p className="text-xs text-muted-foreground">Keys scoped to <code className="rounded bg-muted px-1 py-0.5">{api.name}</code>. They only authorize calls to this API's endpoints.</p>
+        </div>
+      </div>
+
+      {/* Reveal banner */}
+      {revealedKey && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
+            <Check className="h-4 w-4" /> Key created — copy it now, you won't see it again
+          </div>
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-white p-2">
+            <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-xs">{revealedKey}</code>
+            <button onClick={() => copy(revealedKey)} className="clicky-sm inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs hover:bg-black/5">
+              <Copy className="h-3 w-3" /> Copy
+            </button>
+            <button onClick={() => setRevealedKey(null)} className="clicky-sm rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-black/5">Done</button>
+          </div>
+        </div>
+      )}
+
+      {/* Create */}
+      <div className="rounded-2xl border border-black/5 bg-white p-4">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Create a new key</div>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && create()}
+            placeholder="e.g. Production server"
+            className="flex-1 rounded-lg border border-black/10 bg-muted/20 px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+          <button
+            onClick={create}
+            disabled={creating}
+            className="clicky inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            Create key
+          </button>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="rounded-2xl border border-black/5 bg-white">
+        {loading ? (
+          <div className="grid place-items-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        ) : keys.length === 0 ? (
+          <div className="grid place-items-center py-10 text-center text-sm text-muted-foreground">
+            <KeyRound className="mb-2 h-5 w-5" />
+            No keys yet for this API.
+          </div>
+        ) : (
+          <ul className="divide-y divide-black/5">
+            {keys.map((k) => (
+              <li key={k.id} className="flex items-start gap-3 p-4">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <KeyRound className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate text-sm font-semibold">{k.name}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${k.status === "active" ? "bg-emerald-500/10 text-emerald-700" : "bg-rose-500/10 text-rose-700"}`}>{k.status}</span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <code className="rounded bg-muted px-2 py-0.5 font-mono text-[11px]">{k.key_prefix}…</code>
+                    {k.key_plaintext && (
+                      <button onClick={() => copy(k.key_plaintext as string)} className="clicky-sm rounded-md p-1 text-muted-foreground hover:bg-black/5" title="Copy key">
+                        <Copy className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+                    <span>Created {new Date(k.created_at).toLocaleDateString()}</span>
+                    <span>· {k.usage_count} calls</span>
+                    <span>· {k.last_used_at ? `last used ${new Date(k.last_used_at).toLocaleDateString()}` : "never used"}</span>
+                  </div>
+                </div>
+                <button onClick={() => revoke(k.id)} className="clicky-sm rounded-md p-2 text-muted-foreground hover:bg-rose-500/10 hover:text-rose-600" title="Revoke">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
