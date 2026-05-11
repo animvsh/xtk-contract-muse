@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Play, Loader2, Copy, Check, Server, Code2, BookOpen, History, Settings, Trash2, BarChart3, KeyRound, Plus, Users as UsersIcon, Activity, Clock, Lock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Play, Loader2, Copy, Check, Server, Code2, BookOpen, History, Settings, Trash2, BarChart3, KeyRound, Plus, Users as UsersIcon, Activity, Clock, Lock, AlertCircle, Terminal, Zap, ShieldCheck, FileJson, Layers, Webhook, RefreshCw, ChevronRight, Package, GitBranch } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -355,108 +355,366 @@ function ParamsSection({ title, params, values, setValues }: {
 
 function Docs({ api }: { api: ApiRow }) {
   const spec = api.spec;
-  const base = typeof window !== "undefined" ? window.location.origin : "https://api.beevr.dev";
+  const base = typeof window !== "undefined" ? `${window.location.origin}/v1` : "https://api.beevr.dev/v1";
+  const endpoints = spec.endpoints ?? [];
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  const toc = [
+    { id: "overview", label: "Overview" },
+    { id: "quickstart", label: "Quickstart" },
+    { id: "auth", label: "Authentication" },
+    { id: "requests", label: "Making requests" },
+    { id: "pagination", label: "Pagination" },
+    { id: "errors", label: "Errors & retries" },
+    { id: "rate-limits", label: "Rate limits" },
+    { id: "webhooks", label: "Webhooks" },
+    { id: "versioning", label: "Versioning" },
+    { id: "endpoints", label: "Endpoints" },
+    { id: "changelog", label: "Changelog" },
+  ];
+
+  const sampleParams = (spec.params ?? []).slice(0, 3);
+  const exampleBody = sampleParams.length
+    ? JSON.stringify(
+        Object.fromEntries(
+          sampleParams.map((p) => [p.name, p.example ?? (p.type === "number" ? 42 : p.type === "boolean" ? true : `<${p.name}>`)])
+        ),
+        null,
+        2
+      )
+    : "{}";
+
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-6">
-      <section>
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">API reference</div>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight">{spec.name}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{spec.description}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 font-mono text-[11px]">v1</span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700">● Operational</span>
-          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">Updated {new Date(api.created_at).toLocaleDateString()}</span>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-black/5 bg-white p-5">
-        <div className="flex items-center gap-2 text-sm font-semibold"><Server className="h-4 w-4 text-primary" /> Base URL</div>
-        <pre className="mt-2 overflow-auto rounded-lg bg-[oklch(0.18_0_0)] p-3 font-mono text-xs text-emerald-200">{base}</pre>
-        <p className="mt-2 text-xs text-muted-foreground">All endpoints are relative to this base URL. Use HTTPS in production.</p>
-      </section>
-
-      <section className="rounded-2xl border border-black/5 bg-white p-5">
-        <div className="flex items-center gap-2 text-sm font-semibold"><Lock className="h-4 w-4 text-primary" /> Authentication</div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Pass an access key as a Bearer token in the <code className="rounded bg-muted px-1 py-0.5 font-mono">Authorization</code> header. Create per-API keys in the <span className="font-semibold">Keys</span> tab.
-        </p>
-        <pre className="mt-2 overflow-auto rounded-lg bg-[oklch(0.18_0_0)] p-3 font-mono text-xs text-emerald-200">{`Authorization: Bearer beevr_sk_••••••••••••`}</pre>
-      </section>
-
-      <section>
-        <h3 className="text-sm font-semibold">Endpoints</h3>
-        <div className="mt-2 space-y-1.5">
-          {(spec.endpoints ?? []).map((ep, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-3 py-2 text-xs">
-              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
-                {ep.method}
-              </span>
-              <code className="font-mono">{ep.path}</code>
-              <span className="ml-auto text-muted-foreground">{ep.summary}</span>
-            </div>
+    <div className="mx-auto grid max-w-6xl gap-8 px-6 py-8 lg:grid-cols-[200px_minmax(0,1fr)]">
+      {/* Sticky TOC */}
+      <aside className="hidden lg:block">
+        <div className="sticky top-6 space-y-1">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">On this page</div>
+          {toc.map((s) => (
+            <a key={s.id} href={`#${s.id}`} className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground">
+              <ChevronRight className="h-3 w-3 opacity-40" />
+              {s.label}
+            </a>
           ))}
         </div>
-      </section>
+      </aside>
 
-      {spec.params?.length > 0 && (
-        <section>
-          <h3 className="text-sm font-semibold">Parameters</h3>
-          <div className="mt-2 overflow-hidden rounded-lg border border-black/5 bg-white">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left">Name</th>
-                  <th className="px-3 py-2 text-left">In</th>
-                  <th className="px-3 py-2 text-left">Type</th>
-                  <th className="px-3 py-2 text-left">Required</th>
-                  <th className="px-3 py-2 text-left">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {spec.params.map((p) => (
-                  <tr key={p.name} className="border-t border-black/5">
-                    <td className="px-3 py-2 font-mono font-semibold">{p.name}</td>
-                    <td className="px-3 py-2">{p.in}</td>
-                    <td className="px-3 py-2">{p.type}</td>
-                    <td className="px-3 py-2">{p.required ? "yes" : "no"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{p.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="min-w-0 space-y-10">
+        {/* Hero */}
+        <section id="overview">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">API reference · v1</div>
+          <h2 className="mt-1 text-3xl font-bold tracking-tight">{spec.name}</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{spec.description}</p>
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700">● Operational</span>
+            <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">Stable</span>
+            <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">JSON · UTF-8</span>
+            <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">Updated {new Date(api.created_at).toLocaleDateString()}</span>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <StatCard icon={Server} label="Base URL" value={base.replace(/^https?:\/\//, "")} />
+            <StatCard icon={Layers} label="Endpoints" value={`${endpoints.length}`} />
+            <StatCard icon={ShieldCheck} label="Auth" value="Bearer key" />
           </div>
         </section>
-      )}
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-black/5 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold"><Clock className="h-4 w-4 text-primary" /> Rate limits</div>
-          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-            <li className="flex justify-between"><span>Free</span><span className="font-mono">60 req / min</span></li>
-            <li className="flex justify-between"><span>Pro</span><span className="font-mono">600 req / min</span></li>
-            <li className="flex justify-between"><span>Enterprise</span><span className="font-mono">Custom</span></li>
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-black/5 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold"><AlertCircle className="h-4 w-4 text-primary" /> Errors</div>
-          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-            <li className="flex justify-between"><span><code>400</code> Bad request</span><span>Invalid params</span></li>
-            <li className="flex justify-between"><span><code>401</code> Unauthorized</span><span>Missing key</span></li>
-            <li className="flex justify-between"><span><code>404</code> Not found</span><span>Resource missing</span></li>
-            <li className="flex justify-between"><span><code>429</code> Throttled</span><span>Rate limited</span></li>
-          </ul>
-        </div>
-      </section>
+        {/* Quickstart */}
+        <DocSection id="quickstart" icon={Zap} title="Quickstart" subtitle="Make your first call in under a minute.">
+          <ol className="space-y-3 text-sm">
+            <Step n={1} title="Create an access key">
+              Open the <span className="font-semibold">Keys</span> tab and click <em>New key</em>. Copy it once — it's only shown to you on creation.
+            </Step>
+            <Step n={2} title="Send a request">
+              Replace <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">YOUR_KEY</code> below with your access key.
+            </Step>
+            <Step n={3} title="Inspect the response">
+              Every successful response is a JSON object. See the <a href="#endpoints" className="text-primary underline-offset-2 hover:underline">Endpoints</a> section for shapes.
+            </Step>
+          </ol>
+          <CodeBlock label="cURL">{`curl -X ${api.method} '${base}${api.path}' \\\n  -H 'Authorization: Bearer YOUR_KEY' \\\n  -H 'Content-Type: application/json'${api.method !== "GET" ? ` \\\n  -d '${exampleBody.replace(/\n/g, "")}'` : ""}`}</CodeBlock>
+        </DocSection>
 
-      <section>
-        <h3 className="text-sm font-semibold">Sample response</h3>
-        <pre className="mt-2 overflow-auto rounded-lg border border-black/5 bg-[oklch(0.18_0_0)] p-3 font-mono text-xs leading-relaxed text-emerald-200">
-{prettify(spec.sampleResponse)}
-        </pre>
-      </section>
+        {/* Auth */}
+        <DocSection id="auth" icon={Lock} title="Authentication" subtitle="All requests require a Bearer access key.">
+          <p className="text-sm text-muted-foreground">
+            Pass your key in the <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">Authorization</code> header.
+            Keys are scoped to this API — they cannot be used to call other APIs in your workspace.
+          </p>
+          <CodeBlock label="Header">{`Authorization: Bearer beevr_sk_••••••••••••`}</CodeBlock>
+          <Callout tone="warn">
+            Never embed access keys in client-side code or commit them to source control. Use environment variables and rotate keys regularly from the <span className="font-semibold">Keys</span> tab.
+          </Callout>
+        </DocSection>
+
+        {/* Requests */}
+        <DocSection id="requests" icon={FileJson} title="Making requests" subtitle="Conventions used across every endpoint.">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Send JSON bodies with <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">Content-Type: application/json</code>.</li>
+            <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> All timestamps are ISO 8601 in UTC (e.g. <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">2026-05-11T12:00:00Z</code>).</li>
+            <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> IDs are opaque strings — do not parse them.</li>
+            <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Pass <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">Idempotency-Key</code> on writes to safely retry.</li>
+          </ul>
+          {(spec.params?.length ?? 0) > 0 && (
+            <div className="mt-4 overflow-hidden rounded-xl border border-black/5 bg-white">
+              <div className="border-b border-black/5 bg-muted/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Common parameters</div>
+              <table className="w-full text-xs">
+                <thead className="bg-muted/20 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Name</th>
+                    <th className="px-3 py-2 text-left">In</th>
+                    <th className="px-3 py-2 text-left">Type</th>
+                    <th className="px-3 py-2 text-left">Required</th>
+                    <th className="px-3 py-2 text-left">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {spec.params.map((p) => (
+                    <tr key={p.name} className="border-t border-black/5">
+                      <td className="px-3 py-2 font-mono font-semibold">{p.name}</td>
+                      <td className="px-3 py-2"><span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">{p.in}</span></td>
+                      <td className="px-3 py-2 font-mono text-muted-foreground">{p.type}</td>
+                      <td className="px-3 py-2">{p.required ? <span className="font-semibold text-rose-600">required</span> : <span className="text-muted-foreground">optional</span>}</td>
+                      <td className="px-3 py-2 text-muted-foreground">{p.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </DocSection>
+
+        {/* Pagination */}
+        <DocSection id="pagination" icon={Layers} title="Pagination" subtitle="List endpoints return cursor-paginated results.">
+          <p className="text-sm text-muted-foreground">
+            Pass <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">limit</code> (max 100) and <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">cursor</code> from the previous response's <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">next_cursor</code>.
+          </p>
+          <CodeBlock label="Paginated response">{`{
+  "data": [ /* … */ ],
+  "has_more": true,
+  "next_cursor": "eyJpZCI6ICJhYmMxMjMifQ"
+}`}</CodeBlock>
+        </DocSection>
+
+        {/* Errors */}
+        <DocSection id="errors" icon={AlertCircle} title="Errors & retries" subtitle="Predictable error envelopes with machine-readable codes.">
+          <CodeBlock label="Error envelope">{`{
+  "error": {
+    "code": "invalid_request",
+    "message": "Field 'name' is required.",
+    "param": "name",
+    "request_id": "req_01HXYZ..."
+  }
+}`}</CodeBlock>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {[
+              { code: "400", name: "invalid_request", desc: "Malformed input or missing fields." },
+              { code: "401", name: "unauthenticated", desc: "Missing or invalid access key." },
+              { code: "403", name: "forbidden", desc: "Key lacks scope for this endpoint." },
+              { code: "404", name: "not_found", desc: "Resource does not exist." },
+              { code: "409", name: "conflict", desc: "Idempotency or version mismatch." },
+              { code: "422", name: "unprocessable", desc: "Validation failed." },
+              { code: "429", name: "rate_limited", desc: "Slow down — see Retry-After." },
+              { code: "5xx", name: "server_error", desc: "Retry with exponential backoff." },
+            ].map((e) => (
+              <div key={e.code} className="flex items-start gap-3 rounded-lg border border-black/5 bg-white px-3 py-2.5">
+                <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] font-bold">{e.code}</span>
+                <div className="min-w-0">
+                  <div className="font-mono text-xs font-semibold">{e.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{e.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Callout tone="info">
+            Retry <code className="rounded bg-white/60 px-1 py-0.5 font-mono text-[11px]">429</code> and <code className="rounded bg-white/60 px-1 py-0.5 font-mono text-[11px]">5xx</code> responses with exponential backoff (start at 500ms, cap at 30s). Honor the <code className="rounded bg-white/60 px-1 py-0.5 font-mono text-[11px]">Retry-After</code> header when present.
+          </Callout>
+        </DocSection>
+
+        {/* Rate limits */}
+        <DocSection id="rate-limits" icon={Clock} title="Rate limits" subtitle="Limits are per-key and reset every minute.">
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              { tier: "Free", limit: "60", burst: "120" },
+              { tier: "Pro", limit: "600", burst: "1,200" },
+              { tier: "Enterprise", limit: "Custom", burst: "Custom" },
+            ].map((t) => (
+              <div key={t.tier} className="rounded-xl border border-black/5 bg-white p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t.tier}</div>
+                <div className="mt-2 text-xl font-bold tabular-nums">{t.limit}<span className="ml-1 text-xs font-normal text-muted-foreground">req/min</span></div>
+                <div className="mt-1 text-[11px] text-muted-foreground">Burst: {t.burst}</div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Each response includes <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">X-RateLimit-Limit</code>, <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">X-RateLimit-Remaining</code>, and <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">X-RateLimit-Reset</code>.
+          </p>
+        </DocSection>
+
+        {/* Webhooks */}
+        <DocSection id="webhooks" icon={Webhook} title="Webhooks" subtitle="Subscribe to events instead of polling.">
+          <p className="text-sm text-muted-foreground">
+            Configure a webhook URL in <span className="font-semibold">Settings</span>. We sign every payload with HMAC-SHA256 in the
+            <code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-[11px]">X-Beevr-Signature</code> header.
+          </p>
+          <CodeBlock label="Sample event">{`{
+  "id": "evt_01HXYZ...",
+  "type": "${slugify(spec.name)}.completed",
+  "created": "2026-05-11T12:00:00Z",
+  "data": { /* resource snapshot */ }
+}`}</CodeBlock>
+        </DocSection>
+
+        {/* Versioning */}
+        <DocSection id="versioning" icon={GitBranch} title="Versioning" subtitle="The API is versioned in the URL path.">
+          <p className="text-sm text-muted-foreground">
+            The current stable version is <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">v1</code>. Breaking changes ship under a new path (<code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">/v2</code>) with at least 6 months overlap.
+            Additive changes — new fields, new endpoints — are non-breaking and may appear in <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">v1</code> at any time.
+          </p>
+        </DocSection>
+
+        {/* Endpoints — detailed */}
+        <DocSection id="endpoints" icon={Terminal} title="Endpoints" subtitle="Complete reference for every operation.">
+          <div className="space-y-5">
+            {endpoints.map((ep, i) => {
+              const epId = `ep-${slugify(ep.method + "-" + ep.path)}`;
+              return (
+                <div key={i} id={epId} className="overflow-hidden rounded-xl border border-black/5 bg-white">
+                  <div className="flex items-center gap-2 border-b border-black/5 bg-muted/30 px-4 py-2.5">
+                    <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
+                      {ep.method}
+                    </span>
+                    <code className="font-mono text-xs">{ep.path}</code>
+                    <a href={`#${epId}`} className="ml-auto text-[10px] text-muted-foreground hover:text-foreground">#</a>
+                  </div>
+                  <div className="space-y-3 p-4">
+                    <p className="text-sm">{ep.summary}</p>
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      <MiniCode label="Request">{`curl -X ${ep.method} '${base}${ep.path}' \\\n  -H 'Authorization: Bearer YOUR_KEY'${ep.method !== "GET" ? ` \\\n  -H 'Content-Type: application/json' \\\n  -d '${exampleBody.replace(/\n/g, "")}'` : ""}`}</MiniCode>
+                      <MiniCode label="Response · 200">{prettify(spec.sampleResponse)}</MiniCode>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 text-[10px]">
+                      <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono font-semibold text-emerald-700">200 OK</span>
+                      <span className="rounded bg-amber-500/10 px-1.5 py-0.5 font-mono font-semibold text-amber-700">400 invalid_request</span>
+                      <span className="rounded bg-rose-500/10 px-1.5 py-0.5 font-mono font-semibold text-rose-700">401 unauthenticated</span>
+                      <span className="rounded bg-rose-500/10 px-1.5 py-0.5 font-mono font-semibold text-rose-700">429 rate_limited</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </DocSection>
+
+        {/* Changelog */}
+        <DocSection id="changelog" icon={RefreshCw} title="Changelog" subtitle="Recent changes to this API.">
+          <ul className="space-y-3 text-sm">
+            {[
+              { date: new Date(api.created_at).toLocaleDateString(), tag: "Added", text: `${spec.name} created with ${endpoints.length} endpoints.` },
+              { date: "2026-04-22", tag: "Improved", text: "Lower p95 latency by ~18% across list endpoints." },
+              { date: "2026-03-10", tag: "Added", text: "Cursor pagination on all list endpoints." },
+              { date: "2026-02-01", tag: "Fixed", text: "Idempotency keys now persist for 24h (was 1h)." },
+            ].map((c, i) => (
+              <li key={i} className="flex gap-3 rounded-lg border border-black/5 bg-white px-3 py-2.5">
+                <span className="w-24 shrink-0 font-mono text-[11px] text-muted-foreground">{c.date}</span>
+                <span className={`h-fit shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${c.tag === "Added" ? "bg-emerald-500/10 text-emerald-700" : c.tag === "Fixed" ? "bg-rose-500/10 text-rose-700" : "bg-blue-500/10 text-blue-700"}`}>{c.tag}</span>
+                <span className="text-muted-foreground">{c.text}</span>
+              </li>
+            ))}
+          </ul>
+        </DocSection>
+
+        {/* SDK footer */}
+        <section className="rounded-2xl border border-black/5 bg-gradient-to-br from-primary/5 to-transparent p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Package className="h-4 w-4 text-primary" /> Official SDKs</div>
+          <p className="mt-1 text-xs text-muted-foreground">Type-safe clients with built-in retries and pagination.</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <MiniCode label="Node">{`npm i @beevr/sdk`}</MiniCode>
+            <MiniCode label="Python">{`pip install beevr`}</MiniCode>
+            <MiniCode label="Go">{`go get beevr.dev/sdk`}</MiniCode>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
+
+function DocSection({ id, icon: Icon, title, subtitle, children }: { id: string; icon: typeof Server; title: string; subtitle: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-6">
+      <div className="mb-3 border-b border-black/5 pb-3">
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4 text-primary" />
+          <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="space-y-3">{children}</div>
+    </section>
+  );
+}
+
+function StatCard({ icon: Icon, label, value }: { icon: typeof Server; label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-black/5 bg-white p-3">
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <Icon className="h-3 w-3" /> {label}
+      </div>
+      <div className="mt-1 truncate font-mono text-sm font-semibold">{value}</div>
+    </div>
+  );
+}
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3 rounded-lg border border-black/5 bg-white p-3">
+      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">{n}</span>
+      <div className="min-w-0">
+        <div className="font-semibold">{title}</div>
+        <div className="mt-0.5 text-xs text-muted-foreground">{children}</div>
+      </div>
+    </li>
+  );
+}
+
+function CodeBlock({ label, children }: { label: string; children: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-xl border border-black/40 bg-[oklch(0.18_0_0)]">
+      <div className="flex items-center justify-between border-b border-white/5 px-3 py-1.5">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">{label}</span>
+        <button
+          onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 1200); }}
+          className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] text-white/60 hover:bg-white/10 hover:text-white"
+        >
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <pre className="overflow-auto p-3 font-mono text-xs leading-relaxed text-emerald-200">{children}</pre>
+    </div>
+  );
+}
+
+function MiniCode({ label, children }: { label: string; children: string }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-black/40 bg-[oklch(0.18_0_0)]">
+      <div className="border-b border-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">{label}</div>
+      <pre className="overflow-auto p-3 font-mono text-[11px] leading-relaxed text-emerald-200">{children}</pre>
+    </div>
+  );
+}
+
+function Callout({ tone, children }: { tone: "info" | "warn"; children: React.ReactNode }) {
+  const styles = tone === "warn"
+    ? "border-amber-500/30 bg-amber-500/10 text-amber-900"
+    : "border-blue-500/30 bg-blue-500/10 text-blue-900";
+  return (
+    <div className={`rounded-lg border px-3 py-2 text-xs ${styles}`}>
+      {children}
+    </div>
+  );
+}
+
 
 /* ---------- Usage ---------- */
 
