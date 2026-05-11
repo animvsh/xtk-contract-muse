@@ -336,97 +336,299 @@ function TabBtn({ active, onClick, icon: Icon, children }: { active: boolean; on
   );
 }
 
-function AddRow({ onClick }: { onClick: () => void }) {
+// ---------- Workflow canvas (drag & drop, n8n-style) ----------
+
+const NODE_W = 220;
+const NODE_H = 88;
+
+function defaultPosition(index: number): { x: number; y: number } {
+  // Lay nodes out in a horizontal flow with gentle vertical staggering
+  const col = index;
+  const x = 80 + col * (NODE_W + 80);
+  const y = 120 + (index % 2 === 0 ? 0 : 32);
+  return { x, y };
+}
+
+type CanvasNodeMeta =
+  | { kind: "trigger"; x: number; y: number; index: 0 }
+  | { kind: "step"; x: number; y: number; index: number };
+
+function WorkflowCanvas({
+  agent,
+  activeIndex,
+  editing,
+  onSelectTrigger,
+  onSelectStep,
+  onAddStep,
+  onRemoveStep,
+  onMoveNode,
+}: {
+  agent: Agent;
+  activeIndex: number | undefined;
+  editing: { kind: "trigger" } | { kind: "step"; index: number } | null;
+  onSelectTrigger: () => void;
+  onSelectStep: (i: number) => void;
+  onAddStep: (i: number) => void;
+  onRemoveStep: (i: number) => void;
+  onMoveNode: (kind: "trigger" | "step", index: number, x: number, y: number) => void;
+}) {
+  const trig = agent.spec.trigger ?? { type: "manual", description: "Run on demand" };
+  const steps = agent.spec.steps ?? [];
+
+  // Local positions for smooth dragging (committed to spec on drop)
+  const initial = useMemo<CanvasNodeMeta[]>(() => {
+    const out: CanvasNodeMeta[] = [];
+    const tp = trig.x !== undefined && trig.y !== undefined ? { x: trig.x, y: trig.y } : defaultPosition(0);
+    out.push({ kind: "trigger", index: 0, ...tp });
+    steps.forEach((s, i) => {
+      const p = s.x !== undefined && s.y !== undefined ? { x: s.x, y: s.y } : defaultPosition(i + 1);
+      out.push({ kind: "step", index: i, ...p });
+    });
+    return out;
+  }, [agent]);
+
+  const [positions, setPositions] = useState<CanvasNodeMeta[]>(initial);
+  useEffect(() => setPositions(initial), [initial]);
+
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ idx: number; ox: number; oy: number; px: number; py: number } | null>(null);
+  const panRef = useRef<{ ox: number; oy: number; px: number; py: number } | null>(null);
+
+  const onNodePointerDown = (e: React.PointerEvent, idx: number) => {
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    const p = positions[idx];
+    dragRef.current = { idx, ox: p.x, oy: p.y, px: e.clientX, py: e.clientY };
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (dragRef.current) {
+      const d = dragRef.current;
+      const dx = (e.clientX - d.px) / zoom;
+      const dy = (e.clientY - d.py) / zoom;
+      setPositions((cur) => cur.map((n, i) => (i === d.idx ? { ...n, x: d.ox + dx, y: d.oy + dy } : n)));
+    } else if (panRef.current) {
+      const p = panRef.current;
+      setPan({ x: p.ox + (e.clientX - p.px), y: p.oy + (e.clientY - p.py) });
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (dragRef.current) {
+      const d = dragRef.current;
+      const final = positions[d.idx];
+      if (Math.abs(final.x - d.ox) > 1 || Math.abs(final.y - d.oy) > 1) {
+        onMoveNode(final.kind, final.kind === "trigger" ? 0 : final.index, Math.round(final.x), Math.round(final.y));
+      }
+      dragRef.current = null;
+    }
+    panRef.current = null;
+    try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* */ }
+  };
+
+  const onCanvasPointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest("[data-node]")) return;
+    panRef.current = { ox: pan.x, oy: pan.y, px: e.clientX, py: e.clientY };
+  };
+
+  const fitView = () => {
+    setPan({ x: 0, y: 0 });
+    setZoom(1);
+  };
+
+  // Edges: trigger → step 0 → step 1 → … → step n-1
+  const edges = positions.slice(0, -1).map((from, i) => ({ from, to: positions[i + 1], id: i }));
+
   return (
-    <div className="group relative flex h-10 w-full items-center justify-center">
-      <div className="absolute inset-y-0 left-1/2 w-[2px] -translate-x-1/2 bg-black/10" />
-      <button
-        onClick={onClick}
-        className="clicky-sm relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-black/10 bg-white text-muted-foreground opacity-0 shadow-sm transition-all hover:scale-110 hover:border-primary hover:text-primary group-hover:opacity-100"
-        title="Add step here"
+    <div className="flex min-h-0 flex-col">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+          <GitBranch className="h-3 w-3" /> Workflow editor
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setZoom((z) => Math.max(0.4, z - 0.1))}
+            className="clicky-sm rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+          >−</button>
+          <div className="w-10 text-center text-[11px] tabular-nums text-muted-foreground">{Math.round(zoom * 100)}%</div>
+          <button
+            onClick={() => setZoom((z) => Math.min(1.6, z + 0.1))}
+            className="clicky-sm rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+          >+</button>
+          <button
+            onClick={fitView}
+            className="clicky-sm ml-1 flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+            title="Reset view"
+          >
+            <Maximize2 className="h-3 w-3" /> Fit
+          </button>
+          <button
+            onClick={() => onAddStep(steps.length)}
+            className="clicky-sm ml-2 flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-90"
+          >
+            <Plus className="h-3 w-3" /> Step
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={wrapperRef}
+        onPointerDown={onCanvasPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+        className="relative min-h-0 flex-1 cursor-grab overflow-hidden rounded-2xl border border-black/5 bg-[oklch(0.985_0.005_85)] active:cursor-grabbing"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, oklch(0.82 0.015 85) 1px, transparent 0)",
+          backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
+          backgroundPosition: `${pan.x}px ${pan.y}px`,
+        }}
       >
-        <Plus className="h-3.5 w-3.5" />
-      </button>
+        <div
+          className="absolute left-0 top-0 origin-top-left"
+          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+        >
+          {/* SVG edges */}
+          <svg
+            className="pointer-events-none absolute left-0 top-0 overflow-visible"
+            width="1"
+            height="1"
+          >
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="oklch(0.72 0.05 60)" />
+              </marker>
+            </defs>
+            {edges.map((e) => {
+              const x1 = e.from.x + NODE_W;
+              const y1 = e.from.y + NODE_H / 2;
+              const x2 = e.to.x;
+              const y2 = e.to.y + NODE_H / 2;
+              const dx = Math.max(60, Math.abs(x2 - x1) * 0.5);
+              const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+              const isActive =
+                activeIndex !== undefined &&
+                activeIndex !== -1 &&
+                e.id < activeIndex;
+              return (
+                <g key={e.id}>
+                  <path d={path} fill="none" stroke="oklch(0.85 0.02 70)" strokeWidth={2} />
+                  {isActive && (
+                    <path d={path} fill="none" stroke="oklch(0.72 0.21 45)" strokeWidth={2.5} markerEnd="url(#arrow)" />
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Nodes */}
+          {positions.map((n, idx) => {
+            const isTrigger = n.kind === "trigger";
+            const data = isTrigger ? trig : steps[n.index];
+            if (!data) return null;
+            const status = statusFor(idx, activeIndex);
+            const selected =
+              editing?.kind === (isTrigger ? "trigger" : "step") &&
+              (isTrigger || (editing.kind === "step" && editing.index === n.index));
+            const Icon = isTrigger ? triggerIcon((data as AgentTrigger).type) : Bot;
+            return (
+              <FlowNode
+                key={`${n.kind}-${n.index}`}
+                x={n.x}
+                y={n.y}
+                width={NODE_W}
+                height={NODE_H}
+                kind={n.kind}
+                index={isTrigger ? 0 : n.index + 1}
+                title={isTrigger ? (data as AgentTrigger).type : (data as AgentStep).title}
+                sub={isTrigger ? (data as AgentTrigger).description : `${(data as AgentStep).integration} · ${(data as AgentStep).action}`}
+                Icon={Icon}
+                status={status}
+                selected={selected}
+                onPointerDown={(e) => onNodePointerDown(e, idx)}
+                onClick={() => (isTrigger ? onSelectTrigger() : onSelectStep(n.index))}
+                onDelete={isTrigger ? undefined : () => onRemoveStep(n.index)}
+              />
+            );
+          })}
+        </div>
+
+        {/* Empty hint */}
+        {steps.length === 0 && (
+          <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur">
+            Drag nodes to rearrange · click "+ Step" to add
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function CanvasNode({
-  kind,
-  title,
-  sub,
-  Icon,
-  status,
-  index,
-  selected,
-  onClick,
-  onDelete,
+function FlowNode({
+  x, y, width, height, kind, index, title, sub, Icon, status, selected,
+  onPointerDown, onClick, onDelete,
 }: {
+  x: number; y: number; width: number; height: number;
   kind: "trigger" | "step";
+  index: number;
   title: string;
   sub: string;
   Icon: typeof Bot;
   status: "idle" | "pending" | "active" | "done";
-  index: number;
   selected: boolean;
+  onPointerDown: (e: React.PointerEvent) => void;
   onClick: () => void;
   onDelete?: () => void;
 }) {
-  const ring = selected
-    ? "ring-2 ring-primary shadow-lg"
-    : status === "active"
-      ? "ring-2 ring-[oklch(0.72_0.21_45)] shadow-xl shadow-[oklch(0.72_0.21_45)]/25"
-      : status === "done"
-        ? "ring-1 ring-[oklch(0.72_0.21_45)]/40"
-        : "ring-1 ring-black/[0.06]";
-
+  const ring =
+    selected ? "ring-2 ring-primary"
+    : status === "active" ? "ring-2 ring-[oklch(0.72_0.21_45)]"
+    : status === "done" ? "ring-1 ring-[oklch(0.72_0.21_45)]/40"
+    : "ring-1 ring-black/[0.08]";
   return (
     <div
+      data-node
+      onPointerDown={onPointerDown}
       onClick={onClick}
-      className={`group/node relative w-full cursor-pointer rounded-xl bg-white p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-lg ${ring}`}
-      style={{ animation: `fade-in 0.4s ease-out ${index * 50}ms both` }}
+      className={`group/node absolute cursor-grab select-none rounded-xl bg-white p-3 transition-shadow hover:shadow-md active:cursor-grabbing ${ring}`}
+      style={{ left: x, top: y, width, height }}
     >
-      {status === "active" && (
-        <span className="pointer-events-none absolute -inset-px rounded-xl bg-[oklch(0.72_0.21_45)]/20 opacity-50 blur-md" />
-      )}
-      <div className="relative flex items-center gap-2.5">
-        <span
-          className={`relative flex h-9 w-9 items-center justify-center rounded-lg ${
-            status === "done" || status === "active"
-              ? "bg-[oklch(0.72_0.21_45)] text-white"
-              : kind === "trigger"
-                ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
-                : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"
-          }`}
-        >
+      {/* connection ports */}
+      <span className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[oklch(0.78_0.04_70)]" />
+      <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[oklch(0.78_0.04_70)]" />
+
+      <div className="flex items-center gap-2.5">
+        <span className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+          status === "done" || status === "active"
+            ? "bg-[oklch(0.72_0.21_45)] text-white"
+            : kind === "trigger"
+              ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
+              : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"
+        }`}>
           {status === "active" ? <Loader2 className="h-4 w-4 animate-spin" /> : status === "done" ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
-          {status === "active" && <span className="absolute inset-0 animate-ping rounded-lg bg-[oklch(0.72_0.21_45)]/30" />}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {kind === "trigger" ? "Trigger" : `Step ${index}`}
+            {status === "active" && <Sparkles className="h-2.5 w-2.5 animate-pulse text-[oklch(0.72_0.21_45)]" />}
           </div>
           <div className="truncate text-sm font-semibold capitalize text-foreground">{title}</div>
         </div>
         {onDelete && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="clicky-sm rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-rose-50 hover:text-rose-600 group-hover/node:opacity-100"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="clicky-sm rounded-md p-1 text-muted-foreground opacity-0 hover:bg-rose-50 hover:text-rose-600 group-hover/node:opacity-100"
             title="Delete step"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-3 w-3" />
           </button>
         )}
       </div>
-      <div className="mt-1.5 line-clamp-2 pl-[46px] text-xs text-muted-foreground">{sub}</div>
-      {status === "active" && (
-        <div className="mt-2 flex items-center gap-1 pl-[46px] text-[10px] font-semibold text-[oklch(0.55_0.2_40)]">
-          <Sparkles className="h-2.5 w-2.5 animate-pulse" /> running
-        </div>
-      )}
+      <div className="mt-1 line-clamp-2 pl-[46px] text-[11px] leading-snug text-muted-foreground">{sub}</div>
     </div>
   );
 }
