@@ -175,6 +175,8 @@ function Settings() {
 
       <WorkspacesSection />
 
+      <MembersSection />
+
       <section className="mt-6 rounded-2xl border border-rose-200 bg-rose-50/60 p-6">
         <div className="text-sm font-semibold text-rose-900">Sign out</div>
         <p className="mt-1 text-xs text-rose-700/80">End your session on this device.</p>
