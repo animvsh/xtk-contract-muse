@@ -54,24 +54,31 @@ export function WorkspaceSwitcher() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((o) => !o)}
-          className="clicky group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/70"
+          className="clicky group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-black/[0.04]"
         >
           <span
-            className="h-2 w-2 shrink-0 rounded-full"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white shadow-sm"
             style={{ background: current.color }}
-          />
-          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[oklch(0.2_0_0)]">
-            {current.name}
+          >
+            {initials(current.name)}
           </span>
-          <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-[oklch(0.5_0_0)] transition-colors group-hover:text-[oklch(0.2_0_0)]" />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold leading-tight text-[oklch(0.18_0_0)]">
+              {current.name}
+            </span>
+            <span className="block truncate text-[10.5px] leading-tight text-[oklch(0.5_0_0)]">
+              {current.company}
+            </span>
+          </span>
+          <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-[oklch(0.55_0_0)] transition-colors group-hover:text-[oklch(0.2_0_0)]" />
         </button>
 
         {open && (
-          <div className="absolute left-0 right-0 top-full z-50 mt-2 origin-top animate-[fadeInUp_140ms_ease-out] overflow-hidden rounded-xl border border-black/10 bg-white shadow-2xl shadow-black/10">
-            <div className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.5_0_0)]">
-              Your workspaces
+          <div className="absolute left-0 right-0 top-full z-50 mt-1.5 origin-top animate-[fadeInUp_140ms_ease-out] overflow-hidden rounded-xl border border-black/[0.08] bg-white shadow-[0_12px_32px_-8px_rgba(0,0,0,0.18),0_2px_6px_-2px_rgba(0,0,0,0.08)]">
+            <div className="px-3 pb-1.5 pt-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-[oklch(0.55_0_0)]">
+              Workspaces
             </div>
-            <div className="max-h-72 overflow-y-auto py-1">
+            <div className="max-h-72 overflow-y-auto px-1 pb-1">
               {workspaces.map((w) => {
                 const active = w.id === current.id;
                 return (
@@ -82,39 +89,41 @@ export function WorkspaceSwitcher() {
                       setOpen(false);
                       if (!active) toast.success(`Switched to ${w.name}`);
                     }}
-                    className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors ${
-                      active ? "bg-[oklch(0.97_0.04_85)]" : "hover:bg-black/5"
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors ${
+                      active ? "bg-[oklch(0.96_0_0)]" : "hover:bg-black/[0.04]"
                     }`}
                   >
                     <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white shadow-sm"
                       style={{ background: w.color }}
-                    />
+                    >
+                      {initials(w.name)}
+                    </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-[oklch(0.2_0_0)]">
+                      <span className="block truncate text-sm font-medium leading-tight text-[oklch(0.18_0_0)]">
                         {w.name}
                       </span>
-                      <span className="block truncate text-[11px] text-[oklch(0.5_0_0)]">
+                      <span className="block truncate text-[10.5px] leading-tight text-[oklch(0.5_0_0)]">
                         {w.company}
                       </span>
                     </span>
-                    {active && <Check className="h-4 w-4 text-[oklch(0.55_0.18_145)]" />}
+                    {active && <Check className="h-3.5 w-3.5 shrink-0 text-[oklch(0.55_0.18_145)]" />}
                   </button>
                 );
               })}
             </div>
-            <div className="border-t border-black/5 p-1">
+            <div className="border-t border-black/[0.06] p-1">
               <button
                 onClick={() => {
                   setOpen(false);
                   setCreating(true);
                 }}
-                className="clicky flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-[oklch(0.2_0_0)] hover:bg-[oklch(0.97_0.04_85)]"
+                className="clicky flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-[oklch(0.2_0_0)] hover:bg-black/[0.04]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-dashed border-black/20 bg-white text-[oklch(0.4_0_0)]">
-                  <Plus className="h-4 w-4" />
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-dashed border-black/20 bg-white text-[oklch(0.45_0_0)]">
+                  <Plus className="h-3.5 w-3.5" />
                 </span>
-                Create new workspace
+                Create workspace
               </button>
             </div>
           </div>
