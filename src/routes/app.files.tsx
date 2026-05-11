@@ -20,6 +20,9 @@ import {
   Maximize2,
   Plus,
   Minus,
+  LayoutGrid,
+  Network,
+  Star as StarIcon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/files")({
@@ -269,9 +272,12 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
 function Files() {
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [view, setView] = useState<"graph" | "grid">("graph");
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(0.55);
+  const [animating, setAnimating] = useState(false);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [pulseId, setPulseId] = useState<string | null>(null);
   const dragging = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -290,12 +296,34 @@ function Files() {
   const { nodes, edges } = useMemo(() => buildGraph(FILES), []);
   const open = openId ? FILES.find((f) => f.id === openId) ?? null : null;
 
+  const centerOnNode = (nodeId: string, targetZoom = 1.05) => {
+    const n = nodes.find((nn) => nn.id === nodeId);
+    if (!n || !containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    setAnimating(true);
+    setZoom(targetZoom);
+    setPan({ x: r.width / 2 - n.x * targetZoom, y: r.height / 2 - n.y * targetZoom });
+    setPulseId(nodeId);
+    window.setTimeout(() => setAnimating(false), 750);
+    window.setTimeout(() => setPulseId((p) => (p === nodeId ? null : p)), 1800);
+  };
+
   useEffect(() => {
     if (!containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
     setPan({ x: r.width / 2 - 1400 * zoom, y: r.height / 2 - 1000 * zoom });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Animate zoom onto first match when searching in graph view
+  useEffect(() => {
+    if (view !== "graph" || !query) return;
+    const first = FILES.find((f) => matchedIds.has(f.id));
+    if (!first) return;
+    const t = window.setTimeout(() => centerOnNode(first.id, 1.0), 220);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, view]);
 
   const onWheel = (e: React.WheelEvent) => {
     const delta = -e.deltaY * 0.0015;
@@ -311,6 +339,7 @@ function Files() {
   };
   const onMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("[data-node]")) return;
+    setAnimating(false);
     dragging.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
   };
   const onMouseMove = (e: React.MouseEvent) => {
@@ -327,32 +356,107 @@ function Files() {
     if (!containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
     const z = 0.55;
+    setAnimating(true);
     setZoom(z);
     setPan({ x: r.width / 2 - 1400 * z, y: r.height / 2 - 1000 * z });
+    window.setTimeout(() => setAnimating(false), 750);
   };
+
+  const filteredFiles = useMemo(
+    () => FILES.filter((f) => matchedIds.has(f.id)),
+    [matchedIds],
+  );
 
   return (
     <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 flex items-start justify-between gap-3 p-4 sm:p-6">
         <div className="pointer-events-auto max-w-md">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[oklch(0.68_0.22_40)]">
-            <Folder className="h-3.5 w-3.5" /> Knowledge graph
+            <Folder className="h-3.5 w-3.5" /> {view === "graph" ? "Knowledge graph" : "All files"}
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Files</h1>
           <p className="mt-1 hidden text-sm text-[oklch(0.4_0_0)] sm:block">
-            Every source and file connected to your workspace. Drag to pan, scroll to zoom.
+            {view === "graph"
+              ? "Every source and file connected to your workspace. Drag to pan, scroll to zoom."
+              : "Browse your workspace files in a clean list."}
           </p>
         </div>
-        <div className="pointer-events-auto flex w-full max-w-xs items-center gap-2 rounded-xl border border-black/10 bg-white/90 px-3 py-2 shadow-sm backdrop-blur focus-within:border-[oklch(0.68_0.22_40)]/40">
-          <Search className="h-4 w-4 text-[oklch(0.5_0_0)]" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search the graph…"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-[oklch(0.55_0_0)]"
-          />
+        <div className="pointer-events-auto flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white/90 px-3 py-2 shadow-sm backdrop-blur focus-within:border-[oklch(0.68_0.22_40)]/40">
+            <Search className="h-4 w-4 text-[oklch(0.5_0_0)]" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={view === "graph" ? "Search the graph…" : "Search files…"}
+              className="w-44 bg-transparent text-sm outline-none placeholder:text-[oklch(0.55_0_0)] sm:w-56"
+            />
+          </div>
+          <div className="flex rounded-xl border border-black/10 bg-white/90 p-1 shadow-sm backdrop-blur">
+            <button
+              onClick={() => setView("graph")}
+              className={`clicky-sm flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "graph" ? "bg-[oklch(0.15_0_0)] text-white" : "text-[oklch(0.4_0_0)] hover:bg-black/5"}`}
+              title="Graph view"
+            >
+              <Network className="h-3.5 w-3.5" /> Graph
+            </button>
+            <button
+              onClick={() => setView("grid")}
+              className={`clicky-sm flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "grid" ? "bg-[oklch(0.15_0_0)] text-white" : "text-[oklch(0.4_0_0)] hover:bg-black/5"}`}
+              title="List view"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Files
+            </button>
+          </div>
         </div>
       </div>
+
+      {view === "grid" && (
+        <div className="flex-1 overflow-y-auto bg-[oklch(0.985_0.005_85)] px-4 pb-6 pt-32 sm:px-8 sm:pt-36">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredFiles.length === 0 && (
+              <div className="col-span-full rounded-2xl border border-dashed border-black/10 bg-white/60 p-10 text-center text-sm text-[oklch(0.5_0_0)]">
+                No files match "{query}".
+              </div>
+            )}
+            {filteredFiles.map((f) => {
+              const meta = KIND_META[f.kind];
+              const Icon = meta.icon;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setOpenId(f.id)}
+                  className="clicky group flex items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg animate-[fadeInUp_140ms_ease-out]"
+                >
+                  <div
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                    style={{ background: meta.tone }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="truncate text-sm font-semibold text-[oklch(0.18_0_0)]">{f.name}</div>
+                      {f.starred && <StarIcon className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />}
+                    </div>
+                    <div className="mt-0.5 truncate text-[11px] text-[oklch(0.5_0_0)]">
+                      {f.source} · {f.owner}
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-[10px] text-[oklch(0.55_0_0)]">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-2.5 w-2.5" /> {f.updated}
+                      </span>
+                      <span>·</span>
+                      <span>{f.size}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {view === "graph" && (
 
       <div
         ref={containerRef}
@@ -374,6 +478,7 @@ function Files() {
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             width: 2800,
             height: 2000,
+            transition: animating ? "transform 700ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
           }}
         >
           <svg width={2800} height={2000} className="pointer-events-none absolute inset-0">
@@ -454,7 +559,7 @@ function Files() {
                 onMouseEnter={() => setHoverId(n.id)}
                 onMouseLeave={() => setHoverId(null)}
                 onClick={() => setOpenId(f.id)}
-                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/5 bg-white/95 p-3 text-left shadow-md backdrop-blur transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-xl ${dim ? "opacity-25" : ""}`}
+                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/5 bg-white/95 p-3 text-left shadow-md backdrop-blur transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-xl ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
                 style={{ left: n.x, top: n.y }}
               >
                 <div className="flex items-start justify-between">
@@ -508,6 +613,7 @@ function Files() {
           {Math.round(zoom * 100)}%
         </div>
       </div>
+      )}
 
       {open && <FileViewer file={open} onClose={() => setOpenId(null)} />}
     </div>
