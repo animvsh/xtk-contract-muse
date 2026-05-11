@@ -1393,19 +1393,19 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
       const { data: userRes } = await supabase.auth.getUser();
       const user = userRes.user;
       if (!user) throw new Error("Sign in required");
-      const slug = (draft.slug || slugify(draft.name) || "mcp").toLowerCase();
+      const slug = (draft.slug || slugify(name) || "mcp").toLowerCase();
       const { error } = await supabase.from("mcps").insert({
         user_id: user.id,
-        name: draft.name,
+        name,
         slug,
-        description: draft.description,
-        emoji: draft.emoji,
-        spec: draft as never,
+        description,
+        emoji,
+        spec: { ...draft, tools, resources, transport } as never,
       });
       if (error) throw error;
       setSaved(true);
-      toast.success(`${draft.emoji} ${draft.name} installed`, {
-        description: `mcp.beevr.dev/${slug} — ${draft.tools.length} tools`,
+      toast.success(`${emoji} ${name} installed`, {
+        description: `mcp.beevr.dev/${slug} — ${tools.length} tools`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save MCP");
@@ -1414,7 +1414,7 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
     }
   };
 
-  const url = `https://mcp.beevr.dev/${draft.slug || slugify(draft.name)}`;
+  const url = `https://mcp.beevr.dev/${draft.slug || slugify(name)}`;
 
   if (saved) {
     return (
