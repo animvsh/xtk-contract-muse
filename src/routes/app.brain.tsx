@@ -27,6 +27,11 @@ import {
   Server,
   Code2,
   PlayCircle,
+  Paperclip,
+  X,
+  UploadCloud,
+  Image as ImageIcon,
+  File as FileIcon,
 } from "lucide-react";
 
 import { z } from "zod";
