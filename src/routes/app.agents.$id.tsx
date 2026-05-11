@@ -25,7 +25,7 @@ import {
   Maximize2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ReasoningSteps } from "@/components/reasoning-steps";
+
 import { PageHeader } from "@/components/page-header";
 import { toast } from "sonner";
 
