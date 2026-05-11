@@ -478,6 +478,7 @@ function Files() {
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             width: 2800,
             height: 2000,
+            transition: animating ? "transform 700ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
           }}
         >
           <svg width={2800} height={2000} className="pointer-events-none absolute inset-0">
