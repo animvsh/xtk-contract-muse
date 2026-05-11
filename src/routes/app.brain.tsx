@@ -675,7 +675,7 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
             return <McpProposalCard key={u.key} draft={u.draft} />;
           }
           if (u.kind === "clarify") {
-            return <ClarifyCard key={u.key} draft={u.draft} onSend={(text) => sendMessage({ text })} />;
+            return <ClarifyCard key={u.key} draft={u.draft} onSend={onSend} />;
           }
           if (u.kind === "tool") {
             return <ToolPart key={u.key} part={u.part} />;
