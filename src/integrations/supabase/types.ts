@@ -285,6 +285,47 @@ export type Database = {
         }
         Relationships: []
       }
+      mcp_invocations: {
+        Row: {
+          arguments: Json
+          created_at: string
+          id: string
+          mcp_id: string
+          result: Json
+          status: number
+          tool_name: string
+          user_id: string
+        }
+        Insert: {
+          arguments?: Json
+          created_at?: string
+          id?: string
+          mcp_id: string
+          result?: Json
+          status?: number
+          tool_name: string
+          user_id: string
+        }
+        Update: {
+          arguments?: Json
+          created_at?: string
+          id?: string
+          mcp_id?: string
+          result?: Json
+          status?: number
+          tool_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcp_invocations_mcp_id_fkey"
+            columns: ["mcp_id"]
+            isOneToOne: false
+            referencedRelation: "mcps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mcp_servers: {
         Row: {
           created_at: string
@@ -312,6 +353,42 @@ export type Database = {
           name?: string
           url?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcps: {
+        Row: {
+          created_at: string
+          description: string
+          emoji: string
+          id: string
+          name: string
+          slug: string
+          spec: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          name: string
+          slug: string
+          spec?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          name?: string
+          slug?: string
+          spec?: Json
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
