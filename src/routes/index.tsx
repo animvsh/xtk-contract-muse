@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import foundersIncLogo from "@/assets/founders-inc.png";
 
 
 export const Route = createFileRoute("/")({
@@ -54,10 +55,8 @@ function Landing() {
           {/* Hero */}
           <section className="px-10 pb-20 pt-12 text-center">
             <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
-              <span className="grid h-5 w-5 place-items-center rounded-[4px] bg-[oklch(0.18_0_0)] text-[10px] font-bold tracking-tight text-white">
-                Fi
-              </span>
-              Backed by Founders Inc
+              <span className="text-[oklch(0.45_0_0)]">Backed by</span>
+              <img src={foundersIncLogo} alt="Founders, Inc." className="h-4 w-auto object-contain" />
             </div>
 
             <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
