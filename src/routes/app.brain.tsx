@@ -203,11 +203,22 @@ function BrainPage() {
     }
   }, [q, sendMessage]);
 
+  const stickToBottom = useRef(true);
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottom.current = distance < 80;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !stickToBottom.current) return;
+    el.scrollTop = el.scrollHeight;
   }, [messages, status]);
 
   const isLoading = status === "submitted" || status === "streaming";
