@@ -122,6 +122,10 @@ type McpDraft = {
   docsMarkdown: string;
 };
 
+type ClarifyOption = { value: string; label: string; description?: string };
+type ClarifyQuestion = { id: string; question: string; options: ClarifyOption[]; multi?: boolean; allowOther?: boolean };
+type ClarifyDraft = { intent: "agent" | "api" | "mcp"; summary: string; questions: ClarifyQuestion[] };
+
 
 type StagedFile = {
   id: string;
