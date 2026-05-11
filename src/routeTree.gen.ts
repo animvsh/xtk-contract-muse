@@ -38,6 +38,7 @@ import { Route as AppAgentsRouteImport } from './routes/app.agents'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AppApisIndexRouteImport } from './routes/app.apis.index'
+import { Route as AppAgentsIndexRouteImport } from './routes/app.agents.index'
 import { Route as DocsExamplesBookstoreSalesAgentRouteImport } from './routes/docs.examples.bookstore-sales-agent'
 import { Route as DocsCloudBuildsAgentsRouteImport } from './routes/docs.cloud-builds.agents'
 import { Route as DocsCliOpencodeRouteImport } from './routes/docs.cli.opencode'
@@ -195,6 +196,11 @@ const AppApisIndexRoute = AppApisIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppApisRoute,
 } as any)
+const AppAgentsIndexRoute = AppAgentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAgentsRoute,
+} as any)
 const DocsExamplesBookstoreSalesAgentRoute =
   DocsExamplesBookstoreSalesAgentRouteImport.update({
     id: '/bookstore-sales-agent',
@@ -293,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/agents/': typeof AppAgentsIndexRoute
   '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRoutesByTo {
@@ -303,7 +310,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/api/chat': typeof ApiChatRoute
   '/app/admin': typeof AppAdminRoute
-  '/app/agents': typeof AppAgentsRouteWithChildren
   '/app/approvals': typeof AppApprovalsRoute
   '/app/brain': typeof AppBrainRoute
   '/app/builds': typeof AppBuildsRoute
@@ -333,6 +339,7 @@ export interface FileRoutesByTo {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/agents': typeof AppAgentsIndexRoute
   '/app/apis': typeof AppApisIndexRoute
 }
 export interface FileRoutesById {
@@ -376,6 +383,7 @@ export interface FileRoutesById {
   '/docs/cli/opencode': typeof DocsCliOpencodeRoute
   '/docs/cloud-builds/agents': typeof DocsCloudBuildsAgentsRoute
   '/docs/examples/bookstore-sales-agent': typeof DocsExamplesBookstoreSalesAgentRoute
+  '/app/agents/': typeof AppAgentsIndexRoute
   '/app/apis/': typeof AppApisIndexRoute
 }
 export interface FileRouteTypes {
@@ -420,6 +428,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/agents/'
     | '/app/apis/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -430,7 +439,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/api/chat'
     | '/app/admin'
-    | '/app/agents'
     | '/app/approvals'
     | '/app/brain'
     | '/app/builds'
@@ -460,6 +468,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/agents'
     | '/app/apis'
   id:
     | '__root__'
@@ -502,6 +511,7 @@ export interface FileRouteTypes {
     | '/docs/cli/opencode'
     | '/docs/cloud-builds/agents'
     | '/docs/examples/bookstore-sales-agent'
+    | '/app/agents/'
     | '/app/apis/'
   fileRoutesById: FileRoutesById
 }
@@ -732,6 +742,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApisIndexRouteImport
       parentRoute: typeof AppApisRoute
     }
+    '/app/agents/': {
+      id: '/app/agents/'
+      path: '/'
+      fullPath: '/app/agents/'
+      preLoaderRoute: typeof AppAgentsIndexRouteImport
+      parentRoute: typeof AppAgentsRoute
+    }
     '/docs/examples/bookstore-sales-agent': {
       id: '/docs/examples/bookstore-sales-agent'
       path: '/bookstore-sales-agent'
@@ -815,11 +832,13 @@ declare module '@tanstack/react-router' {
 interface AppAgentsRouteChildren {
   AppAgentsIdRoute: typeof AppAgentsIdRoute
   AppAgentsNewRoute: typeof AppAgentsNewRoute
+  AppAgentsIndexRoute: typeof AppAgentsIndexRoute
 }
 
 const AppAgentsRouteChildren: AppAgentsRouteChildren = {
   AppAgentsIdRoute: AppAgentsIdRoute,
   AppAgentsNewRoute: AppAgentsNewRoute,
+  AppAgentsIndexRoute: AppAgentsIndexRoute,
 }
 
 const AppAgentsRouteWithChildren = AppAgentsRoute._addFileChildren(
