@@ -255,57 +255,24 @@ function AgentDetail() {
       />
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Canvas */}
-        <div className="flex min-h-0 flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-              <GitBranch className="h-3 w-3" /> Workflow editor
-            </div>
-            <div className="text-[11px] text-muted-foreground">{steps.length} step{steps.length === 1 ? "" : "s"} · click any node to edit</div>
-          </div>
-
-          <div
-            className="relative flex-1 overflow-auto rounded-2xl border border-black/5 bg-[oklch(0.985_0.005_85)] p-8"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 1px 1px, oklch(0.85 0.01 85) 1px, transparent 0)",
-              backgroundSize: "24px 24px",
-            }}
-          >
-            <div className="mx-auto flex max-w-md flex-col items-center">
-              <CanvasNode
-                kind="trigger"
-                title={agent.spec.trigger?.type ?? "manual"}
-                sub={agent.spec.trigger?.description ?? "Run on demand"}
-                Icon={triggerIcon(agent.spec.trigger?.type ?? "manual")}
-                status={statusFor(0, activeIndex)}
-                index={0}
-                selected={editing?.kind === "trigger"}
-                onClick={() => setEditing({ kind: "trigger" })}
-              />
-              <AddRow onClick={() => addStepAt(0)} />
-              {steps.map((s, i) => (
-                <div key={i} className="flex w-full flex-col items-center">
-                  <CanvasNode
-                    kind="step"
-                    title={s.title}
-                    sub={`${s.integration} · ${s.action}`}
-                    Icon={Bot}
-                    status={statusFor(i + 1, activeIndex)}
-                    index={i + 1}
-                    selected={editing?.kind === "step" && editing.index === i}
-                    onClick={() => setEditing({ kind: "step", index: i })}
-                    onDelete={() => removeStep(i)}
-                  />
-                  <AddRow onClick={() => addStepAt(i + 1)} />
-                </div>
-              ))}
-              <div className="mt-1 flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-black/10 bg-white/60 text-[11px] font-semibold uppercase text-muted-foreground">
-                end
-              </div>
-            </div>
-          </div>
-        </div>
+        <WorkflowCanvas
+          agent={agent}
+          activeIndex={activeIndex}
+          editing={editing}
+          onSelectTrigger={() => setEditing({ kind: "trigger" })}
+          onSelectStep={(i) => setEditing({ kind: "step", index: i })}
+          onAddStep={(i) => addStepAt(i)}
+          onRemoveStep={(i) => removeStep(i)}
+          onMoveNode={(kind, index, x, y) => {
+            if (!agent) return;
+            if (kind === "trigger") {
+              persistSpec({ ...agent.spec, trigger: { ...agent.spec.trigger, x, y } });
+            } else {
+              const steps = (agent.spec.steps ?? []).map((s, i) => (i === index ? { ...s, x, y } : s));
+              persistSpec({ ...agent.spec, steps });
+            }
+          }}
+        />
 
         {/* Right panel */}
         <div className="flex min-h-0 flex-col rounded-2xl border border-black/5 bg-white">
