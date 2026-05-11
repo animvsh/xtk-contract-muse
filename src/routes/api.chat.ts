@@ -187,6 +187,26 @@ const tools = {
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
+  clarify: tool({
+    description:
+      "Ask the user 1-3 quick clarifying questions BEFORE creating an agent / API / MCP when critical info is missing or ambiguous (e.g. phone number for SMS agent, which metric to track, which data source to read, cadence/time, which workspace to expose). Each question shows a small UI card with multiple-choice options. After calling this, end your response with ONE short plain-text line like 'A few quick questions to get this right.' DO NOT call proposeAgent / proposeApi / proposeMcp in the same response. The user's answers will arrive as the next user message.",
+    inputSchema: z.object({
+      intent: z.enum(["agent", "api", "mcp"]).describe("What you're about to create"),
+      summary: z.string().describe("One sentence on what you're planning to build, e.g. 'Daily SMS with employee effectiveness score'"),
+      questions: z.array(z.object({
+        id: z.string().describe("kebab-case id, e.g. 'recipient'"),
+        question: z.string().describe("Short question, e.g. 'Where should I send it?'"),
+        options: z.array(z.object({
+          value: z.string().describe("Short value the assistant will see, e.g. 'sms'"),
+          label: z.string().describe("Display label, e.g. 'Text my phone'"),
+          description: z.string().optional().describe("Optional one-line clarifier"),
+        })).min(2).max(5),
+        multi: z.boolean().optional().describe("Allow multiple selections. Default false."),
+        allowOther: z.boolean().optional().describe("Show a free-text 'Other' option. Default true."),
+      })).min(1).max(3),
+    }),
+    execute: async (input) => ({ ok: true, awaiting: true, draft: input }),
+  }),
   proposeMcp: tool({
     description:
       "Use WHEN AND ONLY WHEN the user asks to create / build / make / spin up an MCP, MCP server, Model Context Protocol server, CLI tool, or 'something I can use from Claude Code / Cursor / Codex / my coding tool / terminal' to access their workspace. Render a draft MCP server the user can review and save. Do NOT call createPlan, updateStep, proposeApi, proposeAgent, or other tools alongside this — the proposal IS the response.",
