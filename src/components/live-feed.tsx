@@ -100,7 +100,7 @@ export function LiveFeed() {
   }, []);
 
   return (
-    <div className="hidden w-72 shrink-0 border-l border-black/5 bg-white lg:flex lg:flex-col">
+    <div className="hidden w-72 shrink-0 border-l border-black/5 bg-white xl:flex xl:flex-col">
       <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">

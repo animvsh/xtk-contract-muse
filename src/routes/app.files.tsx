@@ -369,42 +369,42 @@ function Files() {
 
   return (
     <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
-      <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 flex items-start justify-between gap-3 p-4 sm:p-6">
-        <div className="pointer-events-auto max-w-md">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 flex flex-col items-stretch gap-3 p-4 sm:p-6 md:flex-row md:items-start md:justify-between">
+        <div className="pointer-events-auto min-w-0 max-w-md">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[oklch(0.68_0.22_40)]">
             <Folder className="h-3.5 w-3.5" /> {view === "graph" ? "Knowledge graph" : "All files"}
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Files</h1>
-          <p className="mt-1 hidden text-sm text-[oklch(0.4_0_0)] sm:block">
+          <p className="mt-1 hidden text-sm text-[oklch(0.4_0_0)] xl:block">
             {view === "graph"
               ? "Every source and file connected to your workspace. Drag to pan, scroll to zoom."
               : "Browse your workspace files in a clean list."}
           </p>
         </div>
-        <div className="pointer-events-auto flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white/90 px-3 py-2 shadow-sm backdrop-blur focus-within:border-[oklch(0.68_0.22_40)]/40">
-            <Search className="h-4 w-4 text-[oklch(0.5_0_0)]" />
+        <div className="pointer-events-auto flex flex-wrap items-center gap-2 md:flex-nowrap md:justify-end">
+          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-black/10 bg-white/90 px-3 py-2 shadow-sm backdrop-blur focus-within:border-[oklch(0.68_0.22_40)]/40 md:flex-initial">
+            <Search className="h-4 w-4 shrink-0 text-[oklch(0.5_0_0)]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={view === "graph" ? "Search the graph…" : "Search files…"}
-              className="w-44 bg-transparent text-sm outline-none placeholder:text-[oklch(0.55_0_0)] sm:w-56"
+              className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-[oklch(0.55_0_0)] md:w-40 lg:w-56"
             />
           </div>
-          <div className="flex rounded-xl border border-black/10 bg-white/90 p-1 shadow-sm backdrop-blur">
+          <div className="flex shrink-0 rounded-xl border border-black/10 bg-white/90 p-1 shadow-sm backdrop-blur">
             <button
               onClick={() => setView("graph")}
               className={`clicky-sm flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "graph" ? "bg-[oklch(0.15_0_0)] text-white" : "text-[oklch(0.4_0_0)] hover:bg-black/5"}`}
               title="Graph view"
             >
-              <Network className="h-3.5 w-3.5" /> Graph
+              <Network className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Graph</span>
             </button>
             <button
               onClick={() => setView("grid")}
               className={`clicky-sm flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "grid" ? "bg-[oklch(0.15_0_0)] text-white" : "text-[oklch(0.4_0_0)] hover:bg-black/5"}`}
               title="List view"
             >
-              <LayoutGrid className="h-3.5 w-3.5" /> Files
+              <LayoutGrid className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Files</span>
             </button>
           </div>
         </div>
