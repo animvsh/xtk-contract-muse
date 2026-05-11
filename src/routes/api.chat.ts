@@ -225,6 +225,7 @@ export const Route = createFileRoute("/api/chat")({
 
           tools,
           stopWhen: stepCountIs(50),
+          experimental_transform: smoothStream({ delayInMs: 18, chunking: "word" }),
           messages: await convertToModelMessages(messages as UIMessage[]),
         });
 
