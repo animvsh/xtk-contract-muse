@@ -20,6 +20,9 @@ import {
   Maximize2,
   Plus,
   Minus,
+  LayoutGrid,
+  Network,
+  Star as StarIcon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/files")({
