@@ -76,8 +76,10 @@ function AgentDetail() {
     if (agentError || !a) {
       setAgent(null);
       setRuns([]);
-      setLoadError("Agent not found or you don't have access to it.");
+      setLoadError("Agent not found — redirecting to your agents.");
       setLoading(false);
+      toast.error("Agent not found");
+      navigate({ to: "/app/agents", replace: true });
       return;
     }
     const normalized = normalizeAgent(a as unknown as Agent);
