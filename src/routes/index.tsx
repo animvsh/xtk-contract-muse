@@ -264,13 +264,13 @@ function DashboardPreview() {
                 <div
                   key={n.key}
                   ref={(el) => { navRefs.current[n.key] = el; }}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-500 ease-out ${
+                  className={`demo-nav-item flex items-center gap-2 rounded-lg px-2 py-1.5 ${
                     active
-                      ? "bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
+                      ? "is-active bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
                       : "text-[oklch(0.4_0_0)]"
                   }`}
                 >
-                  <n.icon className="h-3.5 w-3.5" />
+                  <n.icon className="demo-nav-icon h-3.5 w-3.5" />
                   {n.label}
                 </div>
               );
