@@ -85,9 +85,14 @@ function Landing() {
 
             {/* Tilted dashboard preview */}
             <div className="relative mt-16">
+              {/* Soft glow underneath */}
+              <div className="pointer-events-none absolute inset-x-20 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px]" />
               <div
-                className="mx-auto max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5"
-                style={{ transform: "perspective(1800px) rotateX(8deg)" }}
+                className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]"
+                style={{
+                  transform: "perspective(1800px) rotateX(6deg)",
+                  boxShadow: "0 40px 80px -30px rgba(0,0,0,0.25), 0 16px 40px -16px rgba(0,0,0,0.12)",
+                }}
               >
                 <DashboardPreview />
               </div>
