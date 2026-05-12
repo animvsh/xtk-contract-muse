@@ -554,6 +554,20 @@ a:focus-visible {
   animation: splash-logo-in 0.4s ease-out both;
 }
 
+/* Smooth view cross-fade for landing demo */
+@keyframes viewEnter {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.985); filter: blur(6px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.view-enter {
+  animation: viewEnter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity, filter;
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-enter { animation: none !important; }
+}
+
 
 
 
