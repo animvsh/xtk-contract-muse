@@ -232,15 +232,18 @@ const SOURCE_TONE: Record<string, string> = {
   GitHub: "oklch(0.3 0.02 250)",
 };
 
+const WORLD_W = 2800;
+const WORLD_H = 2000;
+
 function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[] } {
-  const cx = 1400;
-  const cy = 1000;
+  const cx = WORLD_W / 2;
+  const cy = WORLD_H / 2;
   const nodes: GraphNode[] = [
     { id: "center", kind: "center", x: cx, y: cy, label: "Workspace", sublabel: "Beevr" },
   ];
   const edges: GraphEdge[] = [];
   const sources = Array.from(new Set(files.map((f) => f.source)));
-  const sourceRadius = 480;
+  const sourceRadius = 340;
   sources.forEach((src, i) => {
     const a = (i / sources.length) * Math.PI * 2 - Math.PI / 2;
     const sx = cx + Math.cos(a) * sourceRadius;
@@ -249,8 +252,8 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
     nodes.push({ id: sId, kind: "source", x: sx, y: sy, label: src, source: src });
     edges.push({ from: "center", to: sId });
     const inSource = files.filter((f) => f.source === src);
-    const fileRadius = 300;
-    const spread = Math.PI * 0.9;
+    const fileRadius = 230;
+    const spread = Math.min(Math.PI * 0.7, ((Math.PI * 2) / Math.max(sources.length, 1)) * 0.85);
     inSource.forEach((f, j) => {
       const t = inSource.length === 1 ? 0 : j / (inSource.length - 1) - 0.5;
       const fa = a + t * spread;
@@ -267,6 +270,19 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
     });
   });
   return { nodes, edges };
+}
+
+function computeBounds(nodes: GraphNode[]) {
+  // Pad for node visual extents (file cards are ~180 wide, source ~80)
+  const pad = 140;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of nodes) {
+    if (n.x < minX) minX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.x > maxX) maxX = n.x;
+    if (n.y > maxY) maxY = n.y;
+  }
+  return { minX: minX - pad, minY: minY - pad, maxX: maxX + pad, maxY: maxY + pad };
 }
 
 function Files() {
@@ -294,26 +310,68 @@ function Files() {
     );
   }, [query]);
   const { nodes, edges } = useMemo(() => buildGraph(FILES), []);
+  const bounds = useMemo(() => computeBounds(nodes), [nodes]);
   const open = openId ? FILES.find((f) => f.id === openId) ?? null : null;
 
-  const centerOnNode = (nodeId: string, targetZoom = 1.05) => {
+  const fit = (animate = true) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    // Reserve top safe area for the floating header overlay
+    const topSafe = 132;
+    const bottomSafe = 16;
+    const sideSafe = 24;
+    const availW = Math.max(200, r.width - sideSafe * 2);
+    const availH = Math.max(200, r.height - topSafe - bottomSafe);
+    const w = bounds.maxX - bounds.minX;
+    const h = bounds.maxY - bounds.minY;
+    const z = Math.min(availW / w, availH / h, 1.2);
+    const cx = (bounds.minX + bounds.maxX) / 2;
+    const cy = (bounds.minY + bounds.maxY) / 2;
+    if (animate) setAnimating(true);
+    setZoom(z);
+    setPan({
+      x: sideSafe + availW / 2 - cx * z,
+      y: topSafe + availH / 2 - cy * z,
+    });
+    if (animate) window.setTimeout(() => setAnimating(false), 750);
+  };
+
+  const centerOnNode = (nodeId: string, targetZoom = 1.0) => {
     const n = nodes.find((nn) => nn.id === nodeId);
-    if (!n || !containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
+    const el = containerRef.current;
+    if (!n || !el) return;
+    const r = el.getBoundingClientRect();
+    const topSafe = 132;
     setAnimating(true);
     setZoom(targetZoom);
-    setPan({ x: r.width / 2 - n.x * targetZoom, y: r.height / 2 - n.y * targetZoom });
+    setPan({
+      x: r.width / 2 - n.x * targetZoom,
+      y: topSafe + (r.height - topSafe) / 2 - n.y * targetZoom,
+    });
     setPulseId(nodeId);
     window.setTimeout(() => setAnimating(false), 750);
     window.setTimeout(() => setPulseId((p) => (p === nodeId ? null : p)), 1800);
   };
 
+  // Fit on mount and whenever the view becomes graph
   useEffect(() => {
-    if (!containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
-    setPan({ x: r.width / 2 - 1400 * zoom, y: r.height / 2 - 1000 * zoom });
+    if (view !== "graph") return;
+    // Defer to next frame so container has measured size
+    const id = requestAnimationFrame(() => fit(false));
+    return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [view]);
+
+  // Refit on container resize
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || view !== "graph") return;
+    const ro = new ResizeObserver(() => fit(false));
+    ro.observe(el);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, bounds]);
 
   // Animate zoom onto first match when searching in graph view
   useEffect(() => {
@@ -334,7 +392,7 @@ function Files() {
       e.preventDefault();
       const delta = -e.deltaY * 0.0015;
       setZoom((z) => {
-        const next = Math.min(1.4, Math.max(0.25, z + delta));
+        const next = Math.min(1.6, Math.max(0.2, z + delta));
         const r = el.getBoundingClientRect();
         const mx = e.clientX - r.left;
         const my = e.clientY - r.top;
@@ -363,15 +421,6 @@ function Files() {
   };
   const endDrag = () => {
     dragging.current = null;
-  };
-  const fit = () => {
-    if (!containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
-    const z = 0.55;
-    setAnimating(true);
-    setZoom(z);
-    setPan({ x: r.width / 2 - 1400 * z, y: r.height / 2 - 1000 * z });
-    window.setTimeout(() => setAnimating(false), 750);
   };
 
   const filteredFiles = useMemo(
@@ -551,11 +600,11 @@ function Files() {
                   style={{ left: n.x, top: n.y }}
                 >
                   <div
-                    className="flex h-20 w-20 flex-col items-center justify-center rounded-2xl text-white shadow-lg ring-4 ring-white transition-transform hover:scale-105"
+                    className="flex h-[68px] w-[68px] flex-col items-center justify-center rounded-2xl text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.25)] ring-[3px] ring-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.06] hover:shadow-[0_14px_32px_-10px_rgba(0,0,0,0.3)] active:scale-[0.97]"
                     style={{ background: tone }}
                   >
-                    <Folder className="h-6 w-6" />
-                    <div className="mt-0.5 text-[10px] font-semibold">{n.label}</div>
+                    <Folder className="h-5 w-5" />
+                    <div className="mt-1 text-[10px] font-semibold tracking-wide">{n.label}</div>
                   </div>
                 </div>
               );
@@ -571,7 +620,7 @@ function Files() {
                 onMouseEnter={() => setHoverId(n.id)}
                 onMouseLeave={() => setHoverId(null)}
                 onClick={() => setOpenId(f.id)}
-                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/5 bg-white/95 p-3 text-left shadow-md backdrop-blur transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-xl ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
+                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/[0.06] bg-white/95 p-3 text-left shadow-[0_8px_20px_-8px_rgba(0,0,0,0.18)] backdrop-blur transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.25)] active:translate-y-0 ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
                 style={{ left: n.x, top: n.y }}
               >
                 <div className="flex items-start justify-between">
@@ -613,7 +662,7 @@ function Files() {
             <Minus className="h-4 w-4" />
           </button>
           <button
-            onClick={fit}
+            onClick={() => fit(true)}
             className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
             title="Recenter"
           >
