@@ -40,13 +40,13 @@ function Landing() {
               <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
               <a href="#contacts" className="story-link transition-colors hover:text-black">Contacts</a>
             </nav>
-            <div className="flex items-center gap-6">
-              <Link to="/auth" className="clicky-sm text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/auth" className="clicky-sm hidden text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black sm:inline">
                 Sign in
               </Link>
               <Link
                 to="/onboarding"
-                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50"
+                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-4 py-2 text-[13px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50 sm:px-5 sm:py-2.5 sm:text-[15px]"
               >
                 Join the waitlist
               </Link>
