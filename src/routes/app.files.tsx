@@ -662,7 +662,7 @@ function Files() {
             <Minus className="h-4 w-4" />
           </button>
           <button
-            onClick={fit}
+            onClick={() => fit(true)}
             className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
             title="Recenter"
           >
