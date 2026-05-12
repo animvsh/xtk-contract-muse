@@ -310,26 +310,68 @@ function Files() {
     );
   }, [query]);
   const { nodes, edges } = useMemo(() => buildGraph(FILES), []);
+  const bounds = useMemo(() => computeBounds(nodes), [nodes]);
   const open = openId ? FILES.find((f) => f.id === openId) ?? null : null;
 
-  const centerOnNode = (nodeId: string, targetZoom = 1.05) => {
+  const fit = (animate = true) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    // Reserve top safe area for the floating header overlay
+    const topSafe = 132;
+    const bottomSafe = 16;
+    const sideSafe = 24;
+    const availW = Math.max(200, r.width - sideSafe * 2);
+    const availH = Math.max(200, r.height - topSafe - bottomSafe);
+    const w = bounds.maxX - bounds.minX;
+    const h = bounds.maxY - bounds.minY;
+    const z = Math.min(availW / w, availH / h, 1.2);
+    const cx = (bounds.minX + bounds.maxX) / 2;
+    const cy = (bounds.minY + bounds.maxY) / 2;
+    if (animate) setAnimating(true);
+    setZoom(z);
+    setPan({
+      x: sideSafe + availW / 2 - cx * z,
+      y: topSafe + availH / 2 - cy * z,
+    });
+    if (animate) window.setTimeout(() => setAnimating(false), 750);
+  };
+
+  const centerOnNode = (nodeId: string, targetZoom = 1.0) => {
     const n = nodes.find((nn) => nn.id === nodeId);
-    if (!n || !containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
+    const el = containerRef.current;
+    if (!n || !el) return;
+    const r = el.getBoundingClientRect();
+    const topSafe = 132;
     setAnimating(true);
     setZoom(targetZoom);
-    setPan({ x: r.width / 2 - n.x * targetZoom, y: r.height / 2 - n.y * targetZoom });
+    setPan({
+      x: r.width / 2 - n.x * targetZoom,
+      y: topSafe + (r.height - topSafe) / 2 - n.y * targetZoom,
+    });
     setPulseId(nodeId);
     window.setTimeout(() => setAnimating(false), 750);
     window.setTimeout(() => setPulseId((p) => (p === nodeId ? null : p)), 1800);
   };
 
+  // Fit on mount and whenever the view becomes graph
   useEffect(() => {
-    if (!containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
-    setPan({ x: r.width / 2 - 1400 * zoom, y: r.height / 2 - 1000 * zoom });
+    if (view !== "graph") return;
+    // Defer to next frame so container has measured size
+    const id = requestAnimationFrame(() => fit(false));
+    return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [view]);
+
+  // Refit on container resize
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || view !== "graph") return;
+    const ro = new ResizeObserver(() => fit(false));
+    ro.observe(el);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, bounds]);
 
   // Animate zoom onto first match when searching in graph view
   useEffect(() => {
@@ -350,7 +392,7 @@ function Files() {
       e.preventDefault();
       const delta = -e.deltaY * 0.0015;
       setZoom((z) => {
-        const next = Math.min(1.4, Math.max(0.25, z + delta));
+        const next = Math.min(1.6, Math.max(0.2, z + delta));
         const r = el.getBoundingClientRect();
         const mx = e.clientX - r.left;
         const my = e.clientY - r.top;
@@ -379,15 +421,6 @@ function Files() {
   };
   const endDrag = () => {
     dragging.current = null;
-  };
-  const fit = () => {
-    if (!containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
-    const z = 0.55;
-    setAnimating(true);
-    setZoom(z);
-    setPan({ x: r.width / 2 - 1400 * z, y: r.height / 2 - 1000 * z });
-    window.setTimeout(() => setAnimating(false), 750);
   };
 
   const filteredFiles = useMemo(
