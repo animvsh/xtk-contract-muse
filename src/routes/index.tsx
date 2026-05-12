@@ -1,8 +1,91 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, FileText, MessageSquare, Mail, Send, Upload, FileStack, Paperclip, Search, TrendingUp, Plug, LineChart, Lock } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import foundersIncLogo from "@/assets/founders-inc.png";
+
+// Reveal-on-scroll wrapper
+function Reveal({
+  children,
+  className = "",
+  delay = 0,
+  as: As = "div" as ElementType,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: 0 | 1 | 2 | 3 | 4;
+  as?: ElementType;
+}) {
+  const ref = useRef<HTMLElement | null>(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    if (typeof IntersectionObserver === "undefined") { setVis(true); return; }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { setVis(true); io.disconnect(); } }),
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.12 }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+  const delayClass = delay ? `reveal-delay-${delay}` : "";
+  const Cmp: any = As;
+  return (
+    <Cmp ref={ref} className={`reveal ${delayClass} ${vis ? "is-visible" : ""} ${className}`}>
+      {children}
+    </Cmp>
+  );
+}
+
+// Mouse-parallax for ambient orbs
+function useParallax(strength = 1) {
+  const [xy, setXY] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let raf = 0;
+    const onMove = (e: MouseEvent) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        setXY({ x: ((e.clientX - cx) / cx) * 24 * strength, y: ((e.clientY - cy) / cy) * 24 * strength });
+      });
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(raf); };
+  }, [strength]);
+  return xy;
+}
+
+// Animated count-up triggered when in view
+function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: string; duration?: number }) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const [n, setN] = useState(0);
+  const started = useRef(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (t: number) => {
+            const p = Math.min(1, (t - start) / duration);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setN(Math.round(to * eased));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [to, duration]);
+  return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
+}
+
+const CONNECTORS = ["Notion", "Slack", "Gmail", "Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira"];
 
 
 export const Route = createFileRoute("/")({
