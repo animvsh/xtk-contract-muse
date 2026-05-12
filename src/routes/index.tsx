@@ -156,13 +156,13 @@ function Landing() {
 
             <Reveal delay={1}>
               <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
-                The company brain<br className="hidden sm:block" /> that actually <span className="gradient-text-anim">does the work.</span>
+                Talk to your business<br className="hidden sm:block" /> like it's <span className="gradient-text-anim">one brain.</span>
               </h1>
             </Reveal>
 
             <Reveal delay={2}>
               <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
-                Beevr unifies every doc, message, deal and metric into one searchable brain — then turns it into instant insights and cloud agents that act on your behalf.
+                Beevr unifies every doc, message, deal and metric into one place you can ask in plain English — and turns the answers into insights and agents that act on your behalf.
               </p>
             </Reveal>
 
