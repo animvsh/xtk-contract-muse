@@ -184,9 +184,29 @@ function useTick(ms: number) {
 
 function DashboardPreview() {
   const [view, setView] = useState<ViewKey>("files");
-  const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean }>({ x: 110, y: 168, click: false });
+  const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean; visible: boolean }>({ x: 0, y: 0, click: false, visible: false });
   const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({ files: null, agents: null, brain: null });
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // Initialize cursor on the active nav item once mounted
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const target = navRefs.current[view];
+      const root = rootRef.current;
+      if (target && root) {
+        const tr = target.getBoundingClientRect();
+        const rr = root.getBoundingClientRect();
+        setCursor({
+          x: tr.left - rr.left + tr.width / 2,
+          y: tr.top - rr.top + tr.height / 2,
+          click: false,
+          visible: true,
+        });
+      }
+    });
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Cycle views with a moving cursor
   useEffect(() => {
@@ -203,16 +223,16 @@ function DashboardPreview() {
         const rr = root.getBoundingClientRect();
         const x = tr.left - rr.left + tr.width / 2;
         const y = tr.top - rr.top + tr.height / 2;
-        setCursor({ x, y, click: false });
-        timers.push(setTimeout(() => setCursor((c) => ({ ...c, click: true })), 700));
+        setCursor((c) => ({ ...c, x, y, click: false, visible: true }));
+        timers.push(setTimeout(() => setCursor((c) => ({ ...c, click: true })), 900));
         timers.push(setTimeout(() => {
           setView(next);
           setCursor((c) => ({ ...c, click: false }));
-        }, 850));
+        }, 1100));
       }
-      timers.push(setTimeout(cycle, 7500));
+      timers.push(setTimeout(cycle, 8000));
     };
-    timers.push(setTimeout(cycle, 6500));
+    timers.push(setTimeout(cycle, 7000));
     return () => timers.forEach(clearTimeout);
   }, []);
 
@@ -225,7 +245,9 @@ function DashboardPreview() {
           <span className="h-3 w-3 rounded-full bg-[oklch(0.85_0.18_85)]" />
           <span className="h-3 w-3 rounded-full bg-[oklch(0.75_0.18_145)]" />
         </div>
-        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)]">app.beevr.dev / {view}</div>
+        <div className="mx-auto rounded-md bg-[oklch(0.95_0_0)] px-4 py-1 text-xs text-[oklch(0.4_0_0)] transition-all duration-500">
+          app.beevr.dev / <span className="text-[oklch(0.2_0_0)]">{view}</span>
+        </div>
       </div>
 
       <div className="flex">
@@ -243,7 +265,7 @@ function DashboardPreview() {
                 <div
                   key={n.key}
                   ref={(el) => { navRefs.current[n.key] = el; }}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-300 ${
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-500 ease-out ${
                     active
                       ? "bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
                       : "text-[oklch(0.4_0_0)]"
@@ -265,23 +287,31 @@ function DashboardPreview() {
         </div>
 
         {/* Content — animated swap */}
-        <div key={view} className="flex-1 animate-fade-in p-5">
-          {view === "files" && <FilesView />}
-          {view === "agents" && <AgentsView />}
-          {view === "brain" && <BrainView />}
+        <div className="relative flex-1 overflow-hidden">
+          <div key={view} className="view-enter p-5">
+            {view === "files" && <FilesView />}
+            {view === "agents" && <AgentsView />}
+            {view === "brain" && <BrainView />}
+          </div>
         </div>
       </div>
 
       {/* Faux cursor */}
       <div
-        className="pointer-events-none absolute z-20 transition-all duration-700 ease-out"
-        style={{ left: cursor.x, top: cursor.y, transform: "translate(-2px, -2px)" }}
+        className="pointer-events-none absolute z-20"
+        style={{
+          left: cursor.x,
+          top: cursor.y,
+          transform: "translate(-2px, -2px)",
+          opacity: cursor.visible ? 1 : 0,
+          transition: "left 900ms cubic-bezier(0.65, 0, 0.35, 1), top 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease",
+        }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" className="drop-shadow-md">
+        <svg width="18" height="18" viewBox="0 0 24 24" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>
           <path d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z" fill="#111" stroke="white" strokeWidth="1.2" strokeLinejoin="round"/>
         </svg>
         {cursor.click && (
-          <span className="absolute -left-2 -top-2 h-7 w-7 animate-ping rounded-full bg-[oklch(0.68_0.22_40)] opacity-60" />
+          <span className="absolute -left-2 -top-2 h-7 w-7 animate-ping rounded-full bg-[oklch(0.68_0.22_40)] opacity-50" />
         )}
       </div>
     </div>
