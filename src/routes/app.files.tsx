@@ -620,7 +620,7 @@ function Files() {
                 onMouseEnter={() => setHoverId(n.id)}
                 onMouseLeave={() => setHoverId(null)}
                 onClick={() => setOpenId(f.id)}
-                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/5 bg-white/95 p-3 text-left shadow-md backdrop-blur transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-xl ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
+                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/[0.06] bg-white/95 p-3 text-left shadow-[0_8px_20px_-8px_rgba(0,0,0,0.18)] backdrop-blur transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.25)] active:translate-y-0 ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
                 style={{ left: n.x, top: n.y }}
               >
                 <div className="flex items-start justify-between">
