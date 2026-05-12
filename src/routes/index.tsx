@@ -101,13 +101,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const orb = useParallax(1);
   return (
     <div className="min-h-screen bg-white text-[oklch(0.15_0_0)]">
       {/* Outer frame */}
       <div className="relative overflow-hidden">
-        {/* Soft orange ambient glow */}
-        <div className="pointer-events-none absolute -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]" />
+        {/* Soft orange ambient glow — mouse parallax */}
+        <div
+          className="parallax-orb pointer-events-none absolute -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]"
+          style={{ ["--px" as any]: `${orb.x * 0.6}px`, ["--py" as any]: `${orb.y * 0.6}px` }}
+        />
+        <div
+          className="parallax-orb pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]"
+          style={{ ["--px" as any]: `${-orb.x * 0.8}px`, ["--py" as any]: `${-orb.y * 0.8}px` }}
+        />
+        <div
+          className="parallax-orb pointer-events-none absolute left-1/3 top-[1400px] h-[500px] w-[500px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-15 blur-[140px]"
+          style={{ ["--px" as any]: `${orb.x * 0.4}px`, ["--py" as any]: `${orb.y * 0.4}px` }}
+        />
 
         {/* Inner rounded white card */}
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
@@ -138,19 +149,24 @@ function Landing() {
 
           {/* Hero */}
           <section className="px-5 pb-16 pt-8 text-center sm:px-8 sm:pb-20 sm:pt-12 md:px-10">
-            <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
+            <Reveal className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
               <span className="text-[oklch(0.45_0_0)]">Backed by</span>
               <img src={foundersIncLogo} alt="Founders, Inc." className="h-4 w-auto object-contain" />
-            </div>
+            </Reveal>
 
-            <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
-              The company brain<br className="hidden sm:block" /> that actually <span className="bg-gradient-to-r from-[oklch(0.68_0.22_40)] to-[oklch(0.62_0.22_25)] bg-clip-text text-transparent">does the work.</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
-              Beevr unifies every doc, message, deal and metric into one searchable brain — then turns it into instant insights and cloud agents that act on your behalf.
-            </p>
+            <Reveal delay={1}>
+              <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
+                The company brain<br className="hidden sm:block" /> that actually <span className="gradient-text-anim">does the work.</span>
+              </h1>
+            </Reveal>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
+            <Reveal delay={2}>
+              <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
+                Beevr unifies every doc, message, deal and metric into one searchable brain — then turns it into instant insights and cloud agents that act on your behalf.
+              </p>
+            </Reveal>
+
+            <Reveal delay={3} className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
               <Link
                 to="/onboarding"
                 className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)] sm:px-6 sm:py-3.5 sm:text-[15px]"
@@ -164,61 +180,77 @@ function Landing() {
               >
                 See how it works
               </a>
-            </div>
+            </Reveal>
 
             {/* Trust strip */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[oklch(0.5_0_0)]">
+            <Reveal delay={4} className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[oklch(0.5_0_0)]">
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Connects to 40+ tools</span>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Live in under 10 minutes</span>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> SOC 2 ready</span>
+            </Reveal>
+
+            {/* Connector marquee */}
+            <div className="marquee-mask mt-10 overflow-hidden">
+              <div className="marquee gap-3">
+                {[...CONNECTORS, ...CONNECTORS].map((name, i) => (
+                  <span
+                    key={i}
+                    className="mr-3 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.68_0.22_40)]" />
+                    {name}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Tilted dashboard preview */}
             <div className="relative mt-12 sm:mt-16">
               <div className="pointer-events-none absolute inset-x-10 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px] sm:inset-x-20" />
-              <div
-                className="relative mx-auto max-w-5xl landing-tilt"
-                style={{
-                  filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
-                }}
-              >
-                <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]">
-                  <DashboardPreview />
+              <Reveal className="relative mx-auto max-w-5xl">
+                <div
+                  className="landing-tilt"
+                  style={{
+                    filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
+                  }}
+                >
+                  <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]">
+                    <DashboardPreview />
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </section>
 
           {/* Value prop pillars */}
           <section id="brain" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
-            <div className="mx-auto max-w-3xl text-center">
+            <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
               </div>
               <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-                Every fact about your business — one question away.
+                <span className="headline-underline">Every fact about your business</span> — one question away.
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
                 Knowledge lives in 20+ silos: Notion, Slack, Gmail, Drive, Linear, Hubspot, Stripe… Beevr indexes all of it into a private, role-aware brain that anyone on your team can ask in plain English.
               </p>
-            </div>
+            </Reveal>
 
-            <div className="stagger mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+            <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
                 { icon: Plug, title: "40+ live connectors", desc: "Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom — connect once, stay in sync." },
                 { icon: Search, title: "Ask anything", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
                 { icon: Lock, title: "Permission-aware", desc: "Beevr respects your existing access controls. People only see what they already could." },
-              ].map((f) => (
-                <div
-                  key={f.title}
-                  className="alive group rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)]"
-                >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
-                    <f.icon className="h-5 w-5" />
+              ].map((f, i) => (
+                <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
+                  <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)]">
+                    <div className="bobble mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
+                    <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                   </div>
-                  <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
-                  <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </section>
