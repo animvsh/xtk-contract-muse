@@ -232,15 +232,18 @@ const SOURCE_TONE: Record<string, string> = {
   GitHub: "oklch(0.3 0.02 250)",
 };
 
+const WORLD_W = 2800;
+const WORLD_H = 2000;
+
 function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[] } {
-  const cx = 1400;
-  const cy = 1000;
+  const cx = WORLD_W / 2;
+  const cy = WORLD_H / 2;
   const nodes: GraphNode[] = [
     { id: "center", kind: "center", x: cx, y: cy, label: "Workspace", sublabel: "Beevr" },
   ];
   const edges: GraphEdge[] = [];
   const sources = Array.from(new Set(files.map((f) => f.source)));
-  const sourceRadius = 480;
+  const sourceRadius = 440;
   sources.forEach((src, i) => {
     const a = (i / sources.length) * Math.PI * 2 - Math.PI / 2;
     const sx = cx + Math.cos(a) * sourceRadius;
@@ -249,8 +252,8 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
     nodes.push({ id: sId, kind: "source", x: sx, y: sy, label: src, source: src });
     edges.push({ from: "center", to: sId });
     const inSource = files.filter((f) => f.source === src);
-    const fileRadius = 300;
-    const spread = Math.PI * 0.9;
+    const fileRadius = 280;
+    const spread = Math.min(Math.PI * 0.85, ((Math.PI * 2) / Math.max(sources.length, 1)) * 0.95);
     inSource.forEach((f, j) => {
       const t = inSource.length === 1 ? 0 : j / (inSource.length - 1) - 0.5;
       const fa = a + t * spread;
@@ -267,6 +270,19 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
     });
   });
   return { nodes, edges };
+}
+
+function computeBounds(nodes: GraphNode[]) {
+  // Pad for node visual extents (file cards are ~180 wide, source ~80)
+  const pad = 140;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of nodes) {
+    if (n.x < minX) minX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.x > maxX) maxX = n.x;
+    if (n.y > maxY) maxY = n.y;
+  }
+  return { minX: minX - pad, minY: minY - pad, maxX: maxX + pad, maxY: maxY + pad };
 }
 
 function Files() {
