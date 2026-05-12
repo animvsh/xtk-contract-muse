@@ -88,13 +88,15 @@ function Landing() {
               {/* Soft glow underneath */}
               <div className="pointer-events-none absolute inset-x-20 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px]" />
               <div
-                className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]"
+                className="relative mx-auto max-w-5xl"
                 style={{
                   transform: "perspective(1800px) rotateX(6deg)",
-                  boxShadow: "0 40px 80px -30px rgba(0,0,0,0.25), 0 16px 40px -16px rgba(0,0,0,0.12)",
+                  filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
                 }}
               >
-                <DashboardPreview />
+                <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]">
+                  <DashboardPreview />
+                </div>
               </div>
             </div>
           </section>
