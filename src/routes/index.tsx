@@ -301,12 +301,17 @@ function DashboardPreview() {
         style={{
           left: cursor.x,
           top: cursor.y,
-          transform: "translate(-2px, -2px)",
           opacity: cursor.visible ? 1 : 0,
           transition: "left 900ms cubic-bezier(0.65, 0, 0.35, 1), top 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease",
         }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          className={`demo-cursor ${cursor.click ? "is-clicking" : ""}`}
+          style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
+        >
           <path d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z" fill="#111" stroke="white" strokeWidth="1.2" strokeLinejoin="round"/>
         </svg>
         {cursor.click && (
