@@ -349,17 +349,16 @@ function Landing() {
                 { icon: TrendingUp, title: "Revenue digest", desc: "“Every Monday, summarize Stripe revenue and post to #revenue.”" },
                 { icon: MessageSquare, title: "Support triage", desc: "“Tag Intercom tickets by intent and route urgent ones to on-call.”" },
                 { icon: Zap, title: "Pipeline watch", desc: "“DM me when any deal >$50k stalls more than 7 days.”" },
-              ].map((f) => (
-                <div
-                  key={f.title}
-                  className="rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg"
-                >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.15_0_0)] text-white">
-                    <f.icon className="h-5 w-5" />
+              ].map((f, i) => (
+                <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
+                  <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg">
+                    <div className="bobble mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.15_0_0)] text-white transition-transform group-hover:scale-110 group-hover:rotate-[-6deg]">
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
+                    <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                   </div>
-                  <h3 className="font-semibold">{f.title}</h3>
-                  <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </section>
