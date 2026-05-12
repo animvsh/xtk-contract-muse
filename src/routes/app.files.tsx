@@ -600,11 +600,11 @@ function Files() {
                   style={{ left: n.x, top: n.y }}
                 >
                   <div
-                    className="flex h-20 w-20 flex-col items-center justify-center rounded-2xl text-white shadow-lg ring-4 ring-white transition-transform hover:scale-105"
+                    className="flex h-[68px] w-[68px] flex-col items-center justify-center rounded-2xl text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.25)] ring-[3px] ring-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.06] hover:shadow-[0_14px_32px_-10px_rgba(0,0,0,0.3)] active:scale-[0.97]"
                     style={{ background: tone }}
                   >
-                    <Folder className="h-6 w-6" />
-                    <div className="mt-0.5 text-[10px] font-semibold">{n.label}</div>
+                    <Folder className="h-5 w-5" />
+                    <div className="mt-1 text-[10px] font-semibold tracking-wide">{n.label}</div>
                   </div>
                 </div>
               );
