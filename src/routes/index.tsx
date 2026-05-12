@@ -29,7 +29,7 @@ function Landing() {
         {/* Inner rounded white card */}
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
-          <header className="flex items-center justify-between px-10 py-8">
+          <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-7 md:px-10 md:py-8">
             <Link to="/" className="clicky-sm flex items-center gap-2.5">
               <BrandLogo className="h-12 w-12 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
@@ -40,13 +40,13 @@ function Landing() {
               <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
               <a href="#contacts" className="story-link transition-colors hover:text-black">Contacts</a>
             </nav>
-            <div className="flex items-center gap-6">
-              <Link to="/auth" className="clicky-sm text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/auth" className="clicky-sm hidden text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black sm:inline">
                 Sign in
               </Link>
               <Link
                 to="/onboarding"
-                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50"
+                className="clicky shine rounded-xl bg-[oklch(0.68_0.22_40)] px-4 py-2 text-[13px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 hover:bg-[oklch(0.62_0.22_40)] hover:shadow-xl hover:shadow-[oklch(0.68_0.22_40)]/50 sm:px-5 sm:py-2.5 sm:text-[15px]"
               >
                 Join the waitlist
               </Link>
@@ -54,43 +54,42 @@ function Landing() {
           </header>
 
           {/* Hero */}
-          <section className="px-10 pb-20 pt-12 text-center">
+          <section className="px-5 pb-16 pt-8 text-center sm:px-8 sm:pb-20 sm:pt-12 md:px-10">
             <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
               <span className="text-[oklch(0.45_0_0)]">Backed by</span>
               <img src={foundersIncLogo} alt="Founders, Inc." className="h-4 w-auto object-contain" />
             </div>
 
-            <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
+            <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
               Talk to your business.
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-[oklch(0.4_0_0)]">
+            <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
               With intelligent AI that knows everything about your business — from your docs and emails to your customers and revenue.
             </p>
 
-            <div className="mt-10 flex items-center justify-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
               <Link
                 to="/onboarding"
-                className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)] sm:px-6 sm:py-3.5 sm:text-[15px]"
               >
                 <Sparkles className="h-4 w-4" /> Join the waitlist
                 <ArrowRight className="nudge-x h-4 w-4" />
               </Link>
               <a
                 href="#features"
-                className="clicky rounded-xl border border-black/10 bg-white px-6 py-3.5 text-[15px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)]"
+                className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-[14px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)] sm:px-6 sm:py-3.5 sm:text-[15px]"
               >
                 Learn More
               </a>
             </div>
 
             {/* Tilted dashboard preview */}
-            <div className="relative mt-16">
+            <div className="relative mt-12 sm:mt-16">
               {/* Soft glow underneath */}
-              <div className="pointer-events-none absolute inset-x-20 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px]" />
+              <div className="pointer-events-none absolute inset-x-10 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px] sm:inset-x-20" />
               <div
-                className="relative mx-auto max-w-5xl"
+                className="relative mx-auto max-w-5xl landing-tilt"
                 style={{
-                  transform: "perspective(1800px) rotateX(6deg)",
                   filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
                 }}
               >
@@ -265,13 +264,13 @@ function DashboardPreview() {
                 <div
                   key={n.key}
                   ref={(el) => { navRefs.current[n.key] = el; }}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all duration-500 ease-out ${
+                  className={`demo-nav-item flex items-center gap-2 rounded-lg px-2 py-1.5 ${
                     active
-                      ? "bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
+                      ? "is-active bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
                       : "text-[oklch(0.4_0_0)]"
                   }`}
                 >
-                  <n.icon className="h-3.5 w-3.5" />
+                  <n.icon className="demo-nav-icon h-3.5 w-3.5" />
                   {n.label}
                 </div>
               );
@@ -302,12 +301,17 @@ function DashboardPreview() {
         style={{
           left: cursor.x,
           top: cursor.y,
-          transform: "translate(-2px, -2px)",
           opacity: cursor.visible ? 1 : 0,
           transition: "left 900ms cubic-bezier(0.65, 0, 0.35, 1), top 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease",
         }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          className={`demo-cursor ${cursor.click ? "is-clicking" : ""}`}
+          style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
+        >
           <path d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z" fill="#111" stroke="white" strokeWidth="1.2" strokeLinejoin="round"/>
         </svg>
         {cursor.click && (
