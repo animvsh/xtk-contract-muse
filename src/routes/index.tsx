@@ -29,7 +29,7 @@ function Landing() {
         {/* Inner rounded white card */}
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
-          <header className="flex items-center justify-between px-10 py-8">
+          <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-7 md:px-10 md:py-8">
             <Link to="/" className="clicky-sm flex items-center gap-2.5">
               <BrandLogo className="h-12 w-12 object-contain transition-transform duration-200 hover:rotate-[-8deg] hover:scale-110" />
               <span className="text-xl font-bold tracking-tight">Beevr</span>
