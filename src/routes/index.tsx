@@ -8,10 +8,10 @@ import foundersIncLogo from "@/assets/founders-inc.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Beevr — Your company's second brain" },
-      { name: "description", content: "Connect every tool. Ask anything. Beevr searches across Notion, Slack, Gmail and more — and acts on your behalf." },
-      { property: "og:title", content: "Beevr — Your company's second brain" },
-      { property: "og:description", content: "Connect every tool. Ask anything. Beevr acts on your behalf." },
+      { title: "Beevr — The company brain for fast-moving teams" },
+      { name: "description", content: "Beevr unifies every doc, channel and metric into one searchable brain — then turns it into insights and agents that act on your behalf." },
+      { property: "og:title", content: "Beevr — The company brain for fast-moving teams" },
+      { property: "og:description", content: "Unified company knowledge, instant insights, and cloud agents that act on your data." },
     ],
   }),
   component: Landing,
