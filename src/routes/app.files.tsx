@@ -243,7 +243,7 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
   ];
   const edges: GraphEdge[] = [];
   const sources = Array.from(new Set(files.map((f) => f.source)));
-  const sourceRadius = 440;
+  const sourceRadius = 340;
   sources.forEach((src, i) => {
     const a = (i / sources.length) * Math.PI * 2 - Math.PI / 2;
     const sx = cx + Math.cos(a) * sourceRadius;
@@ -252,8 +252,8 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
     nodes.push({ id: sId, kind: "source", x: sx, y: sy, label: src, source: src });
     edges.push({ from: "center", to: sId });
     const inSource = files.filter((f) => f.source === src);
-    const fileRadius = 280;
-    const spread = Math.min(Math.PI * 0.85, ((Math.PI * 2) / Math.max(sources.length, 1)) * 0.95);
+    const fileRadius = 230;
+    const spread = Math.min(Math.PI * 0.7, ((Math.PI * 2) / Math.max(sources.length, 1)) * 0.85);
     inSource.forEach((f, j) => {
       const t = inSource.length === 1 ? 0 : j / (inSource.length - 1) - 0.5;
       const fa = a + t * spread;
