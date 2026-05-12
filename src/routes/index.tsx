@@ -258,12 +258,12 @@ function Landing() {
           {/* Insights */}
           <section id="insights" className="border-t border-black/5 bg-white px-5 py-20 sm:px-10">
             <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2 md:items-center">
-              <div>
+              <Reveal>
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                   <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
                 </div>
                 <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-                  Stop hunting for numbers. Start getting answers.
+                  <span className="headline-underline">Stop hunting for numbers.</span> Start getting answers.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
                   Beevr cross-references your CRM, billing and product data to surface what's actually moving the business. Ask once — get a chart, a summary and the exact source rows.
@@ -287,42 +287,46 @@ function Landing() {
                 >
                   <Sparkles className="h-4 w-4" /> Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
                 </Link>
-              </div>
+              </Reveal>
 
-              <div className="relative">
-                <div className="pointer-events-none absolute -inset-6 rounded-[32px] bg-[oklch(0.68_0.22_40)] opacity-15 blur-[60px]" />
-                <div className="relative rounded-2xl border border-black/5 bg-white p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-[oklch(0.3_0_0)]">This week · Revenue</div>
-                    <span className="rounded-full bg-[oklch(0.96_0.06_140)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.18_140)]">+12% MoM</span>
-                  </div>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold tracking-tight">$284,210</span>
-                    <span className="text-xs text-[oklch(0.5_0_0)]">MRR</span>
-                  </div>
-                  <div className="mt-4 flex h-24 items-end gap-1">
-                    {[40, 55, 48, 62, 70, 68, 82, 78, 90, 86, 95, 100].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-t bg-gradient-to-t from-[oklch(0.68_0.22_40)] to-[oklch(0.78_0.18_55)]"
-                        style={{ height: `${h}%`, opacity: 0.5 + i * 0.04 }}
-                      />
-                    ))}
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {[
-                      { label: "Mid-market", val: "+28%", color: "oklch(0.55_0.18_140)" },
-                      { label: "Enterprise", val: "+2%", color: "oklch(0.6_0.05_85)" },
-                      { label: "SMB churn", val: "-2pts", color: "oklch(0.55_0.18_140)" },
-                    ].map((r) => (
-                      <div key={r.label} className="flex items-center justify-between rounded-lg border border-black/5 px-3 py-2 text-xs">
-                        <span className="text-[oklch(0.3_0_0)]">{r.label}</span>
-                        <span className="font-semibold tabular-nums" style={{ color: r.color }}>{r.val}</span>
-                      </div>
-                    ))}
+              <Reveal delay={2}>
+                <div className="relative">
+                  <div className="pointer-events-none absolute -inset-6 rounded-[32px] bg-[oklch(0.68_0.22_40)] opacity-15 blur-[60px]" />
+                  <div className="tilt-card relative rounded-2xl border border-black/5 bg-white p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold text-[oklch(0.3_0_0)]">This week · Revenue</div>
+                      <span className="rounded-full bg-[oklch(0.96_0.06_140)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.18_140)]">+12% MoM</span>
+                    </div>
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-3xl font-bold tracking-tight tabular-nums">
+                        <CountUp to={284210} prefix="$" />
+                      </span>
+                      <span className="text-xs text-[oklch(0.5_0_0)]">MRR</span>
+                    </div>
+                    <div className="mt-4 flex h-24 items-end gap-1">
+                      {[40, 55, 48, 62, 70, 68, 82, 78, 90, 86, 95, 100].map((h, i) => (
+                        <div
+                          key={i}
+                          className="bar-grow flex-1 rounded-t bg-gradient-to-t from-[oklch(0.68_0.22_40)] to-[oklch(0.78_0.18_55)]"
+                          style={{ height: `${h}%`, opacity: 0.5 + i * 0.04, animationDelay: `${i * 60}ms` }}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {[
+                        { label: "Mid-market", val: "+28%", color: "oklch(0.55_0.18_140)" },
+                        { label: "Enterprise", val: "+2%", color: "oklch(0.6_0.05_85)" },
+                        { label: "SMB churn", val: "-2pts", color: "oklch(0.55_0.18_140)" },
+                      ].map((r) => (
+                        <div key={r.label} className="flex items-center justify-between rounded-lg border border-black/5 px-3 py-2 text-xs transition-colors hover:bg-[oklch(0.985_0.005_85)]">
+                          <span className="text-[oklch(0.3_0_0)]">{r.label}</span>
+                          <span className="font-semibold tabular-nums" style={{ color: r.color }}>{r.val}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </section>
 
