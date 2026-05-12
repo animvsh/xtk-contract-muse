@@ -54,43 +54,42 @@ function Landing() {
           </header>
 
           {/* Hero */}
-          <section className="px-10 pb-20 pt-12 text-center">
+          <section className="px-5 pb-16 pt-8 text-center sm:px-8 sm:pb-20 sm:pt-12 md:px-10">
             <div className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
               <span className="text-[oklch(0.45_0_0)]">Backed by</span>
               <img src={foundersIncLogo} alt="Founders, Inc." className="h-4 w-auto object-contain" />
             </div>
 
-            <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
+            <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
               Talk to your business.
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-[oklch(0.4_0_0)]">
+            <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
               With intelligent AI that knows everything about your business — from your docs and emails to your customers and revenue.
             </p>
 
-            <div className="mt-10 flex items-center justify-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
               <Link
                 to="/onboarding"
-                className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
+                className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)] sm:px-6 sm:py-3.5 sm:text-[15px]"
               >
                 <Sparkles className="h-4 w-4" /> Join the waitlist
                 <ArrowRight className="nudge-x h-4 w-4" />
               </Link>
               <a
                 href="#features"
-                className="clicky rounded-xl border border-black/10 bg-white px-6 py-3.5 text-[15px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)]"
+                className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-[14px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)] sm:px-6 sm:py-3.5 sm:text-[15px]"
               >
                 Learn More
               </a>
             </div>
 
             {/* Tilted dashboard preview */}
-            <div className="relative mt-16">
+            <div className="relative mt-12 sm:mt-16">
               {/* Soft glow underneath */}
-              <div className="pointer-events-none absolute inset-x-20 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px]" />
+              <div className="pointer-events-none absolute inset-x-10 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px] sm:inset-x-20" />
               <div
-                className="relative mx-auto max-w-5xl"
+                className="relative mx-auto max-w-5xl landing-tilt"
                 style={{
-                  transform: "perspective(1800px) rotateX(6deg)",
                   filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
                 }}
               >
