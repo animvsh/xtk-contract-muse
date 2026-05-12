@@ -35,10 +35,10 @@ function Landing() {
               <span className="text-xl font-bold tracking-tight">Beevr</span>
             </Link>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
-              <a href="#company" className="story-link transition-colors hover:text-black">Company</a>
-              <a href="#features" className="story-link transition-colors hover:text-black">Features</a>
+              <a href="#brain" className="story-link transition-colors hover:text-black">Brain</a>
+              <a href="#insights" className="story-link transition-colors hover:text-black">Insights</a>
+              <a href="#agents" className="story-link transition-colors hover:text-black">Agents</a>
               <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
-              <a href="#contacts" className="story-link transition-colors hover:text-black">Contacts</a>
             </nav>
             <div className="flex items-center gap-3 sm:gap-6">
               <Link to="/auth" className="clicky-sm hidden text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black sm:inline">
@@ -61,10 +61,10 @@ function Landing() {
             </div>
 
             <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
-              Talk to your business.
+              The company brain<br className="hidden sm:block" /> that actually <span className="bg-gradient-to-r from-[oklch(0.68_0.22_40)] to-[oklch(0.62_0.22_25)] bg-clip-text text-transparent">does the work.</span>
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
-              With intelligent AI that knows everything about your business — from your docs and emails to your customers and revenue.
+            <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
+              Beevr unifies every doc, message, deal and metric into one searchable brain — then turns it into instant insights and cloud agents that act on your behalf.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
@@ -76,16 +76,22 @@ function Landing() {
                 <ArrowRight className="nudge-x h-4 w-4" />
               </Link>
               <a
-                href="#features"
+                href="#brain"
                 className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-[14px] font-semibold text-[oklch(0.15_0_0)] hover:bg-[oklch(0.97_0_0)] sm:px-6 sm:py-3.5 sm:text-[15px]"
               >
-                Learn More
+                See how it works
               </a>
+            </div>
+
+            {/* Trust strip */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[oklch(0.5_0_0)]">
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Connects to 40+ tools</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Live in under 10 minutes</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> SOC 2 ready</span>
             </div>
 
             {/* Tilted dashboard preview */}
             <div className="relative mt-12 sm:mt-16">
-              {/* Soft glow underneath */}
               <div className="pointer-events-none absolute inset-x-10 -bottom-10 h-40 rounded-[100%] bg-[oklch(0.68_0.22_40)] opacity-25 blur-[80px] sm:inset-x-20" />
               <div
                 className="relative mx-auto max-w-5xl landing-tilt"
@@ -100,18 +106,29 @@ function Landing() {
             </div>
           </section>
 
-          {/* Features */}
-          <section id="features" className="border-t border-black/5 bg-white px-10 py-20">
-            <h2 className="text-center text-4xl font-bold tracking-tight">Built for teams that move fast</h2>
-            <div className="stagger mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
+          {/* Value prop pillars */}
+          <section id="brain" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
+                <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
+              </div>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Every fact about your business — one question away.
+              </h2>
+              <p className="mt-4 text-[oklch(0.4_0_0)]">
+                Knowledge lives in 20+ silos: Notion, Slack, Gmail, Drive, Linear, Hubspot, Stripe… Beevr indexes all of it into a private, role-aware brain that anyone on your team can ask in plain English.
+              </p>
+            </div>
+
+            <div className="stagger mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: Brain, title: "Unified brain", desc: "One search across every doc, channel, and inbox in your stack." },
-                { icon: Zap, title: "Cloud agents", desc: "Spin up agents that act on your data — no code, no cron." },
-                { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs out of the box." },
+                { icon: Plug, title: "40+ live connectors", desc: "Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom — connect once, stay in sync." },
+                { icon: Search, title: "Ask anything", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
+                { icon: Lock, title: "Permission-aware", desc: "Beevr respects your existing access controls. People only see what they already could." },
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="alive group cursor-pointer rounded-2xl border border-black/5 bg-[oklch(0.98_0_0)] p-6 hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)] active:scale-[0.98]"
+                  className="alive group rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)]"
                 >
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
                     <f.icon className="h-5 w-5" />
@@ -123,17 +140,143 @@ function Landing() {
             </div>
           </section>
 
-          {/* Pricing — custom only */}
-          <section id="pricing" className="bg-white px-10 py-20">
+          {/* Insights */}
+          <section id="insights" className="border-t border-black/5 bg-white px-5 py-20 sm:px-10">
+            <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2 md:items-center">
+              <div>
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
+                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
+                </div>
+                <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                  Stop hunting for numbers. Start getting answers.
+                </h2>
+                <p className="mt-4 text-[oklch(0.4_0_0)]">
+                  Beevr cross-references your CRM, billing and product data to surface what's actually moving the business. Ask once — get a chart, a summary and the exact source rows.
+                </p>
+                <ul className="mt-6 space-y-2.5 text-sm">
+                  {[
+                    "MRR, churn and CAC computed from raw Stripe data",
+                    "Pipeline & win-rate from Hubspot, Salesforce or Attio",
+                    "Weekly digests delivered to Slack or email",
+                    "Drill-down to the exact invoice, deal or message",
+                  ].map((l) => (
+                    <li key={l} className="flex items-start gap-2 text-[oklch(0.25_0_0)]">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.55_0.18_140)]" />
+                      {l}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/onboarding"
+                  className="clicky shine group mt-8 inline-flex items-center gap-2 rounded-xl bg-[oklch(0.15_0_0)] px-5 py-3 text-sm font-semibold text-white hover:bg-black"
+                >
+                  <Sparkles className="h-4 w-4" /> Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
+                </Link>
+              </div>
+
+              <div className="relative">
+                <div className="pointer-events-none absolute -inset-6 rounded-[32px] bg-[oklch(0.68_0.22_40)] opacity-15 blur-[60px]" />
+                <div className="relative rounded-2xl border border-black/5 bg-white p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-semibold text-[oklch(0.3_0_0)]">This week · Revenue</div>
+                    <span className="rounded-full bg-[oklch(0.96_0.06_140)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.18_140)]">+12% MoM</span>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-bold tracking-tight">$284,210</span>
+                    <span className="text-xs text-[oklch(0.5_0_0)]">MRR</span>
+                  </div>
+                  <div className="mt-4 flex h-24 items-end gap-1">
+                    {[40, 55, 48, 62, 70, 68, 82, 78, 90, 86, 95, 100].map((h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 rounded-t bg-gradient-to-t from-[oklch(0.68_0.22_40)] to-[oklch(0.78_0.18_55)]"
+                        style={{ height: `${h}%`, opacity: 0.5 + i * 0.04 }}
+                      />
+                    ))}
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {[
+                      { label: "Mid-market", val: "+28%", color: "oklch(0.55_0.18_140)" },
+                      { label: "Enterprise", val: "+2%", color: "oklch(0.6_0.05_85)" },
+                      { label: "SMB churn", val: "-2pts", color: "oklch(0.55_0.18_140)" },
+                    ].map((r) => (
+                      <div key={r.label} className="flex items-center justify-between rounded-lg border border-black/5 px-3 py-2 text-xs">
+                        <span className="text-[oklch(0.3_0_0)]">{r.label}</span>
+                        <span className="font-semibold tabular-nums" style={{ color: r.color }}>{r.val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Agents */}
+          <section id="agents" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
+                <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Cloud Agents
+              </div>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Knowledge that doesn't just answer — it acts.
+              </h2>
+              <p className="mt-4 text-[oklch(0.4_0_0)]">
+                Describe a workflow in a sentence. Beevr spins up a cloud agent that runs on a schedule, watches your data and ships work back into Slack, email or your tools.
+              </p>
+            </div>
+
+            <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+              {[
+                { icon: TrendingUp, title: "Revenue digest", desc: "“Every Monday, summarize Stripe revenue and post to #revenue.”" },
+                { icon: MessageSquare, title: "Support triage", desc: "“Tag Intercom tickets by intent and route urgent ones to on-call.”" },
+                { icon: Zap, title: "Pipeline watch", desc: "“DM me when any deal >$50k stalls more than 7 days.”" },
+              ].map((f) => (
+                <div
+                  key={f.title}
+                  className="rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg"
+                >
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.15_0_0)] text-white">
+                    <f.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-semibold">{f.title}</h3>
+                  <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Trust */}
+          <section className="border-t border-black/5 bg-white px-5 py-16 sm:px-10">
+            <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+              {[
+                { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs, regional data residency." },
+                { icon: Lock, title: "Your data stays yours", desc: "We never train on your content. Encrypted at rest and in transit." },
+                { icon: Zap, title: "Live in 10 minutes", desc: "OAuth into your stack, Beevr indexes in the background — no IT ticket." },
+              ].map((f) => (
+                <div key={f.title} className="flex gap-4 rounded-2xl border border-black/5 bg-[oklch(0.985_0_0)] p-5">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[oklch(0.62_0.22_40)] ring-1 ring-black/5">
+                    <f.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold">{f.title}</h3>
+                    <p className="mt-1 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Pricing */}
+          <section id="pricing" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
             <div className="mx-auto max-w-2xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Sparkles className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Private beta
               </div>
-              <h2 className="mt-4 text-4xl font-bold tracking-tight">Custom pricing</h2>
+              <h2 className="mt-4 text-4xl font-bold tracking-tight">Custom pricing, hand-rolled.</h2>
               <p className="mt-3 text-[oklch(0.4_0_0)]">
-                Beevr is hand-rolled for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume, and goals.
+                Beevr is tailored for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume and goals.
               </p>
-              <div className="mx-auto mt-10 max-w-md rounded-2xl border border-[oklch(0.68_0.22_40)] bg-[oklch(0.98_0.04_70)] p-8 text-left">
+              <div className="mx-auto mt-10 max-w-md rounded-2xl border border-[oklch(0.68_0.22_40)] bg-white p-8 text-left shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.4)]">
                 <div className="text-sm font-medium text-[oklch(0.4_0_0)]">Tailored plan</div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-4xl font-bold">Let's talk</span>
@@ -155,8 +298,24 @@ function Landing() {
             </div>
           </section>
 
+          {/* Final CTA */}
+          <section className="border-t border-black/5 bg-white px-5 py-20 text-center sm:px-10">
+            <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+              Give your team a brain that never forgets.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-[oklch(0.4_0_0)]">
+              We onboard a small batch of teams every week. Tell us what you're building and we'll get you set up live.
+            </p>
+            <Link
+              to="/onboarding"
+              className="clicky shine group mt-8 inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
+            >
+              <Sparkles className="h-4 w-4" /> Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
+            </Link>
+          </section>
+
           <footer id="contacts" className="border-t border-black/5 bg-white py-8 text-center text-xs text-[oklch(0.4_0_0)]">
-            © 2026 Beevr Inc. — Your company's second brain.
+            © 2026 Beevr Inc. — The company brain for fast-moving teams.
           </footer>
         </div>
       </div>
