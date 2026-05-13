@@ -265,11 +265,20 @@ function SectionLabel({ children, className = "" }: { children: React.ReactNode;
   return <div className={`mb-3 text-xs uppercase tracking-wider text-muted-foreground ${className}`}>{children}</div>;
 }
 
-function Grid({ items, toggle }: { items: Conn[]; toggle: (c: Conn) => void }) {
+function Grid({
+  items,
+  toggle,
+  savingIds,
+}: {
+  items: Conn[];
+  toggle: (c: Conn) => void | Promise<void>;
+  savingIds: Set<string>;
+}) {
   return (
     <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((c) => {
         const accent = ACCENTS[c.service_id] ?? "oklch(0.5 0 0)";
+        const saving = savingIds.has(c.id);
         return (
           <div key={c.id} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur">
             <div className="relative">
@@ -284,13 +293,14 @@ function Grid({ items, toggle }: { items: Conn[]; toggle: (c: Conn) => void }) {
             </div>
             <button
               onClick={() => toggle(c)}
+              disabled={saving}
               className={`flex h-7 items-center gap-1 rounded-md px-2.5 text-xs font-medium transition-colors ${
                 c.connected
-                  ? "bg-primary/10 text-primary"
-                  : "bg-primary text-primary-foreground hover:opacity-90"
+                  ? "bg-primary/10 text-primary disabled:opacity-60"
+                  : "bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-60"
               }`}
             >
-              {c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
+              {saving ? "Saving" : c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
             </button>
           </div>
         );
