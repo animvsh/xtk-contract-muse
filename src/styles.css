@@ -69,7 +69,23 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01", "cv11";
   }
+}
+
+/* Editorial display font for headlines */
+.font-display {
+  font-family: "Fraunces", "Times New Roman", Georgia, serif;
+  font-optical-sizing: auto;
+  font-feature-settings: "ss01", "ss02", "ss05";
+  letter-spacing: -0.02em;
+}
+.font-display-italic {
+  font-family: "Fraunces", "Times New Roman", Georgia, serif;
+  font-style: italic;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
 
 @keyframes fadeInUp {
