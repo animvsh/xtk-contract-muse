@@ -85,7 +85,26 @@ function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: st
   return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
 }
 
-const CONNECTORS = ["Notion", "Slack", "Gmail", "Google Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira", "Asana", "Outlook", "Dropbox", "Confluence", "Airtable", "ClickUp", "Pipedrive", "QuickBooks", "Zoom", "Loom", "Calendly", "Mixpanel", "Segment", "Snowflake", "Postgres", "Looker", "Metabase", "Coda", "Monday", "Trello", "Greenhouse", "Lever", "Gusto", "Brex", "Ramp", "Shopify", "Webflow", "Vercel"];
+const CONNECTORS: { name: string; slug: string; color: string }[] = [
+  { name: "Notion", slug: "notion", color: "000000" },
+  { name: "Slack", slug: "slack", color: "4A154B" },
+  { name: "Gmail", slug: "gmail", color: "EA4335" },
+  { name: "Google Drive", slug: "googledrive", color: "4285F4" },
+  { name: "GitHub", slug: "github", color: "181717" },
+  { name: "Linear", slug: "linear", color: "5E6AD2" },
+  { name: "HubSpot", slug: "hubspot", color: "FF7A59" },
+  { name: "Stripe", slug: "stripe", color: "635BFF" },
+  { name: "Intercom", slug: "intercom", color: "1F8DED" },
+  { name: "Salesforce", slug: "salesforce", color: "00A1E0" },
+  { name: "Figma", slug: "figma", color: "F24E1E" },
+  { name: "Jira", slug: "jira", color: "0052CC" },
+  { name: "Asana", slug: "asana", color: "F06A6A" },
+  { name: "Dropbox", slug: "dropbox", color: "0061FF" },
+  { name: "Airtable", slug: "airtable", color: "18BFFF" },
+  { name: "Zoom", slug: "zoom", color: "0B5CFF" },
+  { name: "Snowflake", slug: "snowflake", color: "29B5E8" },
+  { name: "Shopify", slug: "shopify", color: "7AB55C" },
+];
 
 
 export const Route = createFileRoute("/")({
@@ -192,13 +211,13 @@ function Landing() {
             {/* Connector marquee */}
             <div className="marquee-mask mt-10 overflow-hidden">
               <div className="marquee gap-3">
-                {[...CONNECTORS, ...CONNECTORS].map((name, i) => (
+                {[...CONNECTORS, ...CONNECTORS].map((c, i) => (
                   <span
                     key={i}
-                    className="mr-3 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
+                    className="mr-3 inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.68_0.22_40)]" />
-                    {name}
+                    <img src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`} alt="" className="h-3.5 w-3.5" loading="lazy" />
+                    {c.name}
                   </span>
                 ))}
               </div>
@@ -229,10 +248,10 @@ function Landing() {
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Connect every tool you already use — <span className="font-display-italic">in one place.</span>
+                Connects to all your <span className="font-display-italic">favourite stuff.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom, Salesforce, Snowflake, Greenhouse, Brex, Shopify… Beevr quietly indexes them all into one private, role-aware brain you can talk to like a human.
+                Plug in the tools your team already lives in. Beevr quietly indexes them into one private, role-aware brain you can talk to like a human.
               </p>
             </Reveal>
 
@@ -246,16 +265,19 @@ function Landing() {
                     {CONNECTORS.length}+ live
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
-                  {CONNECTORS.map((name) => (
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-6 md:grid-cols-9">
+                  {CONNECTORS.map((c) => (
                     <div
-                      key={name}
-                      className="alive group flex aspect-square flex-col items-center justify-center gap-1.5 rounded-xl border border-black/[0.05] bg-[oklch(0.985_0.005_85)] px-2 text-center transition-colors hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white"
+                      key={c.name}
+                      title={c.name}
+                      className="alive group flex aspect-square items-center justify-center rounded-xl border border-black/[0.05] bg-[oklch(0.985_0.005_85)] transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white hover:-translate-y-0.5"
                     >
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-white text-[13px] font-display font-semibold text-[oklch(0.62_0.22_40)] ring-1 ring-black/[0.04] transition-transform group-hover:rotate-[-4deg] group-hover:scale-110">
-                        {name[0]}
-                      </div>
-                      <div className="text-[10px] font-medium leading-tight text-[oklch(0.3_0_0)]">{name}</div>
+                      <img
+                        src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`}
+                        alt={c.name}
+                        loading="lazy"
+                        className="h-7 w-7 transition-transform group-hover:scale-110"
+                      />
                     </div>
                   ))}
                 </div>
