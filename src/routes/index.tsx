@@ -85,7 +85,26 @@ function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: st
   return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
 }
 
-const CONNECTORS = ["Notion", "Slack", "Gmail", "Google Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira", "Asana", "Outlook", "Dropbox", "Confluence", "Airtable", "ClickUp", "Pipedrive", "QuickBooks", "Zoom", "Loom", "Calendly", "Mixpanel", "Segment", "Snowflake", "Postgres", "Looker", "Metabase", "Coda", "Monday", "Trello", "Greenhouse", "Lever", "Gusto", "Brex", "Ramp", "Shopify", "Webflow", "Vercel"];
+const CONNECTORS: { name: string; slug: string; color: string }[] = [
+  { name: "Notion", slug: "notion", color: "000000" },
+  { name: "Slack", slug: "slack", color: "4A154B" },
+  { name: "Gmail", slug: "gmail", color: "EA4335" },
+  { name: "Google Drive", slug: "googledrive", color: "4285F4" },
+  { name: "GitHub", slug: "github", color: "181717" },
+  { name: "Linear", slug: "linear", color: "5E6AD2" },
+  { name: "HubSpot", slug: "hubspot", color: "FF7A59" },
+  { name: "Stripe", slug: "stripe", color: "635BFF" },
+  { name: "Intercom", slug: "intercom", color: "1F8DED" },
+  { name: "Salesforce", slug: "salesforce", color: "00A1E0" },
+  { name: "Figma", slug: "figma", color: "F24E1E" },
+  { name: "Jira", slug: "jira", color: "0052CC" },
+  { name: "Asana", slug: "asana", color: "F06A6A" },
+  { name: "Dropbox", slug: "dropbox", color: "0061FF" },
+  { name: "Airtable", slug: "airtable", color: "18BFFF" },
+  { name: "Zoom", slug: "zoom", color: "0B5CFF" },
+  { name: "Snowflake", slug: "snowflake", color: "29B5E8" },
+  { name: "Shopify", slug: "shopify", color: "7AB55C" },
+];
 
 
 export const Route = createFileRoute("/")({
