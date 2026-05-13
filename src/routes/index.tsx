@@ -265,16 +265,19 @@ function Landing() {
                     {CONNECTORS.length}+ live
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
-                  {CONNECTORS.map((name) => (
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-6 md:grid-cols-9">
+                  {CONNECTORS.map((c) => (
                     <div
-                      key={name}
-                      className="alive group flex aspect-square flex-col items-center justify-center gap-1.5 rounded-xl border border-black/[0.05] bg-[oklch(0.985_0.005_85)] px-2 text-center transition-colors hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white"
+                      key={c.name}
+                      title={c.name}
+                      className="alive group flex aspect-square items-center justify-center rounded-xl border border-black/[0.05] bg-[oklch(0.985_0.005_85)] transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white hover:-translate-y-0.5"
                     >
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-white text-[13px] font-display font-semibold text-[oklch(0.62_0.22_40)] ring-1 ring-black/[0.04] transition-transform group-hover:rotate-[-4deg] group-hover:scale-110">
-                        {name[0]}
-                      </div>
-                      <div className="text-[10px] font-medium leading-tight text-[oklch(0.3_0_0)]">{name}</div>
+                      <img
+                        src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`}
+                        alt={c.name}
+                        loading="lazy"
+                        className="h-7 w-7 transition-transform group-hover:scale-110"
+                      />
                     </div>
                   ))}
                 </div>
