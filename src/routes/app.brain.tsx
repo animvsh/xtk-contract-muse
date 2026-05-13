@@ -31,6 +31,12 @@ import {
   X,
   UploadCloud,
   File as FileIcon,
+  Copy,
+  BookOpen as BookOpenIcon,
+  Terminal,
+  Shield,
+  AlertTriangle,
+  Layers,
 } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
