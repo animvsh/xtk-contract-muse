@@ -390,7 +390,7 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Sparkles className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Private beta
               </div>
-              <h2 className="mt-4 text-4xl font-bold tracking-tight">Custom pricing, hand-rolled.</h2>
+              <h2 className="font-display mt-4 text-5xl font-semibold tracking-[-0.02em]">Custom pricing, <span className="font-display-italic">hand-rolled.</span></h2>
               <p className="mt-3 text-[oklch(0.4_0_0)]">
                 Beevr is tailored for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume and goals.
               </p>
