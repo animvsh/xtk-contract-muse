@@ -155,8 +155,8 @@ function Landing() {
             </Reveal>
 
             <Reveal delay={1}>
-              <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
-                Talk to your business<br className="hidden sm:block" /> like it's <span className="gradient-text-anim">one brain.</span>
+              <h1 className="font-display mx-auto mt-7 max-w-4xl text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:mt-8 sm:text-6xl md:text-[88px]">
+                One brain<br className="hidden sm:block" /> for your <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">whole company.</span>
               </h1>
             </Reveal>
 
