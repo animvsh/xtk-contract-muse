@@ -1328,6 +1328,10 @@ function DocsMarkdown({ md }: { md: string }) {
   );
 }
 
+function prettifyJson(s: string): string {
+  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
+}
+
 function ApiProposalCard({ draft }: { draft: ApiDraft }) {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
