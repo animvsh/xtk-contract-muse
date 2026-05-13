@@ -110,10 +110,10 @@ const CONNECTORS: { name: string; slug: string; color: string }[] = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Beevr — The company brain for fast-moving teams" },
-      { name: "description", content: "Beevr unifies every doc, channel and metric into one searchable brain — then turns it into insights and agents that act on your behalf." },
-      { property: "og:title", content: "Beevr — The company brain for fast-moving teams" },
-      { property: "og:description", content: "Unified company knowledge, instant insights, and cloud agents that act on your data." },
+      { title: "Beevr — Your company's brain" },
+      { name: "description", content: "Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate work — it knows your business." },
+      { property: "og:title", content: "Beevr — Your company's brain" },
+      { property: "og:description", content: "One AI brain across your whole company. Ask anything, find what you'd normally miss, and let agents act on your behalf." },
     ],
   }),
   component: Landing,
