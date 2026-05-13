@@ -31,6 +31,11 @@ import {
   X,
   UploadCloud,
   File as FileIcon,
+  Copy,
+  Terminal,
+  Shield,
+  AlertTriangle,
+  Layers,
 } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
@@ -1296,10 +1301,42 @@ function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 }
 
+function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1400);
+      }}
+      className="clicky-sm inline-flex items-center gap-1 rounded-md border border-black/10 bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:border-black/20"
+      title={label}
+    >
+      {copied ? <Check className="h-2.5 w-2.5 text-emerald-600" strokeWidth={3} /> : <Copy className="h-2.5 w-2.5" />}
+      {copied ? "Copied" : label}
+    </button>
+  );
+}
+
+function DocsMarkdown({ md }: { md: string }) {
+  return (
+    <div className="markdown-body max-w-none px-5 py-4 text-[13.5px] leading-relaxed">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{md}</ReactMarkdown>
+    </div>
+  );
+}
+
+function prettifyJson(s: string): string {
+  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
+}
+
 function ApiProposalCard({ draft }: { draft: ApiDraft }) {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<{ id: string } | null>(null);
+  const [tab, setTab] = useState<"overview" | "sample" | "docs">("overview");
   if (!draft || !draft.name) return null;
 
   const save = async () => {
@@ -1335,7 +1372,7 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
 
   if (saved) {
     return (
-      <div className="animate-pop rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-white p-5">
+      <div className="animate-pop rounded-2xl border border-emerald-500/30 bg-emerald-50/40 p-5">
         <div className="flex items-start gap-3">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white">
             <Check className="h-5 w-5" strokeWidth={3} />
@@ -1367,61 +1404,149 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
   }
 
   const endpoints = draft.endpoints?.length ? draft.endpoints : [{ method: draft.method, path: draft.path, summary: draft.description }];
+  const baseUrl = `https://api.beevr.dev/${slugify(draft.name) || "api"}`;
+  const fullUrl = `${baseUrl}${draft.path}`;
+  const auth = draft.authentication ?? "bearer";
 
   return (
-    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
+    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white shadow-sm">
+      {/* Header */}
       <div className="relative px-5 pt-5 pb-4">
         <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative flex items-start gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/20 bg-primary/5 text-2xl">
             <span aria-hidden>{draft.emoji}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+            <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-primary">
               <Server className="h-3 w-3" /> New API draft
-              <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-                {draft.kind === "rest" ? "REST resource" : "Custom function"}
+              <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[9.5px] tracking-wider">
+                {draft.kind === "rest" ? "REST" : "Function"}
+              </span>
+              <span className="rounded-full border border-black/10 bg-muted/40 px-1.5 py-0.5 text-[9.5px] tracking-wider text-muted-foreground">
+                <Shield className="mr-0.5 inline h-2.5 w-2.5" />
+                {auth === "none" ? "Public" : auth === "api-key" ? "API Key" : "Bearer"}
               </span>
             </div>
-            <h3 className="mt-0.5 truncate text-base font-semibold">{draft.name}</h3>
-            <p className="mt-0.5 text-sm text-muted-foreground">{draft.description}</p>
+            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">{draft.name}</h3>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{draft.description}</p>
+            <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-black/5 bg-muted/30 px-2 py-1.5">
+              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[draft.method] ?? ""}`}>
+                {draft.method}
+              </span>
+              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">{fullUrl}</code>
+              <CopyButton text={fullUrl} label="" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-black/5 bg-muted/20 p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Endpoints</div>
-        <div className="space-y-1.5">
-          {endpoints.slice(0, 6).map((ep, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
-              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
-                {ep.method}
-              </span>
-              <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
-              <span className="ml-auto truncate text-muted-foreground">{ep.summary}</span>
-            </div>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex items-center gap-0.5 border-y border-black/5 bg-muted/20 px-3">
+        {([
+          ["overview", "Overview", Layers],
+          ["sample", "Sample", Code2],
+          ["docs", "Docs", FileText],
+        ] as const).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`relative inline-flex items-center gap-1.5 px-2.5 py-2 text-[11.5px] font-medium transition ${tab === id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Icon className="h-3 w-3" /> {label}
+            {tab === id && <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />}
+          </button>
+        ))}
       </div>
 
-      {(draft.params?.length ?? 0) > 0 && (
-        <div className="border-t border-black/5 p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Parameters</div>
-          <div className="flex flex-wrap gap-1.5">
-            {(draft.params ?? []).slice(0, 6).map((p) => (
-              <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium">
-                <Code2 className="h-2.5 w-2.5" />
-                <code className="font-mono">{p.name}</code>
-                <span className="text-muted-foreground">{p.type}</span>
-                {p.required && <span className="text-rose-600">*</span>}
-              </span>
-            ))}
+      {/* Tab content */}
+      {tab === "overview" && (
+        <div className="space-y-4 p-4">
+          <div>
+            <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Endpoints</div>
+            <div className="space-y-1.5">
+              {endpoints.slice(0, 8).map((ep, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
+                  <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
+                    {ep.method}
+                  </span>
+                  <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
+                  <span className="ml-auto truncate text-muted-foreground">{ep.summary}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {(draft.params?.length ?? 0) > 0 && (
+            <div>
+              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Parameters</div>
+              <div className="overflow-hidden rounded-lg border border-black/5">
+                <table className="w-full text-left text-[11.5px]">
+                  <thead className="bg-muted/40 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-2.5 py-1.5 font-medium">Name</th>
+                      <th className="px-2.5 py-1.5 font-medium">In</th>
+                      <th className="px-2.5 py-1.5 font-medium">Type</th>
+                      <th className="px-2.5 py-1.5 font-medium">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(draft.params ?? []).slice(0, 10).map((p) => (
+                      <tr key={p.name} className="border-t border-black/5">
+                        <td className="px-2.5 py-1.5 font-mono">
+                          {p.name}
+                          {p.required && <span className="ml-0.5 text-rose-600">*</span>}
+                        </td>
+                        <td className="px-2.5 py-1.5 text-muted-foreground">{p.in}</td>
+                        <td className="px-2.5 py-1.5 text-muted-foreground">{p.type}</td>
+                        <td className="px-2.5 py-1.5 text-muted-foreground">{p.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {(draft.errors?.length ?? 0) > 0 && (
+            <div>
+              <div className="mb-1.5 flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                <AlertTriangle className="h-3 w-3" /> Errors
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(draft.errors ?? []).map((e) => (
+                  <span key={e.code} className="inline-flex items-center gap-1 rounded-md border border-rose-500/20 bg-rose-500/5 px-2 py-0.5 text-[11px]">
+                    <code className="font-mono font-semibold text-rose-700">{e.status}</code>
+                    <code className="font-mono text-muted-foreground">{e.code}</code>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
-        <span className="text-[11px] text-muted-foreground">Saves as a mock API — playground returns the sample response.</span>
+      {tab === "sample" && (
+        <div className="p-4">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Sample response</span>
+            <CopyButton text={prettifyJson(draft.sampleResponse ?? "{}")} />
+          </div>
+          <pre className="overflow-auto rounded-xl bg-[oklch(0.18_0_0)] p-3 font-mono text-[11px] leading-relaxed text-emerald-200">
+{prettifyJson(draft.sampleResponse ?? "{}")}
+          </pre>
+        </div>
+      )}
+
+      {tab === "docs" && (
+        draft.docsMarkdown
+          ? <DocsMarkdown md={draft.docsMarkdown} />
+          : <div className="p-6 text-center text-xs text-muted-foreground">No documentation generated.</div>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/20 px-4 py-3">
+        <span className="text-[11px] text-muted-foreground">Mock API — playground returns the sample response.</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast("Discarded draft")}
@@ -1450,9 +1575,14 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
   const emoji = draft?.emoji || "🧩";
   const name = draft?.name || "Untitled MCP";
   const description = draft?.description || "Mock MCP server generated for your workspace.";
+  const slug = (draft.slug || slugify(name) || "mcp").toLowerCase();
+  const url = `https://mcp.beevr.dev/${slug}`;
+
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [tab, setTab] = useState<"tools" | "install" | "docs">("tools");
   const [openTool, setOpenTool] = useState<number | null>(0);
+  const [client, setClient] = useState<"claude" | "cursor" | "codex">("claude");
 
   const save = async () => {
     setBusy(true);
@@ -1460,7 +1590,6 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
       const { data: userRes } = await supabase.auth.getUser();
       const user = userRes.user;
       if (!user) throw new Error("Sign in required");
-      const slug = (draft.slug || slugify(name) || "mcp").toLowerCase();
       const { error } = await supabase.from("mcps").insert({
         user_id: user.id,
         name,
@@ -1481,11 +1610,9 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
     }
   };
 
-  const url = `https://mcp.beevr.dev/${draft.slug || slugify(name)}`;
-
   if (saved) {
     return (
-      <div className="animate-pop rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-50 to-white p-5">
+      <div className="animate-pop rounded-2xl border border-emerald-500/30 bg-emerald-50/40 p-5">
         <div className="flex items-start gap-3">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white">
             <Check className="h-5 w-5" strokeWidth={3} />
@@ -1496,83 +1623,203 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
               <h3 className="text-base font-semibold">{name} is live</h3>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Connect from Claude Code, Cursor or Codex with the URL below.</p>
-            <code className="mt-2 inline-block rounded-md bg-muted px-2 py-1 font-mono text-[11px]">{url}</code>
+            <div className="mt-2 flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2 py-1.5">
+              <code className="flex-1 font-mono text-[11px]">{url}</code>
+              <CopyButton text={url} />
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  const installSnippet = client === "claude"
+    ? `claude mcp add ${slug} --transport ${transport} ${url}`
+    : client === "cursor"
+    ? `{
+  "mcpServers": {
+    "${slug}": {
+      "url": "${url}",
+      "transport": "${transport}"
+    }
+  }
+}`
+    : `{
+  "name": "${slug}",
+  "type": "${transport}",
+  "url": "${url}"
+}`;
+
   return (
-    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white">
+    <div className="animate-pop relative overflow-hidden rounded-2xl border border-primary/20 bg-white shadow-sm">
+      {/* Header */}
       <div className="relative px-5 pt-5 pb-4">
         <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative flex items-start gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-2xl shadow-lg shadow-primary/20">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/20 bg-primary/5 text-2xl">
             <span aria-hidden>{emoji}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+            <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-primary">
               <Plug className="h-3 w-3" /> New MCP draft
-              <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-                {transport}
+              <span className="rounded-full border border-primary/20 bg-primary/5 px-1.5 py-0.5 text-[9.5px] tracking-wider">
+                {transport.toUpperCase()}
               </span>
-            </div>
-            <h3 className="mt-0.5 truncate text-base font-semibold">{name}</h3>
-            <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-            <code className="mt-2 inline-block rounded-md bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground">{url}</code>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t border-black/5 bg-muted/20 p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Tools ({tools.length})</div>
-        {tools.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-black/10 bg-white px-3 py-4 text-center text-[11px] text-muted-foreground">
-            No tools defined yet.
-          </div>
-        ) : (
-        <div className="space-y-1.5">
-          {tools.map((t, i) => {
-            const params = Array.isArray(t?.params) ? t.params : [];
-            return (
-            <div key={t.name ?? i} className="overflow-hidden rounded-lg border border-black/5 bg-white">
-              <button
-                onClick={() => setOpenTool(openTool === i ? null : i)}
-                className="flex w-full items-center gap-2 px-2.5 py-2 text-left text-xs hover:bg-muted/30"
-              >
-                <Code2 className="h-3 w-3 shrink-0 text-primary" />
-                <code className="font-mono font-semibold">{t.name}</code>
-                <span className="ml-2 truncate text-muted-foreground">{t.description}</span>
-                <ChevronDown className={`ml-auto h-3 w-3 shrink-0 text-muted-foreground transition-transform ${openTool === i ? "rotate-180" : ""}`} />
-              </button>
-              {openTool === i && (
-                <div className="border-t border-black/5 bg-muted/10 px-3 py-2 text-[11px]">
-                  {params.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1">
-                      {params.map((p) => (
-                        <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-1.5 py-0.5">
-                          <code className="font-mono">{p.name}</code>
-                          <span className="text-muted-foreground">{p.type}</span>
-                          {p.required && <span className="text-rose-600">*</span>}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <pre className="overflow-auto rounded bg-[oklch(0.18_0_0)] p-2 font-mono text-[10px] leading-relaxed text-emerald-200">
-{prettifyJson(t.sampleResult ?? "{}")}
-                  </pre>
-                </div>
+              <span className="rounded-full border border-black/10 bg-muted/40 px-1.5 py-0.5 text-[9.5px] tracking-wider text-muted-foreground">
+                {tools.length} tools
+              </span>
+              {resources.length > 0 && (
+                <span className="rounded-full border border-black/10 bg-muted/40 px-1.5 py-0.5 text-[9.5px] tracking-wider text-muted-foreground">
+                  {resources.length} resources
+                </span>
               )}
             </div>
-            );
-          })}
+            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">{name}</h3>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{description}</p>
+            <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-black/5 bg-muted/30 px-2 py-1.5">
+              <Plug className="h-3 w-3 shrink-0 text-primary" />
+              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">{url}</code>
+              <CopyButton text={url} label="" />
+            </div>
+          </div>
         </div>
-        )}
       </div>
 
-      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/30 px-4 py-3">
-        <span className="text-[11px] text-muted-foreground">Mock MCP — installs as a connector you can call from Claude Code, Cursor or Codex.</span>
+      {/* Tabs */}
+      <div className="flex items-center gap-0.5 border-y border-black/5 bg-muted/20 px-3">
+        {([
+          ["tools", "Tools", Code2],
+          ["install", "Install", Terminal],
+          ["docs", "Docs", FileText],
+        ] as const).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`relative inline-flex items-center gap-1.5 px-2.5 py-2 text-[11.5px] font-medium transition ${tab === id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Icon className="h-3 w-3" /> {label}
+            {tab === id && <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />}
+          </button>
+        ))}
+      </div>
+
+      {tab === "tools" && (
+        <div className="space-y-3 p-4">
+          {tools.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-black/10 bg-white px-3 py-4 text-center text-[11px] text-muted-foreground">
+              No tools defined yet.
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {tools.map((t, i) => {
+                const params = Array.isArray(t?.params) ? t.params : [];
+                return (
+                  <div key={t.name ?? i} className="overflow-hidden rounded-lg border border-black/5 bg-white">
+                    <button
+                      onClick={() => setOpenTool(openTool === i ? null : i)}
+                      className="flex w-full items-center gap-2 px-2.5 py-2 text-left text-xs hover:bg-muted/30"
+                    >
+                      <Code2 className="h-3 w-3 shrink-0 text-primary" />
+                      <code className="font-mono font-semibold">{t.name}</code>
+                      <span className="ml-2 truncate text-muted-foreground">{t.description}</span>
+                      <ChevronDown className={`ml-auto h-3 w-3 shrink-0 text-muted-foreground transition-transform ${openTool === i ? "rotate-180" : ""}`} />
+                    </button>
+                    {openTool === i && (
+                      <div className="border-t border-black/5 bg-muted/10 p-3 text-[11px]">
+                        {params.length > 0 && (
+                          <div className="mb-2">
+                            <div className="mb-1 text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">Parameters</div>
+                            <div className="flex flex-wrap gap-1">
+                              {params.map((p) => (
+                                <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-1.5 py-0.5">
+                                  <code className="font-mono">{p.name}</code>
+                                  <span className="text-muted-foreground">{p.type}</span>
+                                  {p.required && <span className="text-rose-600">*</span>}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="mb-1 flex items-center justify-between">
+                          <span className="text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">Sample result</span>
+                          <CopyButton text={prettifyJson(t.sampleResult ?? "{}")} />
+                        </div>
+                        <pre className="overflow-auto rounded-md bg-[oklch(0.18_0_0)] p-2 font-mono text-[10.5px] leading-relaxed text-emerald-200">
+{prettifyJson(t.sampleResult ?? "{}")}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {resources.length > 0 && (
+            <div>
+              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Resources</div>
+              <div className="space-y-1">
+                {resources.map((r) => (
+                  <div key={r.uri} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-[11.5px]">
+                    <FileText className="h-3 w-3 shrink-0 text-primary" />
+                    <code className="font-mono">{r.name}</code>
+                    <span className="ml-auto truncate text-muted-foreground">{r.description}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "install" && (
+        <div className="space-y-3 p-4">
+          <div className="flex items-center gap-1 rounded-lg border border-black/5 bg-muted/30 p-1">
+            {([
+              ["claude", "Claude Code"],
+              ["cursor", "Cursor"],
+              ["codex", "Codex / Cline"],
+            ] as const).map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setClient(id)}
+                className={`flex-1 rounded-md px-2 py-1 text-[11px] font-medium transition ${client === id ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                {client === "claude" ? "Run in your terminal" : client === "cursor" ? "Add to ~/.cursor/mcp.json" : "Add to your MCP config"}
+              </span>
+              <CopyButton text={installSnippet} />
+            </div>
+            <pre className="overflow-auto rounded-xl bg-[oklch(0.18_0_0)] p-3 font-mono text-[11px] leading-relaxed text-emerald-200">
+{installSnippet}
+            </pre>
+          </div>
+          <div className="rounded-lg border border-black/5 bg-muted/20 p-3 text-[11.5px]">
+            <div className="mb-1 flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <Shield className="h-3 w-3" /> Authentication
+            </div>
+            <p className="text-muted-foreground">
+              Pass your Beevr access key as a Bearer token. Generate one in <strong className="text-foreground">Access keys</strong>, then export <code className="rounded bg-white px-1 py-0.5 font-mono">BEEVR_KEY</code> in your shell.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {tab === "docs" && (
+        draft.docsMarkdown
+          ? <DocsMarkdown md={draft.docsMarkdown} />
+          : <div className="p-6 text-center text-xs text-muted-foreground">No documentation generated.</div>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/20 px-4 py-3">
+        <span className="text-[11px] text-muted-foreground">Mock MCP — installable from any MCP-aware client.</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast("Discarded draft")}
@@ -1592,10 +1839,6 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
       </div>
     </div>
   );
-}
-
-function prettifyJson(s: string): string {
-  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
 }
 
 function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: string) => void }) {
