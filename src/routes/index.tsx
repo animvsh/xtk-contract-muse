@@ -125,20 +125,6 @@ function Landing() {
     <div className="min-h-screen bg-white text-[oklch(0.15_0_0)]">
       {/* Outer frame */}
       <div className="relative overflow-hidden">
-        {/* Soft orange ambient glow — mouse parallax */}
-        <div
-          className="parallax-orb pointer-events-none absolute -left-40 top-40 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]"
-          style={{ ["--px" as any]: `${orb.x * 0.6}px`, ["--py" as any]: `${orb.y * 0.6}px` }}
-        />
-        <div
-          className="parallax-orb pointer-events-none absolute -right-40 top-80 h-[600px] w-[400px] rounded-full bg-[oklch(0.72_0.21_45)] opacity-20 blur-[120px]"
-          style={{ ["--px" as any]: `${-orb.x * 0.8}px`, ["--py" as any]: `${-orb.y * 0.8}px` }}
-        />
-        <div
-          className="parallax-orb pointer-events-none absolute left-1/3 top-[1400px] h-[500px] w-[500px] rounded-full bg-[oklch(0.78_0.18_55)] opacity-15 blur-[140px]"
-          style={{ ["--px" as any]: `${orb.x * 0.4}px`, ["--py" as any]: `${orb.y * 0.4}px` }}
-        />
-
         {/* Inner rounded white card */}
         <div className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/* Nav */}
