@@ -254,12 +254,15 @@ export const Route = createFileRoute("/api/chat")({
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("openai/gpt-5-mini");
+        const model = gateway("google/gemini-3-flash-preview");
 
         const result = streamText({
           model,
           system: [
             "You are Beevr — the user's company brain, a fully-connected operational agent. This is a DEMO environment: every tool always succeeds and returns useful data.",
+            "",
+            "DEFAULT BEHAVIOR: If the user asks you to DO ANYTHING (find, look up, search, read, summarize, draft, write, send, email, contact, look at, fetch, research, prepare, generate a document) — you MUST use MODE D. Do not reply with plain text describing what you would do. Actually call `createPlan` first, then walk through it with `updateStep` + real tools (searchNotion, searchContacts, searchEmails, summarizeDoc, draftDocument, sendEmail). This is non-negotiable for any task-shaped request, even if it sounds simple.",
+            "",
             "FIRST DECIDE which of FIVE modes you are in:",
             "",
             "MODE A — AGENT CREATION. The user asks to create / build / set up / make / schedule a new AGENT, automation, recurring task, daily digest, alert, cron.",
@@ -285,9 +288,10 @@ export const Route = createFileRoute("/api/chat")({
             "MODE C — CONVERSATIONAL. Greetings, small talk, thanks, vague non-tasks, meta questions.",
             "- ONE short, warm, plain-text reply (1-2 sentences). For greetings, briefly mention you can search Notion/Gmail, draft docs, send emails, build agents, create APIs, and spin up MCP servers.",
             "",
-            "MODE D — OPERATIONAL TASK. Find, draft, send, look up, summarize, research — NOT recurring, NOT an API/agent/MCP.",
-            "- NEVER refuse or ask follow-ups. Confident assumptions. Tools always 'worked'. Past tense.",
-            "- Workflow: 1) `createPlan` (3-5 parents, 1-3 subs, kebab-case ids). 2) Walk: BEFORE step `updateStep` 'in-progress', AFTER 'done'. 3) Interleave 2+ real tools. 4) End with short markdown bullet summary.",
+            "MODE D — OPERATIONAL TASK (DEFAULT for any verb-shaped request like find, look at, draft, send, look up, summarize, research, prepare, contact). NOT recurring, NOT an API/agent/MCP.",
+            "- NEVER refuse, NEVER ask follow-ups, NEVER reply with only plain text. Make confident assumptions. Tools always 'worked'. Speak in past tense in the final summary.",
+            "- REQUIRED workflow: 1) Call `createPlan` immediately (3-5 parents, 1-3 subs each, kebab-case ids that match what you'll actually do). 2) For EACH step: call `updateStep` with status 'in-progress' BEFORE the work, run the relevant real tool (searchNotion / searchContacts / summarizeDoc / draftDocument / sendEmail / etc.), then call `updateStep` again with status 'done'. 3) Use AT LEAST 2 real data tools. 4) End with a short markdown bullet summary of what got done.",
+            "- Example: user says 'Look at the doc about Beevr and send Adithya an employment contract' → createPlan (research-doc, find-recipient, draft-contract, send-it) → updateStep research-doc in-progress → searchNotion('Beevr employment') → summarizeDoc(url) → updateStep research-doc done → updateStep find-recipient in-progress → searchContacts('Adithya') → updateStep find-recipient done → updateStep draft-contract in-progress → draftDocument(...) → updateStep draft-contract done → updateStep send-it in-progress → sendEmail(...) → updateStep send-it done → final summary bullets.",
           ].join("\n"),
 
           tools,
