@@ -399,9 +399,9 @@ function Landing() {
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: TrendingUp, title: "Revenue digest", desc: "“Every Monday, summarize Stripe revenue and post to #revenue.”" },
-                { icon: MessageSquare, title: "Support triage", desc: "“Tag Intercom tickets by intent and route urgent ones to on-call.”" },
-                { icon: Zap, title: "Pipeline watch", desc: "“DM me when any deal >$50k stalls more than 7 days.”" },
+                { icon: TrendingUp, title: "Weekly revenue summary", desc: "“Send a weekly revenue summary every Monday morning to #revenue.”" },
+                { icon: Zap, title: "Stalled deal alerts", desc: "“Alert me when any enterprise deal stalls more than 7 days.”" },
+                { icon: MessageSquare, title: "Support routing", desc: "“Route urgent support tickets to on-call and tag the rest by intent.”" },
               ].map((f, i) => (
                 <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg">
