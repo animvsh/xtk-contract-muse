@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Check, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/app/connections")({
   component: Connections,
@@ -149,6 +151,8 @@ const DEFAULT_SERVICES: Array<{ service_id: string; service_name: string }> = [
 
 function Connections() {
   const [conns, setConns] = useState<Conn[]>([]);
+  const [savingIds, setSavingIds] = useState<Set<string>>(() => new Set());
+  const { user, loading } = useAuth();
 
   const load = async (uid: string) => {
     let { data, error } = await supabase
@@ -192,22 +196,42 @@ function Connections() {
   useEffect(() => {
     let mounted = true;
     const init = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (mounted && data.user?.id) load(data.user.id);
+      if (!loading && user?.id) await load(user.id);
+      if (!loading && !user?.id) setConns([]);
     };
     init();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (mounted && session?.user?.id) load(session.user.id);
-    });
     return () => {
       mounted = false;
-      sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [loading, user?.id]);
 
   const toggle = async (c: Conn) => {
-    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: !c.connected } : x)));
-    await supabase.from("connections").update({ connected: !c.connected }).eq("id", c.id);
+    if (savingIds.has(c.id)) return;
+    const nextConnected = !c.connected;
+    setSavingIds((prev) => new Set(prev).add(c.id));
+    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: nextConnected } : x)));
+
+    const { error } = await supabase
+      .from("connections")
+      .update({ connected: nextConnected })
+      .eq("id", c.id)
+      .select("id")
+      .single();
+
+    setSavingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(c.id);
+      return next;
+    });
+
+    if (error) {
+      setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: c.connected } : x)));
+      toast.error(`Couldn't update ${c.service_name}. Try again.`);
+      console.error("[connections] toggle error", error);
+      return;
+    }
+
+    toast.success(`${c.service_name} ${nextConnected ? "connected" : "disconnected"}`);
   };
 
   const { connected, available } = useMemo(() => {
@@ -227,12 +251,12 @@ function Connections() {
       {connected.length > 0 && (
         <>
           <SectionLabel>Connected</SectionLabel>
-          <Grid items={connected} toggle={toggle} />
+          <Grid items={connected} toggle={toggle} savingIds={savingIds} />
         </>
       )}
 
       <SectionLabel className="mt-10">Available</SectionLabel>
-      <Grid items={available} toggle={toggle} />
+      <Grid items={available} toggle={toggle} savingIds={savingIds} />
     </div>
   );
 }
@@ -241,11 +265,20 @@ function SectionLabel({ children, className = "" }: { children: React.ReactNode;
   return <div className={`mb-3 text-xs uppercase tracking-wider text-muted-foreground ${className}`}>{children}</div>;
 }
 
-function Grid({ items, toggle }: { items: Conn[]; toggle: (c: Conn) => void }) {
+function Grid({
+  items,
+  toggle,
+  savingIds,
+}: {
+  items: Conn[];
+  toggle: (c: Conn) => void | Promise<void>;
+  savingIds: Set<string>;
+}) {
   return (
     <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((c) => {
         const accent = ACCENTS[c.service_id] ?? "oklch(0.5 0 0)";
+        const saving = savingIds.has(c.id);
         return (
           <div key={c.id} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur">
             <div className="relative">
@@ -260,13 +293,14 @@ function Grid({ items, toggle }: { items: Conn[]; toggle: (c: Conn) => void }) {
             </div>
             <button
               onClick={() => toggle(c)}
+              disabled={saving}
               className={`flex h-7 items-center gap-1 rounded-md px-2.5 text-xs font-medium transition-colors ${
                 c.connected
-                  ? "bg-primary/10 text-primary"
-                  : "bg-primary text-primary-foreground hover:opacity-90"
+                  ? "bg-primary/10 text-primary disabled:opacity-60"
+                  : "bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-60"
               }`}
             >
-              {c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
+              {saving ? "Saving" : c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
             </button>
           </div>
         );
