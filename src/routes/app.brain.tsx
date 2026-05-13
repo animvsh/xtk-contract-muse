@@ -33,6 +33,8 @@ import {
   File as FileIcon,
 } from "lucide-react";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -657,8 +659,8 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
         {units.map((u) => {
           if (u.kind === "text") {
             return (
-              <div key={u.key} className="slide-in-left whitespace-pre-wrap rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-4 py-3 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur">
-                {u.text}
+              <div key={u.key} className="slide-in-left rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-5 py-3.5 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{u.text}</ReactMarkdown>
               </div>
             );
           }
