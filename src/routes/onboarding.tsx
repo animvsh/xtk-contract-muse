@@ -71,7 +71,7 @@ function Onboarding() {
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/25 bg-[oklch(0.97_0.05_70)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[oklch(0.62_0.22_40)]">
                   <Sparkles className="h-3 w-3" /> Private beta
                 </div>
-                <h1 className="mt-4 text-[28px] font-bold tracking-tight md:text-[34px]">Join the Beevr waitlist</h1>
+                <h1 className="font-display mt-4 text-[32px] font-semibold tracking-[-0.02em] md:text-[40px]">Join the <span className="font-display-italic">Beevr</span> waitlist</h1>
                 <p className="mt-2 text-[15px] leading-relaxed text-[oklch(0.45_0_0)]">
                   Three quick questions, then book a 15-min intro with the founders. We onboard new teams every week.
                 </p>
