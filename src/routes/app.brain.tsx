@@ -32,7 +32,6 @@ import {
   UploadCloud,
   File as FileIcon,
   Copy,
-  BookOpen as BookOpenIcon,
   Terminal,
   Shield,
   AlertTriangle,
