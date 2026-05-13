@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ArrowRight, Sparkles, Phone, User, Briefcase, Loader2, CalendarCheck, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
