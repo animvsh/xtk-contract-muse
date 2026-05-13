@@ -290,9 +290,9 @@ function Landing() {
 
             <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: Plug, title: "Connect once, stays in sync", desc: "OAuth into your stack. Beevr keeps everything fresh in the background — no IT ticket, no scripts." },
-                { icon: Search, title: "Ask anything in plain English", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
-                { icon: Lock, title: "Your permissions, respected", desc: "Beevr inherits Slack, Drive, Notion and Hubspot ACLs. People only see what they already could." },
+                { icon: Search, title: "“Why did churn increase?”", desc: "Beevr ties Stripe cancellations back to the support threads, NPS drops and product changes that caused them." },
+                { icon: MessageSquare, title: "“What did we promise this customer?”", desc: "It pulls the email thread, the deal notes and the contract — so nobody re-promises or under-delivers." },
+                { icon: Lock, title: "“Which accounts are at risk?”", desc: "It watches usage, sentiment and engagement across your stack and flags the accounts trending the wrong way." },
               ].map((f, i) => (
                 <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5">
