@@ -345,8 +345,17 @@ function Grid({
         return (
           <div key={c.id} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur">
             <div className="relative">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-foreground">
-                {c.service_name[0]}
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-foreground overflow-hidden">
+                {LOGO_SLUGS[c.service_id] ? (
+                  <img
+                    src={`https://cdn.simpleicons.org/${LOGO_SLUGS[c.service_id]}`}
+                    alt={c.service_name}
+                    className="h-5 w-5 object-contain"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  c.service_name[0]
+                )}
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white" style={{ background: accent }} />
             </div>
