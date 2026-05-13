@@ -245,13 +245,13 @@ function Landing() {
           <section id="brain" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
+                <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> It knows your business
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Connects to all your <span className="font-display-italic">favourite stuff.</span>
+                Ask anything. <span className="font-display-italic">Get answers with sources.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Plug in the tools your team already lives in. Beevr quietly indexes them into one private, role-aware brain you can talk to like a human.
+                Beevr learns from your company's conversations, customers, revenue and workflows — then answers in plain English with the exact emails, deals and docs to back it up.
               </p>
             </Reveal>
 
