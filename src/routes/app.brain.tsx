@@ -659,10 +659,8 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
         {units.map((u) => {
           if (u.kind === "text") {
             return (
-              <div key={u.key} className="slide-in-left rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-5 py-3.5 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur">
-                <div className="prose prose-sm max-w-none prose-p:my-2 prose-p:leading-relaxed prose-headings:font-display prose-headings:tracking-tight prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-strong:font-semibold prose-strong:text-foreground prose-ul:my-2 prose-ul:space-y-1 prose-ol:my-2 prose-ol:space-y-1 prose-li:my-0 prose-li:leading-relaxed prose-li:marker:text-primary prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[13px] prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-xl prose-pre:border prose-pre:border-black/10 prose-pre:bg-muted/60 prose-blockquote:border-l-primary/40 prose-blockquote:text-foreground/80 prose-hr:my-4 prose-hr:border-black/10">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{u.text}</ReactMarkdown>
-                </div>
+              <div key={u.key} className="slide-in-left rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-5 py-3.5 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{u.text}</ReactMarkdown>
               </div>
             );
           }
