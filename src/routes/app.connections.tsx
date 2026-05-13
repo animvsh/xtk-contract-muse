@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Check, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/app/connections")({
   component: Connections,
@@ -149,6 +151,8 @@ const DEFAULT_SERVICES: Array<{ service_id: string; service_name: string }> = [
 
 function Connections() {
   const [conns, setConns] = useState<Conn[]>([]);
+  const [savingIds, setSavingIds] = useState<Set<string>>(() => new Set());
+  const { user, loading } = useAuth();
 
   const load = async (uid: string) => {
     let { data, error } = await supabase
@@ -192,22 +196,42 @@ function Connections() {
   useEffect(() => {
     let mounted = true;
     const init = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (mounted && data.user?.id) load(data.user.id);
+      if (!loading && user?.id) await load(user.id);
+      if (!loading && !user?.id) setConns([]);
     };
     init();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (mounted && session?.user?.id) load(session.user.id);
-    });
     return () => {
       mounted = false;
-      sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [loading, user?.id]);
 
   const toggle = async (c: Conn) => {
-    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: !c.connected } : x)));
-    await supabase.from("connections").update({ connected: !c.connected }).eq("id", c.id);
+    if (savingIds.has(c.id)) return;
+    const nextConnected = !c.connected;
+    setSavingIds((prev) => new Set(prev).add(c.id));
+    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: nextConnected } : x)));
+
+    const { error } = await supabase
+      .from("connections")
+      .update({ connected: nextConnected })
+      .eq("id", c.id)
+      .select("id")
+      .single();
+
+    setSavingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(c.id);
+      return next;
+    });
+
+    if (error) {
+      setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: c.connected } : x)));
+      toast.error(`Couldn't update ${c.service_name}. Try again.`);
+      console.error("[connections] toggle error", error);
+      return;
+    }
+
+    toast.success(`${c.service_name} ${nextConnected ? "connected" : "disconnected"}`);
   };
 
   const { connected, available } = useMemo(() => {
@@ -227,12 +251,12 @@ function Connections() {
       {connected.length > 0 && (
         <>
           <SectionLabel>Connected</SectionLabel>
-          <Grid items={connected} toggle={toggle} />
+          <Grid items={connected} toggle={toggle} savingIds={savingIds} />
         </>
       )}
 
       <SectionLabel className="mt-10">Available</SectionLabel>
-      <Grid items={available} toggle={toggle} />
+      <Grid items={available} toggle={toggle} savingIds={savingIds} />
     </div>
   );
 }
