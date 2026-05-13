@@ -798,6 +798,37 @@ a:focus-visible {
 .markdown-body li > ul, .markdown-body li > ol { margin: 0.25rem 0 0.35rem; }
 .markdown-body a { color: oklch(0.55 0.2 40); text-decoration: none; border-bottom: 1px solid color-mix(in oklab, oklch(0.55 0.2 40) 30%, transparent); }
 .markdown-body a:hover { border-bottom-color: oklch(0.55 0.2 40); }
+/* Citation pills: links whose visible text is [N] render as a small superscript badge */
+.markdown-body a:has(> code:only-child) { border-bottom: none; }
+.markdown-body sup a,
+.markdown-body a[href^="notion://"],
+.markdown-body a[href^="file://"],
+.markdown-body a[href^="mailto:"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+/* Bracketed citation marker [[N]] */
+.markdown-body a:where([href^="notion://"], [href^="file://"], [href^="mailto:"], [href^="msg_"], [href^="http"]):not(:has(*)) {
+  /* default link styling already applied */
+}
+/* "Sources" trailing section */
+.markdown-body h2 + ol, .markdown-body h3 + ol,
+.markdown-body p:has(strong:only-child) + ol {
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.75rem 0.5rem 1.75rem;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--muted) 50%, transparent);
+  border: 1px solid rgb(0 0 0 / 0.05);
+  font-size: 13px;
+}
+.markdown-body p > strong:only-child {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
 .markdown-body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.875em;
