@@ -150,27 +150,62 @@ const DEFAULT_SERVICES: Array<{ service_id: string; service_name: string }> = [
 function Connections() {
   const [conns, setConns] = useState<Conn[]>([]);
 
-  const load = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const uid = userData.user?.id;
-    if (!uid) return;
-    let { data } = await supabase.from("connections").select("*").eq("user_id", uid).order("service_name");
+  const load = async (uid: string) => {
+    let { data, error } = await supabase
+      .from("connections")
+      .select("*")
+      .eq("user_id", uid)
+      .order("service_name");
+    if (error) console.error("[connections] load error", error);
     if (!data || data.length === 0) {
-      await supabase.from("connections").insert(
+      const { error: insErr } = await supabase.from("connections").insert(
         DEFAULT_SERVICES.map((s) => ({ ...s, connected: false, user_id: uid })),
       );
-      ({ data } = await supabase.from("connections").select("*").eq("user_id", uid).order("service_name"));
+      if (insErr) console.error("[connections] seed error", insErr);
+      ({ data, error } = await supabase
+        .from("connections")
+        .select("*")
+        .eq("user_id", uid)
+        .order("service_name"));
+      if (error) console.error("[connections] reload error", error);
+    }
+    // Backfill any missing default services (e.g. older accounts seeded with fewer)
+    if (data && data.length > 0 && data.length < DEFAULT_SERVICES.length) {
+      const existing = new Set(data.map((c: any) => c.service_id));
+      const missing = DEFAULT_SERVICES.filter((s) => !existing.has(s.service_id));
+      if (missing.length > 0) {
+        await supabase.from("connections").insert(
+          missing.map((s) => ({ ...s, connected: false, user_id: uid })),
+        );
+        ({ data } = await supabase
+          .from("connections")
+          .select("*")
+          .eq("user_id", uid)
+          .order("service_name"));
+      }
     }
     setConns((data as Conn[] | null) ?? []);
   };
 
   useEffect(() => {
-    load();
+    let mounted = true;
+    const init = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (mounted && data.user?.id) load(data.user.id);
+    };
+    init();
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (mounted && session?.user?.id) load(session.user.id);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const toggle = async (c: Conn) => {
+    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: !c.connected } : x)));
     await supabase.from("connections").update({ connected: !c.connected }).eq("id", c.id);
-    load();
   };
 
   const { connected, available } = useMemo(() => {
