@@ -228,7 +228,7 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
               </div>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
                 <span className="headline-underline">Every fact about your business</span> — one question away.
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
@@ -262,7 +262,7 @@ function Landing() {
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                   <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
                 </div>
-                <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
                   <span className="headline-underline">Stop hunting for numbers.</span> Start getting answers.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
@@ -307,7 +307,7 @@ function Landing() {
                       {[40, 55, 48, 62, 70, 68, 82, 78, 90, 86, 95, 100].map((h, i) => (
                         <div
                           key={i}
-                          className="bar-grow flex-1 rounded-t bg-gradient-to-t from-[oklch(0.68_0.22_40)] to-[oklch(0.78_0.18_55)]"
+                          className="bar-grow flex-1 rounded-t bg-[oklch(0.68_0.22_40)]"
                           style={{ height: `${h}%`, opacity: 0.5 + i * 0.04, animationDelay: `${i * 60}ms` }}
                         />
                       ))}
@@ -336,7 +336,7 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Cloud Agents
               </div>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
                 Knowledge that doesn't just answer — <span className="headline-underline">it acts.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
@@ -418,7 +418,7 @@ function Landing() {
 
           {/* Final CTA */}
           <section className="border-t border-black/5 bg-white px-5 py-20 text-center sm:px-10">
-            <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mx-auto max-w-2xl font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
               Give your team a brain that never forgets.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-[oklch(0.4_0_0)]">
