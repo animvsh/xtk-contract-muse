@@ -85,7 +85,7 @@ function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: st
   return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
 }
 
-const CONNECTORS = ["Notion", "Slack", "Gmail", "Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira"];
+const CONNECTORS = ["Notion", "Slack", "Gmail", "Google Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira", "Asana", "Outlook", "Dropbox", "Confluence", "Airtable", "ClickUp", "Pipedrive", "QuickBooks", "Zoom", "Loom", "Calendly", "Mixpanel", "Segment", "Snowflake", "Postgres", "Looker", "Metabase", "Coda", "Monday", "Trello", "Greenhouse", "Lever", "Gusto", "Brex", "Ramp", "Shopify", "Webflow", "Vercel"];
 
 
 export const Route = createFileRoute("/")({
