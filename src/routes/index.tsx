@@ -387,13 +387,13 @@ function Landing() {
           <section id="agents" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Cloud Agents
+                <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Your brain takes action
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Knowledge that doesn't just answer — <span className="headline-underline">it acts.</span>
+                Create AI agents in <span className="headline-underline">plain English.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Describe a workflow in a sentence. Beevr spins up a cloud agent that runs on a schedule, watches your data and ships work back into Slack, email or your tools.
+                Describe the work in a sentence. Beevr spins up an agent that watches your data, runs on a schedule and ships results back into Slack, email or your tools.
               </p>
             </Reveal>
 
