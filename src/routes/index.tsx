@@ -110,10 +110,10 @@ const CONNECTORS: { name: string; slug: string; color: string }[] = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Beevr — The company brain for fast-moving teams" },
-      { name: "description", content: "Beevr unifies every doc, channel and metric into one searchable brain — then turns it into insights and agents that act on your behalf." },
-      { property: "og:title", content: "Beevr — The company brain for fast-moving teams" },
-      { property: "og:description", content: "Unified company knowledge, instant insights, and cloud agents that act on your data." },
+      { title: "Beevr — Your company's brain" },
+      { name: "description", content: "Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate work — it knows your business." },
+      { property: "og:title", content: "Beevr — Your company's brain" },
+      { property: "og:description", content: "One AI brain across your whole company. Ask anything, find what you'd normally miss, and let agents act on your behalf." },
     ],
   }),
   component: Landing,
@@ -175,13 +175,13 @@ function Landing() {
 
             <Reveal delay={1}>
               <h1 className="font-display mx-auto mt-7 max-w-4xl text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:mt-8 sm:text-6xl md:text-[88px]">
-                One brain<br className="hidden sm:block" /> for your <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">whole company.</span>
+                Your company's <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">brain.</span>
               </h1>
             </Reveal>
 
             <Reveal delay={2}>
               <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
-                Beevr unifies every doc, message, deal and metric into one place you can ask in plain English — and turns the answers into insights and agents that act on your behalf.
+                Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate the work in between.
               </p>
             </Reveal>
 
@@ -245,13 +245,13 @@ function Landing() {
           <section id="brain" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
+                <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> It knows your business
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Connects to all your <span className="font-display-italic">favourite stuff.</span>
+                Ask anything. <span className="font-display-italic">Get answers with sources.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Plug in the tools your team already lives in. Beevr quietly indexes them into one private, role-aware brain you can talk to like a human.
+                Beevr learns from your company's conversations, customers, revenue and workflows — then answers in plain English with the exact emails, deals and docs to back it up.
               </p>
             </Reveal>
 
@@ -290,9 +290,9 @@ function Landing() {
 
             <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: Plug, title: "Connect once, stays in sync", desc: "OAuth into your stack. Beevr keeps everything fresh in the background — no IT ticket, no scripts." },
-                { icon: Search, title: "Ask anything in plain English", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
-                { icon: Lock, title: "Your permissions, respected", desc: "Beevr inherits Slack, Drive, Notion and Hubspot ACLs. People only see what they already could." },
+                { icon: Search, title: "“Why did churn increase?”", desc: "Beevr ties Stripe cancellations back to the support threads, NPS drops and product changes that caused them." },
+                { icon: MessageSquare, title: "“What did we promise this customer?”", desc: "It pulls the email thread, the deal notes and the contract — so nobody re-promises or under-delivers." },
+                { icon: Lock, title: "“Which accounts are at risk?”", desc: "It watches usage, sentiment and engagement across your stack and flags the accounts trending the wrong way." },
               ].map((f, i) => (
                 <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5">
@@ -312,20 +312,21 @@ function Landing() {
             <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2 md:items-center">
               <Reveal>
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
+                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Discover what you're missing
                 </div>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                  <span className="headline-underline">Stop hunting for numbers.</span> Start getting answers.
+                  <span className="headline-underline">Notices the patterns</span> your team would miss.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
-                  Beevr cross-references your CRM, billing and product data to surface what's actually moving the business. Ask once — get a chart, a summary and the exact source rows.
+                  Beevr doesn't just answer questions — it reads across your whole company and proactively surfaces the opportunities, risks and shifts that matter, delivered to Slack or email.
                 </p>
                 <ul className="mt-6 space-y-2.5 text-sm">
                   {[
-                    "MRR, churn and CAC computed from raw Stripe data",
-                    "Pipeline & win-rate from Hubspot, Salesforce or Attio",
-                    "Weekly digests delivered to Slack or email",
-                    "Drill-down to the exact invoice, deal or message",
+                    "Revenue changes you didn't ask about",
+                    "Stalled deals before they go cold",
+                    "Customer accounts trending toward churn",
+                    "Product trends hiding in support tickets",
+                    "Team bottlenecks across your tools",
                   ].map((l) => (
                     <li key={l} className="flex items-start gap-2 text-[oklch(0.25_0_0)]">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.55_0.18_140)]" />
@@ -386,21 +387,21 @@ function Landing() {
           <section id="agents" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Cloud Agents
+                <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Your brain takes action
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Knowledge that doesn't just answer — <span className="headline-underline">it acts.</span>
+                Create AI agents in <span className="headline-underline">plain English.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Describe a workflow in a sentence. Beevr spins up a cloud agent that runs on a schedule, watches your data and ships work back into Slack, email or your tools.
+                Describe the work in a sentence. Beevr spins up an agent that watches your data, runs on a schedule and ships results back into Slack, email or your tools.
               </p>
             </Reveal>
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: TrendingUp, title: "Revenue digest", desc: "“Every Monday, summarize Stripe revenue and post to #revenue.”" },
-                { icon: MessageSquare, title: "Support triage", desc: "“Tag Intercom tickets by intent and route urgent ones to on-call.”" },
-                { icon: Zap, title: "Pipeline watch", desc: "“DM me when any deal >$50k stalls more than 7 days.”" },
+                { icon: TrendingUp, title: "Weekly revenue summary", desc: "“Send a weekly revenue summary every Monday morning to #revenue.”" },
+                { icon: Zap, title: "Stalled deal alerts", desc: "“Alert me when any enterprise deal stalls more than 7 days.”" },
+                { icon: MessageSquare, title: "Support routing", desc: "“Route urgent support tickets to on-call and tag the rest by intent.”" },
               ].map((f, i) => (
                 <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg">
@@ -485,7 +486,7 @@ function Landing() {
           </section>
 
           <footer id="contacts" className="border-t border-black/5 bg-white py-8 text-center text-xs text-[oklch(0.4_0_0)]">
-            © 2026 Beevr Inc. — The company brain for fast-moving teams.
+            © 2026 Beevr Inc. — Your company's brain.
           </footer>
         </div>
       </div>
