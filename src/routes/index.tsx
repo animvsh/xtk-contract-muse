@@ -312,20 +312,21 @@ function Landing() {
             <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2 md:items-center">
               <Reveal>
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
+                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Discover what you're missing
                 </div>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                  <span className="headline-underline">Stop hunting for numbers.</span> Start getting answers.
+                  <span className="headline-underline">Notices the patterns</span> your team would miss.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
-                  Beevr cross-references your CRM, billing and product data to surface what's actually moving the business. Ask once — get a chart, a summary and the exact source rows.
+                  Beevr doesn't just answer questions — it reads across your whole company and proactively surfaces the opportunities, risks and shifts that matter, delivered to Slack or email.
                 </p>
                 <ul className="mt-6 space-y-2.5 text-sm">
                   {[
-                    "MRR, churn and CAC computed from raw Stripe data",
-                    "Pipeline & win-rate from Hubspot, Salesforce or Attio",
-                    "Weekly digests delivered to Slack or email",
-                    "Drill-down to the exact invoice, deal or message",
+                    "Revenue changes you didn't ask about",
+                    "Stalled deals before they go cold",
+                    "Customer accounts trending toward churn",
+                    "Product trends hiding in support tickets",
+                    "Team bottlenecks across your tools",
                   ].map((l) => (
                     <li key={l} className="flex items-start gap-2 text-[oklch(0.25_0_0)]">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.55_0.18_140)]" />
