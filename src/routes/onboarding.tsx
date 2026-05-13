@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ArrowRight, Sparkles, Phone, User, Briefcase, Loader2, CalendarCheck, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -71,7 +71,7 @@ function Onboarding() {
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/25 bg-[oklch(0.97_0.05_70)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[oklch(0.62_0.22_40)]">
                   <Sparkles className="h-3 w-3" /> Private beta
                 </div>
-                <h1 className="mt-4 text-[28px] font-bold tracking-tight md:text-[34px]">Join the Beevr waitlist</h1>
+                <h1 className="font-display mt-4 text-[32px] font-semibold tracking-[-0.02em] md:text-[40px]">Join the <span className="font-display-italic">Beevr</span> waitlist</h1>
                 <p className="mt-2 text-[15px] leading-relaxed text-[oklch(0.45_0_0)]">
                   Three quick questions, then book a 15-min intro with the founders. We onboard new teams every week.
                 </p>
@@ -147,38 +147,43 @@ function Onboarding() {
 }
 
 function BookingStep({ name }: { name: string }) {
-  const calRef = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
-    const w = window as unknown as { Cal?: any };
-    const init = () => {
-      if (!w.Cal) return;
-      try {
-        w.Cal("init", "fireengine", { origin: "https://app.cal.com" });
-        w.Cal.ns.fireengine("inline", {
-          elementOrSelector: "#beevr-cal-inline",
-          config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-          calLink: "animesh-alang-vcfoih/fireengine",
-        });
-        w.Cal.ns.fireengine("ui", { hideEventTypeDetails: false, layout: "month_view" });
-      } catch {}
-    };
+    // Mirrors the official Cal.com inline embed snippet exactly.
+    const w = window as any;
+    (function (C: any, A: string, L: string) {
+      const p = function (a: any, ar: any) { a.q.push(ar); };
+      const d = C.document;
+      C.Cal = C.Cal || function () {
+        const cal = C.Cal;
+        const ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement("script")).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api: any = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === "string") {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ["initNamespace", namespace]);
+          } else p(cal, ar);
+          return;
+        }
+        p(cal, ar);
+      };
+    })(w, "https://app.cal.com/embed/embed.js", "init");
 
-    if (w.Cal) {
-      init();
-    } else {
-      const existing = document.querySelector<HTMLScriptElement>('script[data-cal-loader="1"]');
-      if (existing) {
-        existing.addEventListener("load", init);
-      } else {
-        const s = document.createElement("script");
-        s.src = "https://app.cal.com/embed/embed.js";
-        s.async = true;
-        s.dataset.calLoader = "1";
-        s.addEventListener("load", init);
-        document.head.appendChild(s);
-      }
-    }
+    w.Cal("init", "fireengine", { origin: "https://app.cal.com" });
+    w.Cal.ns.fireengine("inline", {
+      elementOrSelector: "#my-cal-inline-fireengine",
+      config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
+      calLink: "animesh-alang-vcfoih/fireengine",
+    });
+    w.Cal.ns.fireengine("ui", { hideEventTypeDetails: false, layout: "month_view" });
   }, []);
 
   const first = name.trim().split(" ")[0] || "there";
@@ -188,15 +193,18 @@ function BookingStep({ name }: { name: string }) {
       <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.55_0.18_140)]/30 bg-[oklch(0.96_0.06_140)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[oklch(0.45_0.18_140)]">
         <Check className="h-3 w-3" /> You're on the list
       </div>
-      <h1 className="mt-4 text-[26px] font-bold tracking-tight md:text-[30px]">
-        Nice to meet you, {first}.
+      <h1 className="font-display mt-4 text-[30px] font-semibold tracking-[-0.02em] md:text-[36px]">
+        Nice to meet you, <span className="font-display-italic">{first}.</span>
       </h1>
       <p className="mt-2 text-[15px] leading-relaxed text-[oklch(0.45_0_0)]">
         Pick a 15-minute slot below — we'll walk through your stack and get you set up live.
       </p>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-black/[0.06] bg-white">
-        <div ref={calRef} id="beevr-cal-inline" style={{ width: "100%", minHeight: 620, overflow: "auto" }} />
+        <div
+          id="my-cal-inline-fireengine"
+          style={{ width: "100%", height: "100%", minHeight: 660, overflow: "scroll" }}
+        />
       </div>
 
       <div className="mt-5 flex items-center justify-center gap-2 text-xs text-[oklch(0.5_0_0)]">

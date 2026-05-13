@@ -85,7 +85,7 @@ function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: st
   return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
 }
 
-const CONNECTORS = ["Notion", "Slack", "Gmail", "Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira"];
+const CONNECTORS = ["Notion", "Slack", "Gmail", "Google Drive", "GitHub", "Linear", "Hubspot", "Stripe", "Intercom", "Salesforce", "Attio", "Figma", "Zendesk", "Jira", "Asana", "Outlook", "Dropbox", "Confluence", "Airtable", "ClickUp", "Pipedrive", "QuickBooks", "Zoom", "Loom", "Calendly", "Mixpanel", "Segment", "Snowflake", "Postgres", "Looker", "Metabase", "Coda", "Monday", "Trello", "Greenhouse", "Lever", "Gusto", "Brex", "Ramp", "Shopify", "Webflow", "Vercel"];
 
 
 export const Route = createFileRoute("/")({
@@ -155,8 +155,8 @@ function Landing() {
             </Reveal>
 
             <Reveal delay={1}>
-              <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight sm:mt-8 sm:text-5xl md:text-7xl">
-                Talk to your business<br className="hidden sm:block" /> like it's <span className="gradient-text-anim">one brain.</span>
+              <h1 className="font-display mx-auto mt-7 max-w-4xl text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:mt-8 sm:text-6xl md:text-[88px]">
+                One brain<br className="hidden sm:block" /> for your <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">whole company.</span>
               </h1>
             </Reveal>
 
@@ -228,26 +228,56 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
               </div>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-                <span className="headline-underline">Every fact about your business</span> — one question away.
+              <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
+                Connect every tool you already use — <span className="font-display-italic">in one place.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Knowledge lives in 20+ silos: Notion, Slack, Gmail, Drive, Linear, Hubspot, Stripe… Beevr indexes all of it into a private, role-aware brain that anyone on your team can ask in plain English.
+                Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom, Salesforce, Snowflake, Greenhouse, Brex, Shopify… Beevr quietly indexes them all into one private, role-aware brain you can talk to like a human.
               </p>
             </Reveal>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+            {/* Big connector grid — 40+ tools */}
+            <Reveal>
+              <div className="mx-auto mt-12 max-w-5xl rounded-3xl border border-black/[0.06] bg-white p-6 sm:p-8">
+                <div className="mb-5 flex items-center justify-between">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[oklch(0.5_0_0)]">Native connectors</div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-[oklch(0.45_0_0)]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.55_0.18_140)] breathe" />
+                    {CONNECTORS.length}+ live
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
+                  {CONNECTORS.map((name) => (
+                    <div
+                      key={name}
+                      className="alive group flex aspect-square flex-col items-center justify-center gap-1.5 rounded-xl border border-black/[0.05] bg-[oklch(0.985_0.005_85)] px-2 text-center transition-colors hover:border-[oklch(0.68_0.22_40)]/40 hover:bg-white"
+                    >
+                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-white text-[13px] font-display font-semibold text-[oklch(0.62_0.22_40)] ring-1 ring-black/[0.04] transition-transform group-hover:rotate-[-4deg] group-hover:scale-110">
+                        {name[0]}
+                      </div>
+                      <div className="text-[10px] font-medium leading-tight text-[oklch(0.3_0_0)]">{name}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.05] pt-4 text-[11px] text-[oklch(0.5_0_0)]">
+                  <span className="inline-flex items-center gap-1.5"><Lock className="h-3 w-3" /> Permission-aware — people only see what they already could</span>
+                  <span className="inline-flex items-center gap-1.5"><Plug className="h-3 w-3" /> Custom connectors built on request</span>
+                </div>
+              </div>
+            </Reveal>
+
+            <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: Plug, title: "40+ live connectors", desc: "Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom — connect once, stay in sync." },
-                { icon: Search, title: "Ask anything", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
-                { icon: Lock, title: "Permission-aware", desc: "Beevr respects your existing access controls. People only see what they already could." },
+                { icon: Plug, title: "Connect once, stays in sync", desc: "OAuth into your stack. Beevr keeps everything fresh in the background — no IT ticket, no scripts." },
+                { icon: Search, title: "Ask anything in plain English", desc: "“What did we promise Acme last quarter?” Beevr finds the email, the doc and the deal — with sources." },
+                { icon: Lock, title: "Your permissions, respected", desc: "Beevr inherits Slack, Drive, Notion and Hubspot ACLs. People only see what they already could." },
               ].map((f, i) => (
                 <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
-                  <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.35)]">
+                  <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5">
                     <div className="bobble mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
                       <f.icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
+                    <h3 className="font-display text-lg font-semibold tracking-tight transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
                     <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                   </div>
                 </Reveal>
@@ -262,7 +292,7 @@ function Landing() {
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                   <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Insights
                 </div>
-                <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
                   <span className="headline-underline">Stop hunting for numbers.</span> Start getting answers.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
@@ -307,7 +337,7 @@ function Landing() {
                       {[40, 55, 48, 62, 70, 68, 82, 78, 90, 86, 95, 100].map((h, i) => (
                         <div
                           key={i}
-                          className="bar-grow flex-1 rounded-t bg-gradient-to-t from-[oklch(0.68_0.22_40)] to-[oklch(0.78_0.18_55)]"
+                          className="bar-grow flex-1 rounded-t bg-[oklch(0.68_0.22_40)]"
                           style={{ height: `${h}%`, opacity: 0.5 + i * 0.04, animationDelay: `${i * 60}ms` }}
                         />
                       ))}
@@ -336,7 +366,7 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Cloud Agents
               </div>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
                 Knowledge that doesn't just answer — <span className="headline-underline">it acts.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
@@ -390,7 +420,7 @@ function Landing() {
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Sparkles className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Private beta
               </div>
-              <h2 className="mt-4 text-4xl font-bold tracking-tight">Custom pricing, hand-rolled.</h2>
+              <h2 className="font-display mt-4 text-5xl font-semibold tracking-[-0.02em]">Custom pricing, <span className="font-display-italic">hand-rolled.</span></h2>
               <p className="mt-3 text-[oklch(0.4_0_0)]">
                 Beevr is tailored for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume and goals.
               </p>
@@ -418,7 +448,7 @@ function Landing() {
 
           {/* Final CTA */}
           <section className="border-t border-black/5 bg-white px-5 py-20 text-center sm:px-10">
-            <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mx-auto max-w-2xl font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
               Give your team a brain that never forgets.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-[oklch(0.4_0_0)]">
