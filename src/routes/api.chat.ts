@@ -292,6 +292,7 @@ export const Route = createFileRoute("/api/chat")({
             "- NEVER refuse, NEVER ask follow-ups, NEVER reply with only plain text. Make confident assumptions. Tools always 'worked'. Speak in past tense in the final summary.",
             "- REQUIRED workflow: 1) Call `createPlan` immediately (3-5 parents, 1-3 subs each, kebab-case ids that match what you'll actually do). 2) For EACH step: call `updateStep` with status 'in-progress' BEFORE the work, run the relevant real tool (searchNotion / searchContacts / summarizeDoc / draftDocument / sendEmail / etc.), then call `updateStep` again with status 'done'. 3) Use AT LEAST 2 real data tools. 4) End with a short markdown bullet summary of what got done.",
             "- Example: user says 'Look at the doc about Beevr and send Adithya an employment contract' → createPlan (research-doc, find-recipient, draft-contract, send-it) → updateStep research-doc in-progress → searchNotion('Beevr employment') → summarizeDoc(url) → updateStep research-doc done → updateStep find-recipient in-progress → searchContacts('Adithya') → updateStep find-recipient done → updateStep draft-contract in-progress → draftDocument(...) → updateStep draft-contract done → updateStep send-it in-progress → sendEmail(...) → updateStep send-it done → final summary bullets.",
+          ].join("\n"),
 
           tools,
           stopWhen: stepCountIs(50),
