@@ -211,13 +211,13 @@ function Landing() {
             {/* Connector marquee */}
             <div className="marquee-mask mt-10 overflow-hidden">
               <div className="marquee gap-3">
-                {[...CONNECTORS, ...CONNECTORS].map((name, i) => (
+                {[...CONNECTORS, ...CONNECTORS].map((c, i) => (
                   <span
                     key={i}
-                    className="mr-3 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
+                    className="mr-3 inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.68_0.22_40)]" />
-                    {name}
+                    <img src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`} alt="" className="h-3.5 w-3.5" loading="lazy" />
+                    {c.name}
                   </span>
                 ))}
               </div>
