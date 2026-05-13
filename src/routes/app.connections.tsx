@@ -204,8 +204,8 @@ function Connections() {
   }, []);
 
   const toggle = async (c: Conn) => {
+    setConns((prev) => prev.map((x) => (x.id === c.id ? { ...x, connected: !c.connected } : x)));
     await supabase.from("connections").update({ connected: !c.connected }).eq("id", c.id);
-    load();
   };
 
   const { connected, available } = useMemo(() => {
