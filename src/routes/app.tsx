@@ -26,7 +26,7 @@ const navItems = [
   { label: "Agents", to: "/app/agents" as const, icon: Bot },
   { label: "APIs", to: "/app/apis" as const, icon: Server },
   { label: "Builds", to: "/app/builds" as const, icon: Cloud },
-  { label: "Team Spaces", to: "/app/team" as const, icon: Users },
+  { label: "Workspace", to: "/app/team" as const, icon: Users },
   { label: "Files", to: "/app/files" as const, icon: FileStack },
   { label: "Connections", to: "/app/connections" as const, icon: Plug },
   { label: "Access Keys", to: "/app/keys" as const, icon: KeyRound },
