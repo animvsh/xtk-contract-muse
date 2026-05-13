@@ -486,7 +486,7 @@ function Landing() {
           </section>
 
           <footer id="contacts" className="border-t border-black/5 bg-white py-8 text-center text-xs text-[oklch(0.4_0_0)]">
-            © 2026 Beevr Inc. — The company brain for fast-moving teams.
+            © 2026 Beevr Inc. — Your company's brain.
           </footer>
         </div>
       </div>
