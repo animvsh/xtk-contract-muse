@@ -158,8 +158,9 @@ function Connections() {
       .order("service_name");
     if (error) console.error("[connections] load error", error);
     if (!data || data.length === 0) {
-      const { error: insErr } = await supabase.from("connections").insert(
+      const { error: insErr } = await supabase.from("connections").upsert(
         DEFAULT_SERVICES.map((s) => ({ ...s, connected: false, user_id: uid })),
+        { onConflict: "user_id,service_id", ignoreDuplicates: true },
       );
       if (insErr) console.error("[connections] seed error", insErr);
       ({ data, error } = await supabase
@@ -174,8 +175,9 @@ function Connections() {
       const existing = new Set(data.map((c: any) => c.service_id));
       const missing = DEFAULT_SERVICES.filter((s) => !existing.has(s.service_id));
       if (missing.length > 0) {
-        await supabase.from("connections").insert(
+        await supabase.from("connections").upsert(
           missing.map((s) => ({ ...s, connected: false, user_id: uid })),
+          { onConflict: "user_id,service_id", ignoreDuplicates: true },
         );
         ({ data } = await supabase
           .from("connections")
