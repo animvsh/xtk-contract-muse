@@ -248,10 +248,10 @@ function Landing() {
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> The Company Brain
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                Connect every tool you already use — <span className="font-display-italic">in one place.</span>
+                Connects to all your <span className="font-display-italic">favourite stuff.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Notion, Slack, Gmail, Drive, GitHub, Linear, Hubspot, Stripe, Intercom, Salesforce, Snowflake, Greenhouse, Brex, Shopify… Beevr quietly indexes them all into one private, role-aware brain you can talk to like a human.
+                Plug in the tools your team already lives in. Beevr quietly indexes them into one private, role-aware brain you can talk to like a human.
               </p>
             </Reveal>
 
