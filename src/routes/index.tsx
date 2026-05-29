@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, FileText, MessageSquare, Mail, Send, Upload, FileStack, Paperclip, Search, TrendingUp, Plug, LineChart, Lock } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import foundersIncLogo from "@/assets/founders-inc.png";
 
 // Reveal-on-scroll wrapper
 function Reveal({
@@ -154,11 +153,6 @@ function Landing() {
 
           {/* Hero */}
           <section className="px-5 pb-16 pt-8 text-center sm:px-8 sm:pb-20 sm:pt-12 md:px-10">
-            <Reveal className="alive mx-auto inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-sm text-[oklch(0.3_0_0)] backdrop-blur">
-              <span className="text-[oklch(0.45_0_0)]">Backed by</span>
-              <img src={foundersIncLogo} alt="Founders, Inc." className="h-4 w-auto object-contain" />
-            </Reveal>
-
             <Reveal delay={1}>
               <h1 className="font-display mx-auto mt-7 max-w-4xl text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:mt-8 sm:text-6xl md:text-[88px]">
                 Your company's <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">brain.</span>
