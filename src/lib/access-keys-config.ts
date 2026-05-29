@@ -18,8 +18,20 @@ export const PERMISSIONS = [
     id: "sandbox",
     label: "Build in sandbox",
     desc: "Create tool drafts and run tests safely. Nothing goes live without approval.",
-    allowed: ["Read approved docs", "Ask the brain", "Create tool drafts", "Run sandbox tests", "Submit for review"],
-    blocked: ["Send emails", "Install tools", "Activate agents", "Delete data", "Access private docs"],
+    allowed: [
+      "Read approved docs",
+      "Ask the brain",
+      "Create tool drafts",
+      "Run sandbox tests",
+      "Submit for review",
+    ],
+    blocked: [
+      "Send emails",
+      "Install tools",
+      "Activate agents",
+      "Delete data",
+      "Access private docs",
+    ],
   },
   {
     id: "drafts",
@@ -46,9 +58,21 @@ export const PERMISSIONS = [
 ] as const;
 
 export const SAFETY = [
-  { id: "strict", label: "Strict", desc: "Everything new requires approval. Best for external builders." },
-  { id: "balanced", label: "Balanced", desc: "Read & sandbox automatic. Live actions need approval. Default." },
-  { id: "trusted", label: "Trusted", desc: "Approved actions can run directly. Best for internal systems." },
+  {
+    id: "strict",
+    label: "Strict",
+    desc: "Everything new requires approval. Best for external builders.",
+  },
+  {
+    id: "balanced",
+    label: "Balanced",
+    desc: "Read & sandbox automatic. Live actions need approval. Default.",
+  },
+  {
+    id: "trusted",
+    label: "Trusted",
+    desc: "Approved actions can run directly. Best for internal systems.",
+  },
 ] as const;
 
 export const SCOPES = [

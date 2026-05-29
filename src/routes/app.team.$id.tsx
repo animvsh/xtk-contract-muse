@@ -35,7 +35,9 @@ function TeamSpaceDetail() {
   const invite = async () => {
     if (!email.includes("@")) return toast.error("Enter a valid email");
     const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("space_members").insert({ space_id: id, email: email.trim(), role, user_id: u.user?.id });
+    const { error } = await supabase
+      .from("space_members")
+      .insert({ space_id: id, email: email.trim(), role, user_id: u.user?.id });
     if (error) return toast.error(error.message);
     toast.success(`Invite sent to ${email}`);
     setEmail("");
@@ -51,7 +53,10 @@ function TeamSpaceDetail() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-6 py-10">
-      <Link to="/app/team" className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        to="/app/team"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-3 w-3" /> Team Spaces
       </Link>
       <div className="mb-8 flex items-center gap-4">
@@ -84,7 +89,10 @@ function TeamSpaceDetail() {
             <option value="admin">Admin</option>
             <option value="viewer">Viewer</option>
           </select>
-          <button onClick={invite} className="flex items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:opacity-90">
+          <button
+            onClick={invite}
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
             <Plus className="h-3.5 w-3.5" /> Invite
           </button>
         </div>
@@ -104,8 +112,13 @@ function TeamSpaceDetail() {
                   {m.email[0]?.toUpperCase()}
                 </div>
                 <div className="flex-1 truncate text-sm">{m.email}</div>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{m.role}</span>
-                <button onClick={() => remove(m.id)} className="text-muted-foreground/60 hover:text-foreground">
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {m.role}
+                </span>
+                <button
+                  onClick={() => remove(m.id)}
+                  className="text-muted-foreground/60 hover:text-foreground"
+                >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </li>

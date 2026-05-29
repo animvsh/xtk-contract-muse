@@ -152,9 +152,14 @@ function AdminPage() {
         .toLowerCase();
       return hay.includes(q.toLowerCase());
     });
-    if (sort === "oldest") list = [...list].sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
-    else if (sort === "name") list = [...list].sort((a, b) => (a.full_name || a.email).localeCompare(b.full_name || b.email));
-    else if (sort === "starred") list = [...list].sort((a, b) => (starred.has(b.id) ? 1 : 0) - (starred.has(a.id) ? 1 : 0));
+    if (sort === "oldest")
+      list = [...list].sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
+    else if (sort === "name")
+      list = [...list].sort((a, b) =>
+        (a.full_name || a.email).localeCompare(b.full_name || b.email),
+      );
+    else if (sort === "starred")
+      list = [...list].sort((a, b) => (starred.has(b.id) ? 1 : 0) - (starred.has(a.id) ? 1 : 0));
     return list;
   }, [rows, q, filter, sort, starred, contacted]);
 
@@ -167,7 +172,18 @@ function AdminPage() {
   }, [rows, starred, contacted]);
 
   const exportCsv = () => {
-    const headers = ["Created", "Name", "Email", "Business", "Goal", "Phone", "LinkedIn", "Referral", "Starred", "Contacted"];
+    const headers = [
+      "Created",
+      "Name",
+      "Email",
+      "Business",
+      "Goal",
+      "Phone",
+      "LinkedIn",
+      "Referral",
+      "Starred",
+      "Contacted",
+    ];
     const escape = (v: string | null | boolean) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const lines = [
       headers.join(","),
@@ -199,7 +215,8 @@ function AdminPage() {
 
   const selectedIdx = selected ? filtered.findIndex((r) => r.id === selected.id) : -1;
   const goPrev = () => selectedIdx > 0 && setSelected(filtered[selectedIdx - 1]);
-  const goNext = () => selectedIdx >= 0 && selectedIdx < filtered.length - 1 && setSelected(filtered[selectedIdx + 1]);
+  const goNext = () =>
+    selectedIdx >= 0 && selectedIdx < filtered.length - 1 && setSelected(filtered[selectedIdx + 1]);
 
   return (
     <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-3 py-5 sm:px-4 sm:py-8 md:px-6">
@@ -208,7 +225,9 @@ function AdminPage() {
           <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/20 bg-[oklch(0.68_0.22_40)]/10 px-3 py-1 text-xs font-semibold text-[oklch(0.55_0.22_40)]">
             <Shield className="h-3 w-3" /> Admin
           </div>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-[oklch(0.18_0_0)] sm:text-3xl">Waitlist applicants</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-[oklch(0.18_0_0)] sm:text-3xl">
+            Waitlist applicants
+          </h1>
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
             Triage applicants. Star, mark as contacted, take notes and export.
           </p>
@@ -224,10 +243,25 @@ function AdminPage() {
 
       <div className="mb-5 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-3 md:grid-cols-5">
         <StatCard icon={Users} label="Total" value={stats.total} accent="oklch(0.68 0.22 40)" />
-        <StatCard icon={TrendingUp} label="Last 7d" value={stats.last7} accent="oklch(0.7 0.16 145)" />
-        <StatCard icon={Calendar} label="Last 24h" value={stats.last24} accent="oklch(0.68 0.18 250)" />
+        <StatCard
+          icon={TrendingUp}
+          label="Last 7d"
+          value={stats.last7}
+          accent="oklch(0.7 0.16 145)"
+        />
+        <StatCard
+          icon={Calendar}
+          label="Last 24h"
+          value={stats.last24}
+          accent="oklch(0.68 0.18 250)"
+        />
         <StatCard icon={Star} label="Starred" value={stats.starred} accent="oklch(0.74 0.16 85)" />
-        <StatCard icon={CheckCircle2} label="Contacted" value={stats.contacted} accent="oklch(0.6 0.14 160)" />
+        <StatCard
+          icon={CheckCircle2}
+          label="Contacted"
+          value={stats.contacted}
+          accent="oklch(0.6 0.14 160)"
+        />
       </div>
 
       <div className="mb-3 flex items-center gap-2">
@@ -267,13 +301,15 @@ function AdminPage() {
 
       <div className={`mb-4 ${filtersOpen ? "block" : "hidden sm:block"}`}>
         <div className="flex flex-wrap gap-1.5">
-          {([
-            ["all", "All"],
-            ["starred", "Starred"],
-            ["uncontacted", "Uncontacted"],
-            ["contacted", "Contacted"],
-            ["with_business", "Has business"],
-          ] as [FilterKey, string][]).map(([k, l]) => (
+          {(
+            [
+              ["all", "All"],
+              ["starred", "Starred"],
+              ["uncontacted", "Uncontacted"],
+              ["contacted", "Contacted"],
+              ["with_business", "Has business"],
+            ] as [FilterKey, string][]
+          ).map(([k, l]) => (
             <button
               key={k}
               onClick={() => setFilter(k)}
@@ -377,7 +413,9 @@ function Row({
       onClick={onOpen}
       role="button"
       className={`clicky group flex w-full items-center gap-2.5 rounded-2xl border bg-white p-3 text-left transition hover:border-[oklch(0.68_0.22_40)]/30 sm:gap-3 sm:p-3.5 ${
-        contacted ? "border-[oklch(0.6_0.14_160)]/30 bg-[oklch(0.97_0.04_160)]/40" : "border-black/5"
+        contacted
+          ? "border-[oklch(0.6_0.14_160)]/30 bg-[oklch(0.97_0.04_160)]/40"
+          : "border-black/5"
       }`}
     >
       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[oklch(0.68_0.22_40)] text-sm font-bold text-white sm:h-11 sm:w-11">
@@ -390,7 +428,8 @@ function Row({
           </div>
           {r.business && (
             <span className="hidden shrink-0 rounded-md bg-[oklch(0.97_0.02_85)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0.05_60)] md:inline">
-              {r.business.slice(0, 24)}{r.business.length > 24 ? "…" : ""}
+              {r.business.slice(0, 24)}
+              {r.business.length > 24 ? "…" : ""}
             </span>
           )}
           {contacted && (
@@ -399,7 +438,10 @@ function Row({
             </span>
           )}
           {hasNote && (
-            <span title="Has note" className="inline-flex shrink-0 items-center text-[oklch(0.6_0.14_250)]">
+            <span
+              title="Has note"
+              className="inline-flex shrink-0 items-center text-[oklch(0.6_0.14_250)]"
+            >
               <StickyNote className="h-3 w-3" />
             </span>
           )}
@@ -410,19 +452,33 @@ function Row({
       </div>
       <div className="hidden shrink-0 flex-col items-end gap-0.5 text-[11px] text-[oklch(0.5_0_0)] md:flex">
         <span>{new Date(r.created_at).toLocaleDateString()}</span>
-        <span className="text-[10px]">{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+        <span className="text-[10px]">
+          {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </span>
       </div>
       <div className="flex items-center gap-0.5 sm:gap-1">
         <span className="hidden sm:inline-flex">
           <IconBtn onClick={copy} title={copied ? "Copied!" : "Copy email"}>
-            {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
           </IconBtn>
         </span>
-        <IconBtn onClick={stop(onContacted)} title={contacted ? "Mark as uncontacted" : "Mark as contacted"} active={contacted}>
-          <CheckCircle2 className={`h-3.5 w-3.5 ${contacted ? "text-[oklch(0.55_0.16_160)]" : ""}`} />
+        <IconBtn
+          onClick={stop(onContacted)}
+          title={contacted ? "Mark as uncontacted" : "Mark as contacted"}
+          active={contacted}
+        >
+          <CheckCircle2
+            className={`h-3.5 w-3.5 ${contacted ? "text-[oklch(0.55_0.16_160)]" : ""}`}
+          />
         </IconBtn>
         <IconBtn onClick={stop(onStar)} title={starred ? "Unstar" : "Star"} active={starred}>
-          <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)] text-[oklch(0.6_0.16_85)]" : ""}`} />
+          <Star
+            className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)] text-[oklch(0.6_0.16_85)]" : ""}`}
+          />
         </IconBtn>
       </div>
       <ChevronRight className="hidden h-4 w-4 shrink-0 text-[oklch(0.55_0_0)] transition-transform group-hover:translate-x-0.5 sm:block" />
@@ -447,7 +503,9 @@ function IconBtn({
       onClick={onClick}
       title={title}
       className={`clicky-sm grid h-7 w-7 place-items-center rounded-lg border transition ${
-        active ? "border-[oklch(0.74_0.16_85)]/40 bg-[oklch(0.74_0.16_85)]/10" : "border-transparent text-[oklch(0.45_0_0)] hover:border-black/10 hover:bg-[oklch(0.96_0_0)]"
+        active
+          ? "border-[oklch(0.74_0.16_85)]/40 bg-[oklch(0.74_0.16_85)]/10"
+          : "border-transparent text-[oklch(0.45_0_0)] hover:border-black/10 hover:bg-[oklch(0.96_0_0)]"
       }`}
     >
       {children}
@@ -469,8 +527,13 @@ function StatCard({
   return (
     <div className="alive rounded-2xl border border-black/5 bg-white p-4">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">{label}</span>
-        <span className="grid h-7 w-7 place-items-center rounded-lg text-white" style={{ background: accent }}>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">
+          {label}
+        </span>
+        <span
+          className="grid h-7 w-7 place-items-center rounded-lg text-white"
+          style={{ background: accent }}
+        >
           <Icon className="h-3.5 w-3.5" />
         </span>
       </div>
@@ -549,7 +612,9 @@ function DetailDrawer({
                 {(s.full_name?.[0] || s.email[0]).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <div className="truncate font-semibold text-[oklch(0.18_0_0)]">{s.full_name || s.email}</div>
+                <div className="truncate font-semibold text-[oklch(0.18_0_0)]">
+                  {s.full_name || s.email}
+                </div>
                 <div className="truncate text-xs text-[oklch(0.5_0_0)]">
                   Applied {new Date(s.created_at).toLocaleString()}
                 </div>
@@ -571,7 +636,8 @@ function DetailDrawer({
                   : "border-black/10 text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
               }`}
             >
-              <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)]" : ""}`} /> {starred ? "Starred" : "Star"}
+              <Star className={`h-3.5 w-3.5 ${starred ? "fill-[oklch(0.74_0.16_85)]" : ""}`} />{" "}
+              {starred ? "Starred" : "Star"}
             </button>
             <button
               onClick={onContacted}
@@ -587,7 +653,11 @@ function DetailDrawer({
               onClick={copyEmail}
               className="clicky-sm inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[oklch(0.35_0_0)] hover:bg-[oklch(0.96_0_0)]"
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_145)]" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
               <span className="hidden sm:inline">{copied ? "Copied" : "Copy email"}</span>
             </button>
             <a
@@ -598,7 +668,9 @@ function DetailDrawer({
             </a>
           </div>
           <div className="mt-3 flex items-center justify-between text-[11px] text-[oklch(0.5_0_0)]">
-            <span>{position} of {total}</span>
+            <span>
+              {position} of {total}
+            </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={onPrev}
@@ -632,7 +704,9 @@ function DetailDrawer({
           )}
           {s.business && <LongField icon={Briefcase} label="Business" value={s.business} />}
           {s.goal && <LongField icon={Sparkles} label="Goal" value={s.goal} />}
-          {s.referral_source && <Field icon={Users} label="Referral source" value={s.referral_source} />}
+          {s.referral_source && (
+            <Field icon={Users} label="Referral source" value={s.referral_source} />
+          )}
 
           <div className="rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3">
             <div className="flex items-center justify-between gap-2">
@@ -707,13 +781,23 @@ function Field({
   );
 }
 
-function LongField({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value: string }) {
+function LongField({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Mail;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-xl border border-black/5 bg-[oklch(0.98_0_0)] p-3">
       <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.45_0_0)]">
         <Icon className="h-3 w-3" /> {label}
       </div>
-      <div className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-[oklch(0.18_0_0)]">{value}</div>
+      <div className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-[oklch(0.18_0_0)]">
+        {value}
+      </div>
     </div>
   );
 }

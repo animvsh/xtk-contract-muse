@@ -44,7 +44,10 @@ export const Route = createFileRoute("/docs/examples")({
   head: () => ({
     meta: [
       { title: "Examples — Beevr Docs" },
-      { name: "description", content: "Ready-to-use examples for tools and agents you can build on Beevr." },
+      {
+        name: "description",
+        content: "Ready-to-use examples for tools and agents you can build on Beevr.",
+      },
     ],
   }),
   component: Examples,

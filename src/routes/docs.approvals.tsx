@@ -5,7 +5,10 @@ export const Route = createFileRoute("/docs/approvals")({
   head: () => ({
     meta: [
       { title: "Approvals — Beevr Docs" },
-      { name: "description", content: "How Beevr protects workspaces with explicit approval for risky actions." },
+      {
+        name: "description",
+        content: "How Beevr protects workspaces with explicit approval for risky actions.",
+      },
     ],
   }),
   component: Approvals,
@@ -34,7 +37,9 @@ function Approvals() {
       <DocsSection title="Example approval">
         <div className="rounded-xl border border-border bg-card p-5 text-sm">
           <div className="font-semibold">OpenCode submitted: Customer Health Dashboard</div>
-          <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Requested access</div>
+          <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">
+            Requested access
+          </div>
           <ul className="mt-1 list-disc pl-5 text-sm">
             <li>Support KB</li>
             <li>Customer summaries</li>

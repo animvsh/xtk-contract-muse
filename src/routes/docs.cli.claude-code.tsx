@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DocsShell, DocsHero, DocsSection, StepList, CopyBlock, NextSteps } from "@/components/docs-shell";
+import {
+  DocsShell,
+  DocsHero,
+  DocsSection,
+  StepList,
+  CopyBlock,
+  NextSteps,
+} from "@/components/docs-shell";
 
 const PROMPT = `Use Beevr to understand this workspace before building.
 
@@ -12,7 +19,10 @@ export const Route = createFileRoute("/docs/cli/claude-code")({
   head: () => ({
     meta: [
       { title: "Connect Claude Code — Beevr Docs" },
-      { name: "description", content: "Set up Claude Code with a Beevr access key for workspace-aware tool building." },
+      {
+        name: "description",
+        content: "Set up Claude Code with a Beevr access key for workspace-aware tool building.",
+      },
     ],
   }),
   component: ClaudeCode,

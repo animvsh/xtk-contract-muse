@@ -7,9 +7,24 @@ export const Route = createFileRoute("/app/approvals")({
 });
 
 const PENDING = [
-  { id: "1", agent: "Contract Sender", action: "Send employment contract to maya@beevr.dev", time: "2m ago" },
-  { id: "2", agent: "Inbox Triage", action: "Auto-reply to 3 vendor emails with templated response", time: "11m ago" },
-  { id: "3", agent: "Sales Digest", action: "Post weekly digest to #sales-leadership", time: "1h ago" },
+  {
+    id: "1",
+    agent: "Contract Sender",
+    action: "Send employment contract to maya@beevr.dev",
+    time: "2m ago",
+  },
+  {
+    id: "2",
+    agent: "Inbox Triage",
+    action: "Auto-reply to 3 vendor emails with templated response",
+    time: "11m ago",
+  },
+  {
+    id: "3",
+    agent: "Sales Digest",
+    action: "Post weekly digest to #sales-leadership",
+    time: "1h ago",
+  },
 ];
 
 function Approvals() {
@@ -18,7 +33,9 @@ function Approvals() {
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-10">
       <h1 className="text-3xl font-bold">Approvals</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Review actions agents want to take on your behalf.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Review actions agents want to take on your behalf.
+      </p>
 
       <div className="mt-8 space-y-3">
         {PENDING.map((p) => {
@@ -30,11 +47,15 @@ function Approvals() {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs uppercase tracking-wide text-muted-foreground">{p.agent} · {p.time}</div>
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {p.agent} · {p.time}
+                  </div>
                   <div className="mt-1 font-medium">{p.action}</div>
                 </div>
                 {state ? (
-                  <span className={`rounded-md px-3 py-1.5 text-xs font-medium ${state === "approved" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+                  <span
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium ${state === "approved" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}
+                  >
                     {state === "approved" ? "Approved" : "Rejected"}
                   </span>
                 ) : (

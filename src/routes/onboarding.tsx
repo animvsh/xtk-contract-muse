@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { ArrowRight, Sparkles, Phone, User, Briefcase, Loader2, CalendarCheck, Check } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  Phone,
+  User,
+  Briefcase,
+  Loader2,
+  CalendarCheck,
+  Check,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,7 +22,8 @@ export const Route = createFileRoute("/onboarding")({
 const fieldClass =
   "w-full rounded-xl border border-black/[0.08] bg-white px-4 py-3 text-[15px] text-[oklch(0.18_0_0)] placeholder:text-[oklch(0.6_0_0)] outline-none transition-[border-color,box-shadow] focus:border-[oklch(0.68_0.22_40)] focus:ring-4 focus:ring-[oklch(0.68_0.22_40)]/12";
 
-const labelClass = "mb-2 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[oklch(0.5_0_0)]";
+const labelClass =
+  "mb-2 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[oklch(0.5_0_0)]";
 
 function Onboarding() {
   const [name, setName] = useState("");
@@ -60,7 +70,8 @@ function Onboarding() {
             to="/auth"
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-[oklch(0.45_0_0)] transition-colors hover:bg-black/[0.04] hover:text-[oklch(0.15_0_0)]"
           >
-            Have an account? <span className="font-semibold text-[oklch(0.62_0.22_40)]">Sign in</span>
+            Have an account?{" "}
+            <span className="font-semibold text-[oklch(0.62_0.22_40)]">Sign in</span>
           </Link>
         </header>
 
@@ -71,9 +82,12 @@ function Onboarding() {
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-[oklch(0.68_0.22_40)]/25 bg-[oklch(0.97_0.05_70)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[oklch(0.62_0.22_40)]">
                   <Sparkles className="h-3 w-3" /> Private beta
                 </div>
-                <h1 className="font-display mt-4 text-[32px] font-semibold tracking-[-0.02em] md:text-[40px]">Join the <span className="font-display-italic">Beevr</span> waitlist</h1>
+                <h1 className="font-display mt-4 text-[32px] font-semibold tracking-[-0.02em] md:text-[40px]">
+                  Join the <span className="font-display-italic">Beevr</span> waitlist
+                </h1>
                 <p className="mt-2 text-[15px] leading-relaxed text-[oklch(0.45_0_0)]">
-                  Three quick questions, then book a 15-min intro with the founders. We onboard new teams every week.
+                  Three quick questions, then book a 15-min intro with the founders. We onboard new
+                  teams every week.
                 </p>
 
                 <div className="mt-7 space-y-5">
@@ -127,7 +141,11 @@ function Onboarding() {
                   disabled={!valid || busy}
                   className="clicky shine group mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/30 transition-all hover:bg-[oklch(0.62_0.22_40)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                 >
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
                   {busy ? "Submitting…" : "Continue to book a call"}
                   {!busy && <ArrowRight className="nudge-x h-4 w-4" />}
                 </button>
@@ -151,30 +169,36 @@ function BookingStep({ name }: { name: string }) {
     // Mirrors the official Cal.com inline embed snippet exactly.
     const w = window as any;
     (function (C: any, A: string, L: string) {
-      const p = function (a: any, ar: any) { a.q.push(ar); };
-      const d = C.document;
-      C.Cal = C.Cal || function () {
-        const cal = C.Cal;
-        const ar = arguments;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement("script")).src = A;
-          cal.loaded = true;
-        }
-        if (ar[0] === L) {
-          const api: any = function () { p(api, arguments); };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          if (typeof namespace === "string") {
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            p(cal.ns[namespace], ar);
-            p(cal, ["initNamespace", namespace]);
-          } else p(cal, ar);
-          return;
-        }
-        p(cal, ar);
+      const p = function (a: any, ar: any) {
+        a.q.push(ar);
       };
+      const d = C.document;
+      C.Cal =
+        C.Cal ||
+        function () {
+          const cal = C.Cal;
+          const ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api: any = function () {
+              p(api, arguments);
+            };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
     })(w, "https://app.cal.com/embed/embed.js", "init");
 
     w.Cal("init", "fireengine", { origin: "https://app.cal.com" });

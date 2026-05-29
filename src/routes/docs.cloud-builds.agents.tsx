@@ -5,7 +5,10 @@ export const Route = createFileRoute("/docs/cloud-builds/agents")({
   head: () => ({
     meta: [
       { title: "Build agents in cloud — Beevr Docs" },
-      { name: "description", content: "Turn a plain-English description into a tested, hosted Beevr agent." },
+      {
+        name: "description",
+        content: "Turn a plain-English description into a tested, hosted Beevr agent.",
+      },
     ],
   }),
   component: CloudAgents,
@@ -45,14 +48,17 @@ function CloudAgents() {
 
       <DocsSection title="Safety defaults">
         <p className="text-sm">
-          Cloud agents are read-only by default. Anything that sends external messages, modifies data, or
-          touches restricted sources requires explicit approval before going live.
+          Cloud agents are read-only by default. Anything that sends external messages, modifies
+          data, or touches restricted sources requires explicit approval before going live.
         </p>
       </DocsSection>
 
       <NextSteps
         items={[
-          { to: "/docs/examples/bookstore-sales-agent", label: "Worked example: bookstore sales agent" },
+          {
+            to: "/docs/examples/bookstore-sales-agent",
+            label: "Worked example: bookstore sales agent",
+          },
           { to: "/docs/approvals", label: "Approval flow" },
           { to: "/docs/agents", label: "Manage agents from a CLI" },
           { to: "/docs/cloud-builds", label: "Cloud builds overview" },

@@ -36,10 +36,16 @@ function NewAgent() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-6 py-10">
-      <Link to="/app/agents" className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        to="/app/agents"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-3 w-3" /> Agents
       </Link>
-      <PageHeader title="Build an agent" subtitle="Describe what it should do — AI will generate the workflow." />
+      <PageHeader
+        title="Build an agent"
+        subtitle="Describe what it should do — AI will generate the workflow."
+      />
 
       <div className="rounded-2xl border border-black/[0.06] bg-white/70 p-5 backdrop-blur">
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-primary">
@@ -59,7 +65,13 @@ function NewAgent() {
             disabled={loading || !prompt.trim()}
             className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Designing…</> : <>Generate agent</>}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Designing…
+              </>
+            ) : (
+              <>Generate agent</>
+            )}
           </button>
         </div>
       </div>

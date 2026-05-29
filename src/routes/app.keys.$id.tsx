@@ -21,12 +21,7 @@ import {
   updateAccessKeyStatus,
   deleteAccessKey,
 } from "@/lib/access-keys.functions";
-import {
-  clientLabel,
-  permissionLabel,
-  permissionMeta,
-  scopeLabel,
-} from "@/lib/access-keys-config";
+import { clientLabel, permissionLabel, permissionMeta, scopeLabel } from "@/lib/access-keys-config";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/app/keys/$id")({
@@ -83,7 +78,10 @@ function KeyDetail() {
   if (error || !data?.key) {
     return (
       <div className="mx-auto w-full max-w-3xl px-6 py-10">
-        <Link to="/app/keys" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/app/keys"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to keys
         </Link>
         <div className="rounded-2xl border border-border bg-white/70 p-8 text-center">
@@ -99,14 +97,18 @@ function KeyDetail() {
   const meta = permissionMeta(k.permission);
 
   const copyKey = () => {
-    if (!k.key_plaintext) return toast.error("Full key no longer visible. Rotate to get a new one.");
+    if (!k.key_plaintext)
+      return toast.error("Full key no longer visible. Rotate to get a new one.");
     navigator.clipboard.writeText(k.key_plaintext);
     toast.success("API key copied");
   };
 
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-10">
-      <Link to="/app/keys" className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        to="/app/keys"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-3 w-3" /> Access Keys
       </Link>
 
@@ -117,7 +119,9 @@ function KeyDetail() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{k.name}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            <span>Used by <span className="font-medium text-foreground">{clientLabel(k.client)}</span></span>
+            <span>
+              Used by <span className="font-medium text-foreground">{clientLabel(k.client)}</span>
+            </span>
             <span>·</span>
             <span>Scope: {k.scope_label || scopeLabel(k.scope)}</span>
             <span>·</span>
@@ -125,15 +129,30 @@ function KeyDetail() {
           </div>
         </div>
         <div className="flex shrink-0 gap-2">
-          <button onClick={() => toggleMut.mutate()} className="clicky-sm flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm hover:bg-muted">
-            {k.status === "active" ? <><Pause className="h-3.5 w-3.5" /> Pause</> : <><Play className="h-3.5 w-3.5" /> Resume</>}
+          <button
+            onClick={() => toggleMut.mutate()}
+            className="clicky-sm flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm hover:bg-muted"
+          >
+            {k.status === "active" ? (
+              <>
+                <Pause className="h-3.5 w-3.5" /> Pause
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5" /> Resume
+              </>
+            )}
           </button>
-          <button onClick={() => rotateMut.mutate()} className="clicky-sm flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm hover:bg-muted">
+          <button
+            onClick={() => rotateMut.mutate()}
+            className="clicky-sm flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm hover:bg-muted"
+          >
             <RotateCw className="h-3.5 w-3.5" /> Rotate
           </button>
           <button
             onClick={() => {
-              if (confirm("Delete this key? CLIs using it will lose access immediately.")) delMut.mutate();
+              if (confirm("Delete this key? CLIs using it will lose access immediately."))
+                delMut.mutate();
             }}
             className="clicky-sm flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
           >
@@ -143,7 +162,9 @@ function KeyDetail() {
       </div>
 
       <div className="mb-5 rounded-2xl border border-border bg-white/70 p-4 backdrop-blur">
-        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">API Key</div>
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          API Key
+        </div>
         <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/30 p-3 font-mono text-sm">
           <code className="flex-1 truncate">
             {k.key_plaintext ?? `${k.key_prefix}••••••••••••`}
@@ -169,7 +190,11 @@ function KeyDetail() {
             <Check className="h-4 w-4" /> Allowed actions
           </div>
           <ul className="space-y-1 text-sm">
-            {meta.allowed.map((a) => <li key={a} className="text-foreground">· {a}</li>)}
+            {meta.allowed.map((a) => (
+              <li key={a} className="text-foreground">
+                · {a}
+              </li>
+            ))}
           </ul>
         </div>
         <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
@@ -177,7 +202,11 @@ function KeyDetail() {
             <Lock className="h-4 w-4" /> Blocked actions
           </div>
           <ul className="space-y-1 text-sm">
-            {meta.blocked.map((a) => <li key={a} className="text-foreground">· {a}</li>)}
+            {meta.blocked.map((a) => (
+              <li key={a} className="text-foreground">
+                · {a}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -202,11 +231,16 @@ function KeyDetail() {
         ) : (
           <ul className="space-y-2">
             {data.events.map((e) => (
-              <li key={e.id} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm">
+              <li
+                key={e.id}
+                className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm"
+              >
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                 <div className="flex-1">
                   <div>{e.message}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(e.created_at).toLocaleString()}
+                  </div>
                 </div>
               </li>
             ))}

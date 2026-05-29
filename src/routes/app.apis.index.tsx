@@ -31,7 +31,11 @@ const METHOD_TONE: Record<string, string> = {
 const ENABLED_KEY = "beevr.apis.enabled.v1";
 function loadEnabledMap(): Record<string, boolean> {
   if (typeof window === "undefined") return {};
-  try { return JSON.parse(localStorage.getItem(ENABLED_KEY) || "{}"); } catch { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem(ENABLED_KEY) || "{}");
+  } catch {
+    return {};
+  }
 }
 function saveEnabledMap(m: Record<string, boolean>) {
   if (typeof window === "undefined") return;
@@ -58,7 +62,9 @@ function ApisPage() {
       setRows((data ?? []) as ApiRow[]);
       setLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   const remove = async (id: string) => {
@@ -92,7 +98,8 @@ function ApisPage() {
               <Server className="h-6 w-6 text-primary" /> APIs
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Mock APIs you've created. Each has a playground, docs, request history, and code snippets.
+              Mock APIs you've created. Each has a playground, docs, request history, and code
+              snippets.
             </p>
           </div>
           <Link
@@ -143,29 +150,53 @@ function ApisPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate font-semibold">{api.name}</h3>
-                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{api.description}</p>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                        {api.description}
+                      </p>
                     </div>
                     <button
-                      onClick={(e) => { e.stopPropagation(); toggleEnabled(api.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleEnabled(api.id);
+                      }}
                       className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${enabled ? "bg-primary" : "bg-black/15"}`}
                       title={enabled ? "Disable API" : "Enable API"}
                       aria-label="Toggle API enabled"
                     >
-                      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${enabled ? "left-[18px]" : "left-0.5"}`} />
+                      <span
+                        className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${enabled ? "left-[18px]" : "left-0.5"}`}
+                      />
                     </button>
                   </div>
                   <div className="mt-3 flex items-center gap-2">
-                    <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[api.method] ?? ""}`}>
+                    <span
+                      className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[api.method] ?? ""}`}
+                    >
                       {api.method}
                     </span>
-                    <code className="min-w-0 truncate font-mono text-xs text-muted-foreground">{api.path}</code>
+                    <code className="min-w-0 truncate font-mono text-xs text-muted-foreground">
+                      {api.path}
+                    </code>
                   </div>
                   <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-3">
-                    <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${enabled ? "text-primary" : "text-muted-foreground"}`}>
-                      {enabled ? <><PlayCircle className="h-3 w-3" /> Open playground</> : <><Power className="h-3 w-3" /> Disabled</>}
+                    <span
+                      className={`inline-flex items-center gap-1 text-[11px] font-medium ${enabled ? "text-primary" : "text-muted-foreground"}`}
+                    >
+                      {enabled ? (
+                        <>
+                          <PlayCircle className="h-3 w-3" /> Open playground
+                        </>
+                      ) : (
+                        <>
+                          <Power className="h-3 w-3" /> Disabled
+                        </>
+                      )}
                     </span>
                     <button
-                      onClick={(e) => { e.stopPropagation(); remove(api.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        remove(api.id);
+                      }}
                       className="rounded-md p-1 text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:bg-rose-500/10 hover:text-rose-600"
                       aria-label="Delete API"
                     >

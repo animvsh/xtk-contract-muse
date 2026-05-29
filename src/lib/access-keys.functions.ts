@@ -29,26 +29,27 @@ async function sha256(s: string) {
 
 export const createAccessKey = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
-  .inputValidator((data: {
-    name: string;
-    client: string;
-    scope: string;
-    scopeLabel?: string;
-    permission: string;
-    safety: string;
-    expiresInDays?: number;
-  }) =>
-    z
-      .object({
-        name: z.string().min(1).max(80),
-        client: z.enum(["opencode", "claude-code", "cursor", "windsurf", "custom"]),
-        scope: z.enum(["workspace", "team", "collection", "sandbox"]),
-        scopeLabel: z.string().max(80).optional(),
-        permission: z.enum(["read", "sandbox", "drafts", "run-approved", "admin"]),
-        safety: z.enum(["strict", "balanced", "trusted"]),
-        expiresInDays: z.number().int().min(1).max(365).optional(),
-      })
-      .parse(data),
+  .inputValidator(
+    (data: {
+      name: string;
+      client: string;
+      scope: string;
+      scopeLabel?: string;
+      permission: string;
+      safety: string;
+      expiresInDays?: number;
+    }) =>
+      z
+        .object({
+          name: z.string().min(1).max(80),
+          client: z.enum(["opencode", "claude-code", "cursor", "windsurf", "custom"]),
+          scope: z.enum(["workspace", "team", "collection", "sandbox"]),
+          scopeLabel: z.string().max(80).optional(),
+          permission: z.enum(["read", "sandbox", "drafts", "run-approved", "admin"]),
+          safety: z.enum(["strict", "balanced", "trusted"]),
+          expiresInDays: z.number().int().min(1).max(365).optional(),
+        })
+        .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

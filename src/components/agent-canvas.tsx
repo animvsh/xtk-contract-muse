@@ -1,4 +1,13 @@
-import { Bot, Calendar, Webhook, Zap, MousePointerClick, Loader2, Check, Sparkles } from "lucide-react";
+import {
+  Bot,
+  Calendar,
+  Webhook,
+  Zap,
+  MousePointerClick,
+  Loader2,
+  Check,
+  Sparkles,
+} from "lucide-react";
 
 export type AgentStep = { title: string; integration: string; action: string };
 export type AgentTrigger = { type: string; description: string };
@@ -22,7 +31,12 @@ export function AgentCanvas({
   const TIcon = triggerIcon(trigger.type);
   const all = [
     { kind: "trigger" as const, title: trigger.type, sub: trigger.description, Icon: TIcon },
-    ...steps.map((s) => ({ kind: "step" as const, title: s.title, sub: `${s.integration} · ${s.action}`, Icon: Bot })),
+    ...steps.map((s) => ({
+      kind: "step" as const,
+      title: s.title,
+      sub: `${s.integration} · ${s.action}`,
+      Icon: Bot,
+    })),
   ];
 
   return (
@@ -44,7 +58,14 @@ export function AgentCanvas({
                     : "pending";
             return (
               <div key={i} className="flex items-stretch">
-                <Node title={node.title} sub={node.sub} Icon={node.Icon} kind={node.kind} status={status} index={i} />
+                <Node
+                  title={node.title}
+                  sub={node.sub}
+                  Icon={node.Icon}
+                  kind={node.kind}
+                  status={status}
+                  index={i}
+                />
                 {i < all.length - 1 && <Connector status={status} />}
               </div>
             );
@@ -139,7 +160,9 @@ function Node({
           )}
         </div>
       </div>
-      <div className="mt-2 text-sm font-semibold capitalize leading-tight text-foreground">{title}</div>
+      <div className="mt-2 text-sm font-semibold capitalize leading-tight text-foreground">
+        {title}
+      </div>
       <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{sub}</div>
     </div>
   );

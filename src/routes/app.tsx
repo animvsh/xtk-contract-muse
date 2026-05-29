@@ -1,7 +1,25 @@
 import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { Brain, Users, FileStack, Bot, ShieldCheck, Plug, KeyRound, LogOut, Cloud, Settings, Menu, X, ChevronUp, PanelLeftClose, PanelLeft, Shield, Server } from "lucide-react";
+import {
+  Brain,
+  Users,
+  FileStack,
+  Bot,
+  ShieldCheck,
+  Plug,
+  KeyRound,
+  LogOut,
+  Cloud,
+  Settings,
+  Menu,
+  X,
+  ChevronUp,
+  PanelLeftClose,
+  PanelLeft,
+  Shield,
+  Server,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -100,11 +118,22 @@ function AppLayout() {
             <BrandLogo className="mx-auto mb-5 h-14 w-14 object-contain" />
             <h1 className="text-3xl font-bold tracking-tight">You're on the list 🐝</h1>
             <p className="mt-3 text-[oklch(0.4_0_0)]">
-              Beevr is still in private beta. We've saved your application and we'll reach out personally as soon as a spot opens for {user.email}.
+              Beevr is still in private beta. We've saved your application and we'll reach out
+              personally as soon as a spot opens for {user.email}.
             </p>
             <div className="mt-8 flex items-center justify-center gap-3">
-              <Link to="/" className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-[oklch(0.25_0_0)] hover:bg-[oklch(0.97_0_0)]">Back home</Link>
-              <button onClick={() => signOut().then(() => navigate({ to: "/" }))} className="clicky rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white hover:bg-[oklch(0.62_0.22_40)]">Sign out</button>
+              <Link
+                to="/"
+                className="clicky rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-[oklch(0.25_0_0)] hover:bg-[oklch(0.97_0_0)]"
+              >
+                Back home
+              </Link>
+              <button
+                onClick={() => signOut().then(() => navigate({ to: "/" }))}
+                className="clicky rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-sm font-semibold text-white hover:bg-[oklch(0.62_0.22_40)]"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>
@@ -112,8 +141,8 @@ function AppLayout() {
     );
   }
 
-
-  const displayName = (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
+  const displayName =
+    (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
   const initial = displayName.charAt(0).toUpperCase();
 
   const renderSidebar = (mini: boolean) => (
@@ -183,7 +212,9 @@ function AppLayout() {
         <DropdownMenuContent side="top" align="start" className="w-56">
           <DropdownMenuLabel className="font-normal">
             <div className="text-xs font-semibold">{displayName}</div>
-            <div className="truncate text-[10px] font-normal text-muted-foreground">{user.email}</div>
+            <div className="truncate text-[10px] font-normal text-muted-foreground">
+              {user.email}
+            </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => navigate({ to: "/app/settings" })}>
@@ -257,7 +288,11 @@ function AppLayout() {
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              {collapsed ? (
+                <PanelLeft className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
             </button>
             <div className="hidden gap-1.5 md:flex">
               <span className="h-3 w-3 rounded-full bg-[oklch(0.62_0.22_25)]" />
@@ -265,13 +300,23 @@ function AppLayout() {
               <span className="h-3 w-3 rounded-full bg-[oklch(0.72_0.18_145)]" />
             </div>
             <div className="mx-auto flex min-w-0 items-center gap-2 rounded-md border border-black/5 bg-white px-3 py-1 text-xs text-[oklch(0.4_0_0)] md:px-4">
-              <span className="breathe h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: workspace.color }} />
-              <span className="truncate font-medium text-[oklch(0.25_0_0)]">{workspace.name.toLowerCase().replace(/\s+/g, "-")}</span>
-              <span className="hidden truncate text-[oklch(0.55_0_0)] sm:inline">.beevr.dev{pathname.replace(/^\/app/, "") || "/home"}</span>
+              <span
+                className="breathe h-1.5 w-1.5 shrink-0 rounded-full"
+                style={{ background: workspace.color }}
+              />
+              <span className="truncate font-medium text-[oklch(0.25_0_0)]">
+                {workspace.name.toLowerCase().replace(/\s+/g, "-")}
+              </span>
+              <span className="hidden truncate text-[oklch(0.55_0_0)] sm:inline">
+                .beevr.dev{pathname.replace(/^\/app/, "") || "/home"}
+              </span>
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden">
-            <div key={pathname} className="flex min-h-0 flex-1 flex-col overflow-hidden animate-[fadeInUp_80ms_ease-out]">
+            <div
+              key={pathname}
+              className="flex min-h-0 flex-1 flex-col overflow-hidden animate-[fadeInUp_80ms_ease-out]"
+            >
               <Outlet />
             </div>
             <LiveFeed />

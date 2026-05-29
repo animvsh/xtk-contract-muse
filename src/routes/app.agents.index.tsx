@@ -8,7 +8,13 @@ export const Route = createFileRoute("/app/agents/")({
   component: Agents,
 });
 
-type Agent = { id: string; name: string; description: string | null; status: string; runs_count: number };
+type Agent = {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  runs_count: number;
+};
 
 function Agents() {
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -46,7 +52,9 @@ function Agents() {
         <div className="rounded-2xl border border-dashed border-black/[0.08] bg-white/40 p-12 text-center">
           <Bot className="mx-auto h-8 w-8 text-muted-foreground/50" />
           <h3 className="mt-3 font-medium">No agents yet</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Describe an agent and let AI build the workflow.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Describe an agent and let AI build the workflow.
+          </p>
           <Link
             to="/app/agents/new"
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"

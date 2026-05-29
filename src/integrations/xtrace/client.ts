@@ -5,7 +5,11 @@ export const xtrace = new MemoryClient({
   orgId: import.meta.env.VITE_XTRACE_ORG_ID || "",
 });
 
-export async function ingestMemory(messages: Array<{ role: string; content: string }>, userId?: string, convId?: string) {
+export async function ingestMemory(
+  messages: Array<{ role: string; content: string }>,
+  userId?: string,
+  convId?: string,
+) {
   return xtrace.memories.ingest({ messages, user_id: userId, conv_id: convId });
 }
 

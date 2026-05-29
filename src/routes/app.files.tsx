@@ -178,10 +178,7 @@ const FILES: FileItem[] = [
   },
 ];
 
-const KIND_META: Record<
-  FileKind,
-  { icon: typeof FileText; tone: string; label: string }
-> = {
+const KIND_META: Record<FileKind, { icon: typeof FileText; tone: string; label: string }> = {
   doc: { icon: FileText, tone: "oklch(0.55 0.2 250)", label: "Document" },
   sheet: { icon: FileSpreadsheet, tone: "oklch(0.6 0.18 145)", label: "Spreadsheet" },
   slide: { icon: Presentation, tone: "oklch(0.65 0.2 35)", label: "Slides" },
@@ -193,10 +190,26 @@ const KIND_META: Record<
   folder: { icon: Folder, tone: "oklch(0.65 0.16 75)", label: "Folder" },
 };
 
-const FILTERS = ["All", "Starred", "Documents", "Spreadsheets", "Slides", "PDFs", "Images", "Media", "Code", "Folders"] as const;
+const FILTERS = [
+  "All",
+  "Starred",
+  "Documents",
+  "Spreadsheets",
+  "Slides",
+  "PDFs",
+  "Images",
+  "Media",
+  "Code",
+  "Folders",
+] as const;
 
 function matches(f: FileItem, q: string, filter: (typeof FILTERS)[number]) {
-  if (q && !f.name.toLowerCase().includes(q.toLowerCase()) && !f.owner.toLowerCase().includes(q.toLowerCase())) return false;
+  if (
+    q &&
+    !f.name.toLowerCase().includes(q.toLowerCase()) &&
+    !f.owner.toLowerCase().includes(q.toLowerCase())
+  )
+    return false;
   if (filter === "All") return true;
   if (filter === "Starred") return !!f.starred;
   if (filter === "Documents") return f.kind === "doc";
@@ -275,7 +288,10 @@ function buildGraph(files: FileItem[]): { nodes: GraphNode[]; edges: GraphEdge[]
 function computeBounds(nodes: GraphNode[]) {
   // Pad for node visual extents (file cards are ~180 wide, source ~80)
   const pad = 140;
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const n of nodes) {
     if (n.x < minX) minX = n.x;
     if (n.y < minY) minY = n.y;
@@ -311,7 +327,7 @@ function Files() {
   }, [query]);
   const { nodes, edges } = useMemo(() => buildGraph(FILES), []);
   const bounds = useMemo(() => computeBounds(nodes), [nodes]);
-  const open = openId ? FILES.find((f) => f.id === openId) ?? null : null;
+  const open = openId ? (FILES.find((f) => f.id === openId) ?? null) : null;
 
   const fit = (animate = true) => {
     const el = containerRef.current;
@@ -423,10 +439,7 @@ function Files() {
     dragging.current = null;
   };
 
-  const filteredFiles = useMemo(
-    () => FILES.filter((f) => matchedIds.has(f.id)),
-    [matchedIds],
-  );
+  const filteredFiles = useMemo(() => FILES.filter((f) => matchedIds.has(f.id)), [matchedIds]);
 
   return (
     <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
@@ -496,8 +509,12 @@ function Files() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <div className="truncate text-sm font-semibold text-[oklch(0.18_0_0)]">{f.name}</div>
-                      {f.starred && <StarIcon className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />}
+                      <div className="truncate text-sm font-semibold text-[oklch(0.18_0_0)]">
+                        {f.name}
+                      </div>
+                      {f.starred && (
+                        <StarIcon className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+                      )}
                     </div>
                     <div className="mt-0.5 truncate text-[11px] text-[oklch(0.5_0_0)]">
                       {f.source} · {f.owner}
@@ -518,162 +535,162 @@ function Files() {
       )}
 
       {view === "graph" && (
-
-      <div
-        ref={containerRef}
-        
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={endDrag}
-        onMouseLeave={endDrag}
-        className="relative flex-1 cursor-grab overflow-hidden bg-[oklch(0.985_0.005_85)] active:cursor-grabbing"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, oklch(0.85 0.01 85) 1px, transparent 0)",
-          backgroundSize: "28px 28px",
-        }}
-      >
         <div
-          className="absolute left-0 top-0 origin-top-left"
+          ref={containerRef}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={endDrag}
+          onMouseLeave={endDrag}
+          className="relative flex-1 cursor-grab overflow-hidden bg-[oklch(0.985_0.005_85)] active:cursor-grabbing"
           style={{
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-            width: 2800,
-            height: 2000,
-            transition: animating ? "transform 700ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, oklch(0.85 0.01 85) 1px, transparent 0)",
+            backgroundSize: "28px 28px",
           }}
         >
-          <svg width={2800} height={2000} className="pointer-events-none absolute inset-0">
-            <defs>
-              <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx={1400} cy={1000} r={520} fill="url(#centerGlow)" />
-            {edges.map((e, i) => {
-              const a = nodes.find((n) => n.id === e.from)!;
-              const b = nodes.find((n) => n.id === e.to)!;
-              const isMatch = b.kind !== "file" || matchedIds.has(b.id);
-              const active = hoverId === a.id || hoverId === b.id;
-              return (
-                <line
-                  key={i}
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
-                  stroke={active ? "oklch(0.68 0.22 40)" : "oklch(0.7 0.02 85)"}
-                  strokeWidth={active ? 2.5 : 1.25}
-                  strokeOpacity={isMatch ? (active ? 0.9 : 0.45) : 0.08}
-                  strokeDasharray={a.kind === "center" ? "0" : "4 6"}
-                />
-              );
-            })}
-          </svg>
+          <div
+            className="absolute left-0 top-0 origin-top-left"
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              width: 2800,
+              height: 2000,
+              transition: animating ? "transform 700ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
+            }}
+          >
+            <svg width={2800} height={2000} className="pointer-events-none absolute inset-0">
+              <defs>
+                <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="oklch(0.68 0.22 40)" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+              <circle cx={1400} cy={1000} r={520} fill="url(#centerGlow)" />
+              {edges.map((e, i) => {
+                const a = nodes.find((n) => n.id === e.from)!;
+                const b = nodes.find((n) => n.id === e.to)!;
+                const isMatch = b.kind !== "file" || matchedIds.has(b.id);
+                const active = hoverId === a.id || hoverId === b.id;
+                return (
+                  <line
+                    key={i}
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    stroke={active ? "oklch(0.68 0.22 40)" : "oklch(0.7 0.02 85)"}
+                    strokeWidth={active ? 2.5 : 1.25}
+                    strokeOpacity={isMatch ? (active ? 0.9 : 0.45) : 0.08}
+                    strokeDasharray={a.kind === "center" ? "0" : "4 6"}
+                  />
+                );
+              })}
+            </svg>
 
-          {nodes.map((n) => {
-            if (n.kind === "center") {
-              return (
-                <div
-                  key={n.id}
-                  data-node
-                  className="absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: n.x, top: n.y }}
-                >
-                  <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.72_0.22_40)] to-[oklch(0.6_0.22_30)] text-white shadow-[0_20px_60px_-15px_oklch(0.68_0.22_40_/_0.6)] ring-4 ring-white">
-                    <Building2 className="h-7 w-7" />
-                    <div className="mt-1 text-xs font-semibold tracking-wide">{n.label}</div>
-                    <div className="text-[10px] opacity-80">{n.sublabel}</div>
+            {nodes.map((n) => {
+              if (n.kind === "center") {
+                return (
+                  <div
+                    key={n.id}
+                    data-node
+                    className="absolute -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: n.x, top: n.y }}
+                  >
+                    <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.72_0.22_40)] to-[oklch(0.6_0.22_30)] text-white shadow-[0_20px_60px_-15px_oklch(0.68_0.22_40_/_0.6)] ring-4 ring-white">
+                      <Building2 className="h-7 w-7" />
+                      <div className="mt-1 text-xs font-semibold tracking-wide">{n.label}</div>
+                      <div className="text-[10px] opacity-80">{n.sublabel}</div>
+                    </div>
                   </div>
-                </div>
-              );
-            }
-            if (n.kind === "source") {
-              const tone = SOURCE_TONE[n.source!] ?? "oklch(0.5 0 0)";
+                );
+              }
+              if (n.kind === "source") {
+                const tone = SOURCE_TONE[n.source!] ?? "oklch(0.5 0 0)";
+                return (
+                  <div
+                    key={n.id}
+                    data-node
+                    onMouseEnter={() => setHoverId(n.id)}
+                    onMouseLeave={() => setHoverId(null)}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                    style={{ left: n.x, top: n.y }}
+                  >
+                    <div
+                      className="flex h-[68px] w-[68px] flex-col items-center justify-center rounded-2xl text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.25)] ring-[3px] ring-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.06] hover:shadow-[0_14px_32px_-10px_rgba(0,0,0,0.3)] active:scale-[0.97]"
+                      style={{ background: tone }}
+                    >
+                      <Folder className="h-5 w-5" />
+                      <div className="mt-1 text-[10px] font-semibold tracking-wide">{n.label}</div>
+                    </div>
+                  </div>
+                );
+              }
+              const f = n.file!;
+              const meta = KIND_META[f.kind];
+              const Icon = meta.icon;
+              const dim = !matchedIds.has(f.id);
               return (
-                <div
+                <button
                   key={n.id}
                   data-node
                   onMouseEnter={() => setHoverId(n.id)}
                   onMouseLeave={() => setHoverId(null)}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  onClick={() => setOpenId(f.id)}
+                  className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/[0.06] bg-white/95 p-3 text-left shadow-[0_8px_20px_-8px_rgba(0,0,0,0.18)] backdrop-blur transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.25)] active:translate-y-0 ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
                   style={{ left: n.x, top: n.y }}
                 >
-                  <div
-                    className="flex h-[68px] w-[68px] flex-col items-center justify-center rounded-2xl text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.25)] ring-[3px] ring-white transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.06] hover:shadow-[0_14px_32px_-10px_rgba(0,0,0,0.3)] active:scale-[0.97]"
-                    style={{ background: tone }}
-                  >
-                    <Folder className="h-5 w-5" />
-                    <div className="mt-1 text-[10px] font-semibold tracking-wide">{n.label}</div>
+                  <div className="flex items-start justify-between">
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-white shadow-sm"
+                      style={{ background: meta.tone }}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    {f.starred && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
                   </div>
-                </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[12px] font-semibold text-[oklch(0.2_0_0)]">
+                      {f.name}
+                    </div>
+                    <div className="mt-0.5 flex items-center justify-between text-[10px] text-[oklch(0.5_0_0)]">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-2.5 w-2.5" /> {f.updated}
+                      </span>
+                      <span>{f.size}</span>
+                    </div>
+                  </div>
+                </button>
               );
-            }
-            const f = n.file!;
-            const meta = KIND_META[f.kind];
-            const Icon = meta.icon;
-            const dim = !matchedIds.has(f.id);
-            return (
-              <button
-                key={n.id}
-                data-node
-                onMouseEnter={() => setHoverId(n.id)}
-                onMouseLeave={() => setHoverId(null)}
-                onClick={() => setOpenId(f.id)}
-                className={`clicky absolute flex w-44 -translate-x-1/2 -translate-y-1/2 flex-col gap-2 rounded-xl border border-black/[0.06] bg-white/95 p-3 text-left shadow-[0_8px_20px_-8px_rgba(0,0,0,0.18)] backdrop-blur transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.25)] active:translate-y-0 ${dim ? "opacity-25" : ""} ${pulseId === n.id ? "scale-110 ring-4 ring-[oklch(0.68_0.22_40)]/50 shadow-[0_0_40px_oklch(0.68_0.22_40_/_0.5)]" : ""}`}
-                style={{ left: n.x, top: n.y }}
-              >
-                <div className="flex items-start justify-between">
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-white shadow-sm"
-                    style={{ background: meta.tone }}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  {f.starred && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-[12px] font-semibold text-[oklch(0.2_0_0)]">{f.name}</div>
-                  <div className="mt-0.5 flex items-center justify-between text-[10px] text-[oklch(0.5_0_0)]">
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-2.5 w-2.5" /> {f.updated}
-                    </span>
-                    <span>{f.size}</span>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+            })}
+          </div>
 
-        <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1 rounded-xl border border-black/10 bg-white/90 p-1 shadow-md backdrop-blur">
-          <button
-            onClick={() => setZoom((z) => Math.min(1.4, z + 0.15))}
-            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
-            title="Zoom in"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setZoom((z) => Math.max(0.25, z - 0.15))}
-            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
-            title="Zoom out"
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => fit(true)}
-            className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
-            title="Recenter"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </button>
-        </div>
+          <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1 rounded-xl border border-black/10 bg-white/90 p-1 shadow-md backdrop-blur">
+            <button
+              onClick={() => setZoom((z) => Math.min(1.4, z + 0.15))}
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+              title="Zoom in"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setZoom((z) => Math.max(0.25, z - 0.15))}
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+              title="Zoom out"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => fit(true)}
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.3_0_0)] hover:bg-black/5"
+              title="Recenter"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
+          </div>
 
-        <div className="pointer-events-none absolute bottom-4 left-4 z-20 rounded-lg bg-white/80 px-2.5 py-1 text-[10px] font-medium text-[oklch(0.45_0_0)] shadow-sm backdrop-blur">
-          {Math.round(zoom * 100)}%
+          <div className="pointer-events-none absolute bottom-4 left-4 z-20 rounded-lg bg-white/80 px-2.5 py-1 text-[10px] font-medium text-[oklch(0.45_0_0)] shadow-sm backdrop-blur">
+            {Math.round(zoom * 100)}%
+          </div>
         </div>
-      </div>
       )}
 
       {open && <FileViewer file={open} onClose={() => setOpenId(null)} />}
@@ -702,19 +719,31 @@ function FileViewer({ file, onClose }: { file: FileItem; onClose: () => void }) 
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-semibold text-[oklch(0.15_0_0)]">{file.name}</div>
+            <div className="truncate text-base font-semibold text-[oklch(0.15_0_0)]">
+              {file.name}
+            </div>
             <div className="mt-0.5 text-[11px] text-[oklch(0.5_0_0)]">
               {meta.label} · {file.source} · {file.owner} · updated {file.updated} · {file.size}
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <button className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5" title="Share">
+            <button
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5"
+              title="Share"
+            >
               <Share2 className="h-4 w-4" />
             </button>
-            <button className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5" title="Download">
+            <button
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5"
+              title="Download"
+            >
               <Download className="h-4 w-4" />
             </button>
-            <button onClick={onClose} className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5" title="Close">
+            <button
+              onClick={onClose}
+              className="clicky clicky-sm rounded-lg p-2 text-[oklch(0.4_0_0)] hover:bg-black/5"
+              title="Close"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -741,7 +770,9 @@ function FilePreview({ file }: { file: FileItem }) {
         >
           <FileImage className="h-16 w-16 opacity-90" />
         </div>
-        <p className="max-w-md text-center text-sm leading-relaxed text-[oklch(0.4_0_0)]">{file.preview}</p>
+        <p className="max-w-md text-center text-sm leading-relaxed text-[oklch(0.4_0_0)]">
+          {file.preview}
+        </p>
       </div>
     );
   }
@@ -760,7 +791,9 @@ function FilePreview({ file }: { file: FileItem }) {
         <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-black/10">
           <div className="h-full w-1/3 rounded-full" style={{ background: meta.tone }} />
         </div>
-        <p className="max-w-md text-center text-sm leading-relaxed text-[oklch(0.4_0_0)]">{file.preview}</p>
+        <p className="max-w-md text-center text-sm leading-relaxed text-[oklch(0.4_0_0)]">
+          {file.preview}
+        </p>
       </div>
     );
   }
@@ -781,9 +814,16 @@ function FilePreview({ file }: { file: FileItem }) {
           <table className="w-full text-left text-sm">
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} className={i === 0 ? "bg-[oklch(0.97_0.02_85)] font-semibold" : "border-t border-black/5"}>
+                <tr
+                  key={i}
+                  className={
+                    i === 0 ? "bg-[oklch(0.97_0.02_85)] font-semibold" : "border-t border-black/5"
+                  }
+                >
                   {r.map((c, j) => (
-                    <td key={j} className="px-4 py-2 tabular-nums text-[oklch(0.25_0_0)]">{c}</td>
+                    <td key={j} className="px-4 py-2 tabular-nums text-[oklch(0.25_0_0)]">
+                      {c}
+                    </td>
                   ))}
                 </tr>
               ))}
@@ -811,11 +851,30 @@ function FilePreview({ file }: { file: FileItem }) {
   return (
     <article className="prose prose-sm mx-auto max-w-none rounded-xl border border-black/5 bg-white p-6 text-[oklch(0.2_0_0)] shadow-sm">
       {file.preview.split("\n").map((line, i) => {
-        if (line.startsWith("## ")) return <h2 key={i} className="mt-4 text-lg font-semibold first:mt-0">{line.slice(3)}</h2>;
-        if (line.startsWith("- ")) return <div key={i} className="ml-4 mt-1 text-sm">• {line.slice(2)}</div>;
-        if (/^\d+\./.test(line)) return <div key={i} className="ml-4 mt-1 text-sm">{line}</div>;
+        if (line.startsWith("## "))
+          return (
+            <h2 key={i} className="mt-4 text-lg font-semibold first:mt-0">
+              {line.slice(3)}
+            </h2>
+          );
+        if (line.startsWith("- "))
+          return (
+            <div key={i} className="ml-4 mt-1 text-sm">
+              • {line.slice(2)}
+            </div>
+          );
+        if (/^\d+\./.test(line))
+          return (
+            <div key={i} className="ml-4 mt-1 text-sm">
+              {line}
+            </div>
+          );
         if (!line.trim()) return <div key={i} className="h-2" />;
-        return <p key={i} className="mt-2 text-sm leading-relaxed">{line}</p>;
+        return (
+          <p key={i} className="mt-2 text-sm leading-relaxed">
+            {line}
+          </p>
+        );
       })}
     </article>
   );

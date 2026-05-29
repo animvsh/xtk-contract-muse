@@ -63,7 +63,8 @@ function AuthPage() {
           "No password on file for this email. If you signed up with Google, use Continue with Google. Otherwise, reset your password to set a new one.",
         );
         toast.error("Can't sign in with that password", {
-          description: "This email may have been created with Google. Try Continue with Google or reset your password.",
+          description:
+            "This email may have been created with Google. Try Continue with Google or reset your password.",
           action: { label: "Use Google", onClick: () => void google() },
           duration: 8000,
         });

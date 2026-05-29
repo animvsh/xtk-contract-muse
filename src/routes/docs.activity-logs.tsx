@@ -5,7 +5,11 @@ export const Route = createFileRoute("/docs/activity-logs")({
   head: () => ({
     meta: [
       { title: "Activity logs — Beevr Docs" },
-      { name: "description", content: "Every access key action in Beevr is logged. See exactly what was used, by whom, and when." },
+      {
+        name: "description",
+        content:
+          "Every access key action in Beevr is logged. See exactly what was used, by whom, and when.",
+      },
     ],
   }),
   component: ActivityLogs,

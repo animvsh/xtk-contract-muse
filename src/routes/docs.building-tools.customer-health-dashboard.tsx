@@ -7,7 +7,8 @@ export const Route = createFileRoute("/docs/building-tools/customer-health-dashb
       { title: "Customer Health Dashboard — Beevr Docs" },
       {
         name: "description",
-        content: "Walk through building a customer health dashboard tool on top of Beevr with OpenCode.",
+        content:
+          "Walk through building a customer health dashboard tool on top of Beevr with OpenCode.",
       },
     ],
   }),

@@ -15,7 +15,10 @@ export const Route = createFileRoute("/docs/building-tools")({
   head: () => ({
     meta: [
       { title: "Building tools — Beevr Docs" },
-      { name: "description", content: "How builders create tools on top of Beevr — sandbox, tests, approval, install." },
+      {
+        name: "description",
+        content: "How builders create tools on top of Beevr — sandbox, tests, approval, install.",
+      },
     ],
   }),
   component: BuildingTools,
@@ -34,7 +37,9 @@ function BuildingTools() {
         <ol className="space-y-2 text-sm">
           {FLOW.map((s, i) => (
             <li key={i} className="rounded-lg border border-border bg-card px-4 py-3">
-              <span className="mr-2 text-xs font-semibold text-primary">{String(i + 1).padStart(2, "0")}</span>
+              <span className="mr-2 text-xs font-semibold text-primary">
+                {String(i + 1).padStart(2, "0")}
+              </span>
               {s}
             </li>
           ))}
@@ -43,7 +48,10 @@ function BuildingTools() {
 
       <NextSteps
         items={[
-          { to: "/docs/building-tools/customer-health-dashboard", label: "Example: Customer health dashboard" },
+          {
+            to: "/docs/building-tools/customer-health-dashboard",
+            label: "Example: Customer health dashboard",
+          },
           { to: "/docs/agents", label: "Build an agent" },
           { to: "/docs/approvals", label: "Approval flow" },
           { to: "/docs/examples", label: "More examples" },

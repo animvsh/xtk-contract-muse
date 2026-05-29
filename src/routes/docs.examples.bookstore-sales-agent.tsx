@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DocsShell, DocsHero, DocsSection, StepList, CopyBlock, NextSteps } from "@/components/docs-shell";
+import {
+  DocsShell,
+  DocsHero,
+  DocsSection,
+  StepList,
+  CopyBlock,
+  NextSteps,
+} from "@/components/docs-shell";
 
 const PROMPT = `Build an agent for my bookstore that summarizes books sold last week and yesterday's revenue every morning.`;
 
@@ -32,7 +39,8 @@ export const Route = createFileRoute("/docs/examples/bookstore-sales-agent")({
       { title: "Bookstore Sales Agent — Beevr Docs" },
       {
         name: "description",
-        content: "End-to-end example: turn a sentence into a hosted Beevr agent that emails you bookstore sales every morning.",
+        content:
+          "End-to-end example: turn a sentence into a hosted Beevr agent that emails you bookstore sales every morning.",
       },
     ],
   }),
@@ -72,8 +80,8 @@ function Example() {
 
       <DocsSection title="Edit it through chat">
         <p className="text-sm">
-          Say <em>"add top 5 authors from last week"</em>. Beevr finds author info in the Inventory Sheet,
-          updates the agent, re-tests, and asks you to confirm before applying.
+          Say <em>"add top 5 authors from last week"</em>. Beevr finds author info in the Inventory
+          Sheet, updates the agent, re-tests, and asks you to confirm before applying.
         </p>
       </DocsSection>
 

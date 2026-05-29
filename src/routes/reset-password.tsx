@@ -35,14 +35,19 @@ function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-[oklch(0.04_0_0)] p-3">
       <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1500px] items-center justify-center overflow-hidden rounded-[24px] bg-white p-6 shadow-2xl">
-        <form onSubmit={submit} className="w-full max-w-sm rounded-3xl border border-black/5 bg-white/80 p-8 backdrop-blur">
+        <form
+          onSubmit={submit}
+          className="w-full max-w-sm rounded-3xl border border-black/5 bg-white/80 p-8 backdrop-blur"
+        >
           <Link to="/" className="mb-6 flex items-center gap-2.5">
             <BrandLogo className="h-8 w-8 object-contain" />
             <span className="text-lg font-bold tracking-tight">Beevr</span>
           </Link>
           <h1 className="text-2xl font-bold tracking-tight">Reset password</h1>
           <p className="mt-1 text-sm text-[oklch(0.45_0_0)]">
-            {ready ? "Choose a new password for your account." : "Open the reset link from your email to continue."}
+            {ready
+              ? "Choose a new password for your account."
+              : "Open the reset link from your email to continue."}
           </p>
           <input
             type="password"
@@ -61,7 +66,10 @@ function ResetPasswordPage() {
           >
             {busy ? "Saving…" : "Save new password"}
           </button>
-          <Link to="/auth" className="mt-4 block text-center text-xs font-semibold text-[oklch(0.55_0.2_40)] hover:underline">
+          <Link
+            to="/auth"
+            className="mt-4 block text-center text-xs font-semibold text-[oklch(0.55_0.2_40)] hover:underline"
+          >
             Back to sign in
           </Link>
         </form>

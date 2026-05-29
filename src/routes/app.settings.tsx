@@ -1,6 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Settings as SettingsIcon, User as UserIcon, LogOut, Save, Loader2, Check, Building2, Plus, Trash2, CheckCircle2 } from "lucide-react";
+import {
+  Settings as SettingsIcon,
+  User as UserIcon,
+  LogOut,
+  Save,
+  Loader2,
+  Check,
+  Building2,
+  Plus,
+  Trash2,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -191,11 +202,21 @@ function Settings() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="mb-1.5 flex items-baseline justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.4_0_0)]">{label}</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.4_0_0)]">
+          {label}
+        </span>
         {hint && <span className="text-[10px] text-[oklch(0.5_0_0)]">{hint}</span>}
       </div>
       {children}
@@ -213,9 +234,15 @@ const COLOR_PRESETS = [
 ];
 
 function WorkspacesSection() {
-  const { workspaces, current, switchTo, createWorkspace, removeWorkspace, renameWorkspace } = useWorkspaces();
+  const { workspaces, current, switchTo, createWorkspace, removeWorkspace, renameWorkspace } =
+    useWorkspaces();
   const [creating, setCreating] = useState(false);
-  const [draft, setDraft] = useState({ name: "", company: "", industry: "", color: COLOR_PRESETS[0] });
+  const [draft, setDraft] = useState({
+    name: "",
+    company: "",
+    industry: "",
+    color: COLOR_PRESETS[0],
+  });
 
   function handleCreate() {
     if (!draft.name.trim()) {
@@ -246,7 +273,9 @@ function WorkspacesSection() {
           <Plus className="h-3.5 w-3.5" /> New workspace
         </button>
       </div>
-      <p className="mt-1 text-xs text-[oklch(0.45_0_0)]">Manage your workspaces, switch the active one, or remove ones you no longer need.</p>
+      <p className="mt-1 text-xs text-[oklch(0.45_0_0)]">
+        Manage your workspaces, switch the active one, or remove ones you no longer need.
+      </p>
 
       {creating && (
         <div className="mt-4 rounded-xl border border-dashed border-black/15 bg-white/80 p-4">
@@ -283,7 +312,10 @@ function WorkspacesSection() {
                     type="button"
                     onClick={() => setDraft({ ...draft, color: c })}
                     className="h-7 w-7 rounded-full border-2"
-                    style={{ background: c, borderColor: draft.color === c ? "black" : "transparent" }}
+                    style={{
+                      background: c,
+                      borderColor: draft.color === c ? "black" : "transparent",
+                    }}
                     aria-label={c}
                   />
                 ))}
@@ -291,8 +323,18 @@ function WorkspacesSection() {
             </Field>
           </div>
           <div className="mt-4 flex justify-end gap-2">
-            <button onClick={() => setCreating(false)} className="clicky rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-medium hover:bg-black/5">Cancel</button>
-            <button onClick={handleCreate} className="clicky rounded-lg bg-[oklch(0.68_0.22_40)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[oklch(0.62_0.22_40)]">Create workspace</button>
+            <button
+              onClick={() => setCreating(false)}
+              className="clicky rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-medium hover:bg-black/5"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCreate}
+              className="clicky rounded-lg bg-[oklch(0.68_0.22_40)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[oklch(0.62_0.22_40)]"
+            >
+              Create workspace
+            </button>
           </div>
         </div>
       )}
@@ -352,16 +394,41 @@ function WorkspaceRow({
   return (
     <li className="p-4">
       <div className="flex items-start gap-3">
-        <span className="mt-1 inline-block h-8 w-8 flex-shrink-0 rounded-lg" style={{ background: color }} />
+        <span
+          className="mt-1 inline-block h-8 w-8 flex-shrink-0 rounded-lg"
+          style={{ background: color }}
+        />
         <div className="min-w-0 flex-1">
           {editing ? (
             <div className="grid gap-2 sm:grid-cols-2">
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]" />
-              <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]" />
-              <input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Industry" className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]" />
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+                className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]"
+              />
+              <input
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Company"
+                className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]"
+              />
+              <input
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                placeholder="Industry"
+                className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]"
+              />
               <div className="flex flex-wrap items-center gap-1.5">
                 {COLOR_PRESETS.map((c) => (
-                  <button key={c} type="button" onClick={() => setColor(c)} className="h-6 w-6 rounded-full border-2" style={{ background: c, borderColor: color === c ? "black" : "transparent" }} aria-label={c} />
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    className="h-6 w-6 rounded-full border-2"
+                    style={{ background: c, borderColor: color === c ? "black" : "transparent" }}
+                    aria-label={c}
+                  />
                 ))}
               </div>
             </div>
@@ -376,7 +443,8 @@ function WorkspaceRow({
                 )}
               </div>
               <div className="mt-0.5 truncate text-xs text-[oklch(0.45_0_0)]">
-                {[workspace.company, workspace.industry].filter(Boolean).join(" · ") || "No company / industry set"}
+                {[workspace.company, workspace.industry].filter(Boolean).join(" · ") ||
+                  "No company / industry set"}
               </div>
             </div>
           )}
@@ -384,7 +452,10 @@ function WorkspaceRow({
 
         <div className="flex flex-shrink-0 items-center gap-1.5">
           {!isCurrent && !editing && (
-            <button onClick={onSwitch} className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5">
+            <button
+              onClick={onSwitch}
+              className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5"
+            >
               Switch
             </button>
           )}
@@ -393,45 +464,69 @@ function WorkspaceRow({
               <button
                 onClick={() => {
                   if (!name.trim()) return toast.error("Name is required");
-                  onSave({ name: name.trim(), company: company.trim(), industry: industry.trim(), color });
+                  onSave({
+                    name: name.trim(),
+                    company: company.trim(),
+                    industry: industry.trim(),
+                    color,
+                  });
                   setEditing(false);
                 }}
                 className="clicky rounded-lg bg-[oklch(0.68_0.22_40)] px-2.5 py-1.5 text-xs font-medium text-white hover:bg-[oklch(0.62_0.22_40)]"
               >
                 Save
               </button>
-              <button onClick={() => setEditing(false)} className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5">
+              <button
+                onClick={() => setEditing(false)}
+                className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5"
+              >
                 Cancel
               </button>
             </>
           ) : (
-            <button onClick={() => setEditing(true)} className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5">
+            <button
+              onClick={() => setEditing(true)}
+              className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5"
+            >
               Edit
             </button>
           )}
-          {canDelete && !editing && (
-            confirmDel ? (
+          {canDelete &&
+            !editing &&
+            (confirmDel ? (
               <>
-                <button onClick={onDelete} className="clicky inline-flex items-center gap-1 rounded-lg bg-rose-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-rose-700">
+                <button
+                  onClick={onDelete}
+                  className="clicky inline-flex items-center gap-1 rounded-lg bg-rose-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-rose-700"
+                >
                   <Trash2 className="h-3 w-3" /> Confirm
                 </button>
-                <button onClick={() => setConfirmDel(false)} className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5">
+                <button
+                  onClick={() => setConfirmDel(false)}
+                  className="clicky rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-black/5"
+                >
                   Cancel
                 </button>
               </>
             ) : (
-              <button onClick={() => setConfirmDel(true)} className="clicky inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50">
+              <button
+                onClick={() => setConfirmDel(true)}
+                className="clicky inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50"
+              >
                 <Trash2 className="h-3 w-3" /> Delete
               </button>
-            )
-          )}
+            ))}
         </div>
       </div>
     </li>
   );
 }
 
-import { useWorkspaceMembers, type MemberRole, type WorkspaceMember } from "@/hooks/use-workspace-members";
+import {
+  useWorkspaceMembers,
+  type MemberRole,
+  type WorkspaceMember,
+} from "@/hooks/use-workspace-members";
 import { Users as UsersIcon, Mail, MoreHorizontal, Activity } from "lucide-react";
 
 const ROLES: { value: MemberRole; label: string; desc: string }[] = [
@@ -444,7 +539,10 @@ const ROLES: { value: MemberRole; label: string; desc: string }[] = [
 function MembersSection() {
   const { user } = useAuth();
   const { current } = useWorkspaces();
-  const { members, invite, remove, setRole, resend } = useWorkspaceMembers(current?.id, user?.email ?? undefined);
+  const { members, invite, remove, setRole, resend } = useWorkspaceMembers(
+    current?.id,
+    user?.email ?? undefined,
+  );
   const [email, setEmail] = useState("");
   const [role, setRoleDraft] = useState<MemberRole>("editor");
 
@@ -508,7 +606,9 @@ function MembersSection() {
             className="rounded-lg border border-black/10 bg-white px-2.5 py-2 text-sm outline-none focus:border-[oklch(0.68_0.22_40)]"
           >
             {ROLES.filter((r) => r.value !== "owner").map((r) => (
-              <option key={r.value} value={r.value}>{r.label}</option>
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
             ))}
           </select>
           <button
@@ -551,7 +651,9 @@ function MembersSection() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-black/5 bg-white/80 p-3">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.5_0_0)]">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.5_0_0)]">
+        {label}
+      </div>
       <div className="mt-1 text-lg font-bold tracking-tight">{value}</div>
     </div>
   );
@@ -586,12 +688,22 @@ function MemberRow({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold">{member.name}</span>
-            {isSelf && <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.4_0_0)]">You</span>}
-            {member.status === "invited" && <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">Invited</span>}
+            {isSelf && (
+              <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.4_0_0)]">
+                You
+              </span>
+            )}
+            {member.status === "invited" && (
+              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+                Invited
+              </span>
+            )}
           </div>
           <div className="mt-0.5 truncate text-xs text-[oklch(0.45_0_0)]">{member.email}</div>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-[oklch(0.45_0_0)]">
-            <span className="inline-flex items-center gap-1"><Activity className="h-3 w-3" /> {member.usage.agentRuns} runs</span>
+            <span className="inline-flex items-center gap-1">
+              <Activity className="h-3 w-3" /> {member.usage.agentRuns} runs
+            </span>
             <span>{member.usage.apiCalls.toLocaleString()} API calls</span>
             <span>{member.usage.storageMB} MB</span>
             <span>· Active {lastActiveLabel}</span>
@@ -605,27 +717,45 @@ function MemberRow({
             className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs outline-none focus:border-[oklch(0.68_0.22_40)] disabled:cursor-not-allowed disabled:bg-black/5"
           >
             {ROLES.map((r) => (
-              <option key={r.value} value={r.value}>{r.label}</option>
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
             ))}
           </select>
           <div className="flex items-center gap-1.5">
             {member.status === "invited" && !isOwner && (
-              <button onClick={onResend} className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5">Resend</button>
+              <button
+                onClick={onResend}
+                className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5"
+              >
+                Resend
+              </button>
             )}
-            {!isOwner && !isSelf && (
-              confirmDel ? (
+            {!isOwner &&
+              !isSelf &&
+              (confirmDel ? (
                 <>
-                  <button onClick={onRemove} className="clicky inline-flex items-center gap-1 rounded-lg bg-rose-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-rose-700">
+                  <button
+                    onClick={onRemove}
+                    className="clicky inline-flex items-center gap-1 rounded-lg bg-rose-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-rose-700"
+                  >
                     <Trash2 className="h-3 w-3" /> Confirm
                   </button>
-                  <button onClick={() => setConfirmDel(false)} className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5">Cancel</button>
+                  <button
+                    onClick={() => setConfirmDel(false)}
+                    className="clicky rounded-lg border border-black/10 bg-white px-2 py-1 text-[11px] font-medium hover:bg-black/5"
+                  >
+                    Cancel
+                  </button>
                 </>
               ) : (
-                <button onClick={() => setConfirmDel(true)} className="clicky inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50">
+                <button
+                  onClick={() => setConfirmDel(true)}
+                  className="clicky inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50"
+                >
                   <Trash2 className="h-3 w-3" /> Remove
                 </button>
-              )
-            )}
+              ))}
           </div>
         </div>
       </div>

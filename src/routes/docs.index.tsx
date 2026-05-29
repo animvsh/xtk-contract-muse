@@ -28,27 +28,61 @@ function DocsHome() {
 
       <DocsSection title="Start here">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <DocsCard to="/docs/quickstart" title="Quickstart" description="Ship your first Beevr-powered tool in 5 minutes." />
-          <DocsCard to="/docs/access-keys" title="Access keys" description="The product object that powers everything." />
-          <DocsCard to="/docs/cli/opencode" title="Connect OpenCode" description="Paste-ready setup for OpenCode sessions." />
-          <DocsCard to="/docs/cli/claude-code" title="Connect Claude Code" description="Workspace-aware context for Claude Code." />
-          <DocsCard to="/docs/cli/cursor" title="Connect Cursor" description="Use Beevr as a context source in Cursor." />
-          <DocsCard to="/docs/building-tools" title="Build a tool" description="Sandbox → tests → review → install." />
-          <DocsCard to="/docs/approvals" title="Approvals & safety" description="How risky actions get reviewed." />
-          <DocsCard to="/docs/examples" title="Examples" description="Ready-to-use prompts and tool ideas." />
+          <DocsCard
+            to="/docs/quickstart"
+            title="Quickstart"
+            description="Ship your first Beevr-powered tool in 5 minutes."
+          />
+          <DocsCard
+            to="/docs/access-keys"
+            title="Access keys"
+            description="The product object that powers everything."
+          />
+          <DocsCard
+            to="/docs/cli/opencode"
+            title="Connect OpenCode"
+            description="Paste-ready setup for OpenCode sessions."
+          />
+          <DocsCard
+            to="/docs/cli/claude-code"
+            title="Connect Claude Code"
+            description="Workspace-aware context for Claude Code."
+          />
+          <DocsCard
+            to="/docs/cli/cursor"
+            title="Connect Cursor"
+            description="Use Beevr as a context source in Cursor."
+          />
+          <DocsCard
+            to="/docs/building-tools"
+            title="Build a tool"
+            description="Sandbox → tests → review → install."
+          />
+          <DocsCard
+            to="/docs/approvals"
+            title="Approvals & safety"
+            description="How risky actions get reviewed."
+          />
+          <DocsCard
+            to="/docs/examples"
+            title="Examples"
+            description="Ready-to-use prompts and tool ideas."
+          />
         </div>
       </DocsSection>
 
       <DocsSection title="Works with">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {["OpenCode", "Claude Code", "Cursor", "Windsurf", "Custom CLI", "Internal app"].map((n) => (
-            <div
-              key={n}
-              className="clicky rounded-lg border border-border bg-card px-3 py-4 text-center text-sm font-medium"
-            >
-              {n}
-            </div>
-          ))}
+          {["OpenCode", "Claude Code", "Cursor", "Windsurf", "Custom CLI", "Internal app"].map(
+            (n) => (
+              <div
+                key={n}
+                className="clicky rounded-lg border border-border bg-card px-3 py-4 text-center text-sm font-medium"
+              >
+                {n}
+              </div>
+            ),
+          )}
         </div>
       </DocsSection>
     </DocsShell>

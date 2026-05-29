@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DocsShell, DocsHero, DocsSection, StepList, CopyBlock, NextSteps } from "@/components/docs-shell";
+import {
+  DocsShell,
+  DocsHero,
+  DocsSection,
+  StepList,
+  CopyBlock,
+  NextSteps,
+} from "@/components/docs-shell";
 
 const SETUP = `You are connected to the Beevr workspace using a workspace access key.
 
@@ -18,7 +25,10 @@ export const Route = createFileRoute("/docs/cli/opencode")({
   head: () => ({
     meta: [
       { title: "Connect OpenCode — Beevr Docs" },
-      { name: "description", content: "Use a Beevr access key to give OpenCode safe, scoped workspace access." },
+      {
+        name: "description",
+        content: "Use a Beevr access key to give OpenCode safe, scoped workspace access.",
+      },
     ],
   }),
   component: OpenCode,
@@ -61,7 +71,10 @@ function OpenCode() {
       <NextSteps
         items={[
           { to: "/docs/building-tools", label: "Build your first tool" },
-          { to: "/docs/building-tools/customer-health-dashboard", label: "Example: customer health dashboard" },
+          {
+            to: "/docs/building-tools/customer-health-dashboard",
+            label: "Example: customer health dashboard",
+          },
           { to: "/docs/approvals", label: "Approval flow" },
           { to: "/docs/cli/claude-code", label: "Connect Claude Code" },
         ]}

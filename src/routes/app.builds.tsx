@@ -138,7 +138,12 @@ const AGENTS: BilledAgent[] = [
 ];
 
 function initials(name: string) {
-  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 function formatMoney(n: number) {
@@ -186,9 +191,27 @@ function Builds() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <SummaryCard label="This month" value={formatMoney(totals.cost)} icon={DollarSign} accent="oklch(0.68 0.22 40)" sub="Across all agents" />
-        <SummaryCard label="Total runs" value={totals.runs.toLocaleString()} icon={Activity} accent="oklch(0.7 0.16 145)" sub="Last 30 days" />
-        <SummaryCard label="Active people" value={String(totals.seats)} icon={Users} accent="oklch(0.68 0.18 250)" sub="Using at least one agent" />
+        <SummaryCard
+          label="This month"
+          value={formatMoney(totals.cost)}
+          icon={DollarSign}
+          accent="oklch(0.68 0.22 40)"
+          sub="Across all agents"
+        />
+        <SummaryCard
+          label="Total runs"
+          value={totals.runs.toLocaleString()}
+          icon={Activity}
+          accent="oklch(0.7 0.16 145)"
+          sub="Last 30 days"
+        />
+        <SummaryCard
+          label="Active people"
+          value={String(totals.seats)}
+          icon={Users}
+          accent="oklch(0.68 0.18 250)"
+          sub="Using at least one agent"
+        />
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
@@ -259,7 +282,10 @@ function Builds() {
 
               <div className="mt-4 grid grid-cols-3 gap-3 rounded-xl bg-[oklch(0.97_0.02_85)]/70 p-3 text-xs">
                 <Stat label="Runs" value={a.monthlyRuns.toLocaleString()} />
-                <Stat label="Unit price" value={`${formatMoney(a.unitPrice)} / ${a.pricingModel.replace("per ", "")}`} />
+                <Stat
+                  label="Unit price"
+                  value={`${formatMoney(a.unitPrice)} / ${a.pricingModel.replace("per ", "")}`}
+                />
                 <Stat label="People using" value={`${a.users.length}`} />
               </div>
 
@@ -281,7 +307,9 @@ function Builds() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2 text-sm">
-                            <span className="truncate font-medium text-[oklch(0.2_0_0)]">{u.name}</span>
+                            <span className="truncate font-medium text-[oklch(0.2_0_0)]">
+                              {u.name}
+                            </span>
                             <span className="shrink-0 tabular-nums text-[oklch(0.4_0_0)]">
                               {u.runs.toLocaleString()}
                             </span>
@@ -327,7 +355,9 @@ function SummaryCard({
   return (
     <div className="rounded-2xl border border-black/5 bg-white/70 p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-[oklch(0.45_0_0)]">{label}</span>
+        <span className="text-xs font-medium uppercase tracking-wider text-[oklch(0.45_0_0)]">
+          {label}
+        </span>
         <span
           className="flex h-7 w-7 items-center justify-center rounded-lg text-white"
           style={{ background: accent }}
@@ -344,7 +374,9 @@ function SummaryCard({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">{label}</div>
+      <div className="text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">
+        {label}
+      </div>
       <div className="mt-0.5 text-sm font-semibold tabular-nums text-[oklch(0.2_0_0)]">{value}</div>
     </div>
   );

@@ -324,8 +324,18 @@ function Connections() {
   );
 }
 
-function SectionLabel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`mb-3 text-xs uppercase tracking-wider text-muted-foreground ${className}`}>{children}</div>;
+function SectionLabel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`mb-3 text-xs uppercase tracking-wider text-muted-foreground ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 function Grid({
@@ -343,7 +353,10 @@ function Grid({
         const accent = ACCENTS[c.service_id] ?? "oklch(0.5 0 0)";
         const saving = savingIds.has(c.id);
         return (
-          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur">
+          <div
+            key={c.id}
+            className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white/70 p-3.5 backdrop-blur"
+          >
             <div className="relative">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-foreground overflow-hidden">
                 {LOGO_SLUGS[c.service_id] ? (
@@ -351,17 +364,24 @@ function Grid({
                     src={`https://cdn.simpleicons.org/${LOGO_SLUGS[c.service_id]}`}
                     alt={c.service_name}
                     className="h-5 w-5 object-contain"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
                   />
                 ) : (
                   c.service_name[0]
                 )}
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white" style={{ background: accent }} />
+              <span
+                className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white"
+                style={{ background: accent }}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="truncate text-sm font-medium">{c.service_name}</div>
-              <div className="text-[11px] text-muted-foreground">{c.connected ? "Connected" : "Not connected"}</div>
+              <div className="text-[11px] text-muted-foreground">
+                {c.connected ? "Connected" : "Not connected"}
+              </div>
             </div>
             <button
               onClick={() => toggle(c)}
@@ -372,7 +392,17 @@ function Grid({
                   : "bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-60"
               }`}
             >
-              {saving ? "Saving" : c.connected ? <><Check className="h-3 w-3" /> On</> : <><Plus className="h-3 w-3" /> Connect</>}
+              {saving ? (
+                "Saving"
+              ) : c.connected ? (
+                <>
+                  <Check className="h-3 w-3" /> On
+                </>
+              ) : (
+                <>
+                  <Plus className="h-3 w-3" /> Connect
+                </>
+              )}
             </button>
           </div>
         );

@@ -31,7 +31,12 @@ function seedFor(workspaceId: string, ownerEmail: string): WorkspaceMember[] {
       role: "owner",
       status: "active",
       joinedAt: new Date().toISOString(),
-      usage: { agentRuns: 142, apiCalls: 3210, storageMB: 184, lastActiveAt: new Date().toISOString() },
+      usage: {
+        agentRuns: 142,
+        apiCalls: 3210,
+        storageMB: 184,
+        lastActiveAt: new Date().toISOString(),
+      },
     },
   ];
 }
@@ -55,7 +60,10 @@ function rand(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function useWorkspaceMembers(workspaceId: string | undefined, ownerEmail: string | undefined) {
+export function useWorkspaceMembers(
+  workspaceId: string | undefined,
+  ownerEmail: string | undefined,
+) {
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
 
   useEffect(() => {
@@ -70,12 +78,15 @@ export function useWorkspaceMembers(workspaceId: string | undefined, ownerEmail:
     setMembers(scoped);
   }, [workspaceId, ownerEmail]);
 
-  const persist = useCallback((next: WorkspaceMember[]) => {
-    if (!workspaceId) return;
-    setMembers(next);
-    const all = loadAll().filter((m) => m.workspaceId !== workspaceId);
-    saveAll([...all, ...next]);
-  }, [workspaceId]);
+  const persist = useCallback(
+    (next: WorkspaceMember[]) => {
+      if (!workspaceId) return;
+      setMembers(next);
+      const all = loadAll().filter((m) => m.workspaceId !== workspaceId);
+      saveAll([...all, ...next]);
+    },
+    [workspaceId],
+  );
 
   const invite = useCallback(
     (email: string, role: MemberRole) => {
@@ -88,7 +99,12 @@ export function useWorkspaceMembers(workspaceId: string | undefined, ownerEmail:
         role,
         status: "invited",
         joinedAt: new Date().toISOString(),
-        usage: { agentRuns: rand(0, 25), apiCalls: rand(0, 400), storageMB: rand(0, 30), lastActiveAt: new Date(Date.now() - rand(0, 7) * 86400000).toISOString() },
+        usage: {
+          agentRuns: rand(0, 25),
+          apiCalls: rand(0, 400),
+          storageMB: rand(0, 30),
+          lastActiveAt: new Date(Date.now() - rand(0, 7) * 86400000).toISOString(),
+        },
       };
       persist([...members, m]);
     },
@@ -109,10 +125,13 @@ export function useWorkspaceMembers(workspaceId: string | undefined, ownerEmail:
     [members, persist],
   );
 
-  const resend = useCallback((id: string) => {
-    // mock: just bump joinedAt
-    persist(members.map((m) => (m.id === id ? { ...m, joinedAt: new Date().toISOString() } : m)));
-  }, [members, persist]);
+  const resend = useCallback(
+    (id: string) => {
+      // mock: just bump joinedAt
+      persist(members.map((m) => (m.id === id ? { ...m, joinedAt: new Date().toISOString() } : m)));
+    },
+    [members, persist],
+  );
 
   return { members, invite, remove, setRole, resend };
 }

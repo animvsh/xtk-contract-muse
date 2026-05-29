@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type Workspace = {
   id: string;
@@ -15,7 +23,10 @@ type Ctx = {
   switchTo: (id: string) => void;
   createWorkspace: (input: Omit<Workspace, "id" | "createdAt">) => Workspace;
   removeWorkspace: (id: string) => void;
-  renameWorkspace: (id: string, patch: Partial<Pick<Workspace, "name" | "company" | "industry" | "color">>) => void;
+  renameWorkspace: (
+    id: string,
+    patch: Partial<Pick<Workspace, "name" | "company" | "industry" | "color">>,
+  ) => void;
 };
 
 const STORAGE_KEY = "beevr.workspaces.v1";
@@ -87,14 +98,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     return ws;
   }, []);
 
-  const removeWorkspace = useCallback((id: string) => {
-    setWorkspaces((prev) => {
-      const next = prev.filter((w) => w.id !== id);
-      if (next.length === 0) return prev; // never empty
-      if (currentId === id) setCurrentId(next[0].id);
-      return next;
-    });
-  }, [currentId]);
+  const removeWorkspace = useCallback(
+    (id: string) => {
+      setWorkspaces((prev) => {
+        const next = prev.filter((w) => w.id !== id);
+        if (next.length === 0) return prev; // never empty
+        if (currentId === id) setCurrentId(next[0].id);
+        return next;
+      });
+    },
+    [currentId],
+  );
 
   const renameWorkspace = useCallback<Ctx["renameWorkspace"]>((id, patch) => {
     setWorkspaces((prev) => prev.map((w) => (w.id === id ? { ...w, ...patch } : w)));

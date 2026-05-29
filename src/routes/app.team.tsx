@@ -64,11 +64,23 @@ const ROLES = [
 const PERMISSION_MATRIX: { label: string; roles: Record<string, boolean> }[] = [
   { label: "Ask the brain", roles: { owner: true, admin: true, editor: true, viewer: true } },
   { label: "View agents & APIs", roles: { owner: true, admin: true, editor: true, viewer: true } },
-  { label: "Create agents, APIs, MCPs", roles: { owner: true, admin: true, editor: true, viewer: false } },
-  { label: "Manage connections", roles: { owner: true, admin: true, editor: false, viewer: false } },
-  { label: "Invite & remove members", roles: { owner: true, admin: true, editor: false, viewer: false } },
+  {
+    label: "Create agents, APIs, MCPs",
+    roles: { owner: true, admin: true, editor: true, viewer: false },
+  },
+  {
+    label: "Manage connections",
+    roles: { owner: true, admin: true, editor: false, viewer: false },
+  },
+  {
+    label: "Invite & remove members",
+    roles: { owner: true, admin: true, editor: false, viewer: false },
+  },
   { label: "Issue access keys", roles: { owner: true, admin: true, editor: false, viewer: false } },
-  { label: "Billing & workspace settings", roles: { owner: true, admin: false, editor: false, viewer: false } },
+  {
+    label: "Billing & workspace settings",
+    roles: { owner: true, admin: false, editor: false, viewer: false },
+  },
 ];
 
 function roleMeta(role: string) {
@@ -179,10 +191,7 @@ function WorkspaceManagement() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-10">
-      <PageHeader
-        title="Workspace"
-        subtitle="Manage who's on your team and what they can do"
-      />
+      <PageHeader title="Workspace" subtitle="Manage who's on your team and what they can do" />
 
       {/* Workspace identity card */}
       <div className="mb-6 rounded-2xl border border-black/[0.06] bg-white/70 p-5 backdrop-blur">
@@ -249,9 +258,7 @@ function WorkspaceManagement() {
             <Plus className="h-3.5 w-3.5" /> Send invite
           </button>
         </div>
-        <p className="mt-2.5 text-[11px] text-muted-foreground">
-          {roleMeta(role).desc}
-        </p>
+        <p className="mt-2.5 text-[11px] text-muted-foreground">{roleMeta(role).desc}</p>
       </div>
 
       {/* Members list */}
@@ -375,10 +382,7 @@ function WorkspaceManagement() {
           {ROLES.map((r) => {
             const Icon = r.icon;
             return (
-              <div
-                key={r.key}
-                className="rounded-xl border border-black/[0.05] bg-white/60 p-4"
-              >
+              <div key={r.key} className="rounded-xl border border-black/[0.05] bg-white/60 p-4">
                 <div className="mb-1 flex items-center gap-2">
                   <span
                     className="flex h-6 w-6 items-center justify-center rounded-md text-white"
@@ -399,9 +403,14 @@ function WorkspaceManagement() {
           <table className="w-full text-xs">
             <thead className="bg-muted/40">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Capability</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  Capability
+                </th>
                 {ROLES.map((r) => (
-                  <th key={r.key} className="px-3 py-2 text-center font-medium text-muted-foreground">
+                  <th
+                    key={r.key}
+                    className="px-3 py-2 text-center font-medium text-muted-foreground"
+                  >
                     {r.label}
                   </th>
                 ))}
@@ -434,7 +443,8 @@ function WorkspaceManagement() {
         </div>
         <div className="flex items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            Deleting this workspace removes all members, agents, APIs and connections. This can't be undone.
+            Deleting this workspace removes all members, agents, APIs and connections. This can't be
+            undone.
           </p>
           <button
             onClick={() => toast.error("Contact support to delete a workspace.")}

@@ -50,10 +50,7 @@ export const Route = createFileRoute("/app/brain")({
   component: BrainPage,
 });
 
-const TOOL_META: Record<
-  string,
-  { label: string; icon: typeof Search; verb: string }
-> = {
+const TOOL_META: Record<string, { label: string; icon: typeof Search; verb: string }> = {
   searchNotion: { label: "Notion", icon: FileStack, verb: "Searching Notion" },
   searchContacts: { label: "Contacts", icon: User, verb: "Looking up contact" },
   searchEmails: { label: "Gmail", icon: Inbox, verb: "Searching inbox" },
@@ -87,7 +84,11 @@ type ApiParam = {
   description: string;
   example?: string;
 };
-type ApiEndpoint = { method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; path: string; summary: string };
+type ApiEndpoint = {
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  path: string;
+  summary: string;
+};
 type ApiError = { status: number; code: string; message: string };
 type ApiDraft = {
   name: string;
@@ -130,9 +131,18 @@ type McpDraft = {
 };
 
 type ClarifyOption = { value: string; label: string; description?: string };
-type ClarifyQuestion = { id: string; question: string; options: ClarifyOption[]; multi?: boolean; allowOther?: boolean };
-type ClarifyDraft = { intent: "agent" | "api" | "mcp"; summary: string; questions: ClarifyQuestion[] };
-
+type ClarifyQuestion = {
+  id: string;
+  question: string;
+  options: ClarifyOption[];
+  multi?: boolean;
+  allowOther?: boolean;
+};
+type ClarifyDraft = {
+  intent: "agent" | "api" | "mcp";
+  summary: string;
+  questions: ClarifyQuestion[];
+};
 
 type StagedFile = {
   id: string;
@@ -142,12 +152,18 @@ type StagedFile = {
   textContent?: string; // for text-like files
 };
 
-const TEXT_EXT = /\.(txt|md|markdown|json|csv|tsv|ya?ml|toml|ini|env|log|html?|css|scss|tsx?|jsx?|py|rb|go|rs|java|c|cpp|h|sh|bash|sql|xml|svg)$/i;
+const TEXT_EXT =
+  /\.(txt|md|markdown|json|csv|tsv|ya?ml|toml|ini|env|log|html?|css|scss|tsx?|jsx?|py|rb|go|rs|java|c|cpp|h|sh|bash|sql|xml|svg)$/i;
 
 function classifyFile(f: File): StagedFile["kind"] {
   if (f.type.startsWith("image/")) return "image";
   if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) return "pdf";
-  if (f.type.startsWith("text/") || /^application\/(json|xml|x-yaml|toml)/.test(f.type) || TEXT_EXT.test(f.name)) return "text";
+  if (
+    f.type.startsWith("text/") ||
+    /^application\/(json|xml|x-yaml|toml)/.test(f.type) ||
+    TEXT_EXT.test(f.name)
+  )
+    return "text";
   return "other";
 }
 
@@ -264,11 +280,15 @@ function BrainPage() {
     if (input.trim()) textParts.push(input.trim());
     for (const sf of pending) {
       if (sf.kind === "text" && sf.textContent) {
-        textParts.push(`\n\n--- File: ${sf.file.name} (${formatBytes(sf.file.size)}) ---\n${sf.textContent}\n--- end of ${sf.file.name} ---`);
+        textParts.push(
+          `\n\n--- File: ${sf.file.name} (${formatBytes(sf.file.size)}) ---\n${sf.textContent}\n--- end of ${sf.file.name} ---`,
+        );
       } else if (sf.kind === "pdf") {
         textParts.push(`\n[Attached PDF: ${sf.file.name} (${formatBytes(sf.file.size)})]`);
       } else if (sf.kind === "other") {
-        textParts.push(`\n[Attached file: ${sf.file.name} (${sf.file.type || "unknown"}, ${formatBytes(sf.file.size)})]`);
+        textParts.push(
+          `\n[Attached file: ${sf.file.name} (${sf.file.type || "unknown"}, ${formatBytes(sf.file.size)})]`,
+        );
       }
     }
 
@@ -323,12 +343,16 @@ function BrainPage() {
           <div className="animate-pop flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-primary/60 bg-white/90 px-10 py-8 shadow-xl">
             <UploadCloud className="h-10 w-10 text-primary" />
             <div className="text-base font-medium text-foreground">Drop to attach</div>
-            <div className="text-xs text-muted-foreground">Images, PDFs, text and code files · up to 20MB each</div>
+            <div className="text-xs text-muted-foreground">
+              Images, PDFs, text and code files · up to 20MB each
+            </div>
           </div>
         </div>
       )}
       <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain">
-        <div className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}>
+        <div
+          className={`mx-auto w-full max-w-3xl px-6 ${isEmpty ? "flex min-h-full flex-col justify-center pb-32 pt-8" : "pb-40 pt-10"}`}
+        >
           {isEmpty && (
             <div className="animate-[fadeInUp_300ms_ease-out]">
               <div className="float-y wobble-hover mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
@@ -336,7 +360,8 @@ function BrainPage() {
               </div>
               <h1 className="text-4xl font-semibold tracking-tight">Ask your company brain</h1>
               <p className="mt-2 text-base text-muted-foreground">
-                Connected to Notion, Gmail contacts, document drafting, and email. Drag and drop files to reference them.
+                Connected to Notion, Gmail contacts, document drafting, and email. Drag and drop
+                files to reference them.
               </p>
               <div className="stagger mt-8 grid gap-2 text-sm sm:grid-cols-2">
                 {[
@@ -348,7 +373,7 @@ function BrainPage() {
                   <button
                     key={s}
                     onClick={() => sendMessage({ text: s })}
-                    style={{ ['--i' as never]: i }}
+                    style={{ ["--i" as never]: i }}
                     className="clicky alive slide-in-right group rounded-xl border border-black/5 bg-white/70 px-4 py-3 text-left leading-snug text-foreground/80 shadow-sm backdrop-blur transition-all hover:border-primary/30 hover:bg-white hover:text-foreground"
                   >
                     {s}
@@ -403,15 +428,31 @@ function BrainPage() {
                     className="animate-pop group relative flex items-center gap-2 rounded-xl border border-black/10 bg-white py-1.5 pl-1.5 pr-2 shadow-sm"
                   >
                     {sf.kind === "image" && sf.preview ? (
-                      <img src={sf.preview} alt={sf.file.name} className="h-9 w-9 rounded-md object-cover" />
+                      <img
+                        src={sf.preview}
+                        alt={sf.file.name}
+                        className="h-9 w-9 rounded-md object-cover"
+                      />
                     ) : (
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-md ${sf.kind === "pdf" ? "bg-rose-500/10 text-rose-600" : sf.kind === "text" ? "bg-blue-500/10 text-blue-600" : "bg-muted text-muted-foreground"}`}>
-                        {sf.kind === "pdf" ? <FileText className="h-4 w-4" /> : sf.kind === "text" ? <Code2 className="h-4 w-4" /> : <FileIcon className="h-4 w-4" />}
+                      <div
+                        className={`flex h-9 w-9 items-center justify-center rounded-md ${sf.kind === "pdf" ? "bg-rose-500/10 text-rose-600" : sf.kind === "text" ? "bg-blue-500/10 text-blue-600" : "bg-muted text-muted-foreground"}`}
+                      >
+                        {sf.kind === "pdf" ? (
+                          <FileText className="h-4 w-4" />
+                        ) : sf.kind === "text" ? (
+                          <Code2 className="h-4 w-4" />
+                        ) : (
+                          <FileIcon className="h-4 w-4" />
+                        )}
                       </div>
                     )}
                     <div className="min-w-0">
-                      <div className="max-w-[180px] truncate text-xs font-medium text-foreground">{sf.file.name}</div>
-                      <div className="text-[10px] text-muted-foreground">{formatBytes(sf.file.size)}</div>
+                      <div className="max-w-[180px] truncate text-xs font-medium text-foreground">
+                        {sf.file.name}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {formatBytes(sf.file.size)}
+                      </div>
                     </div>
                     <button
                       onClick={() => removePending(sf.id)}
@@ -484,7 +525,6 @@ function BrainPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -501,7 +541,10 @@ function UserMessage({ msg }: { msg: UIMsg }) {
     filename?: string;
   }>;
   // Hide raw inline file dumps from the bubble (they were prepended for the model).
-  const visibleText = text.replace(/\n*--- File: [\s\S]*?--- end of [^\n]+---/g, "").replace(/\n\[Attached (PDF|file): [^\]]+\]/g, "").trim();
+  const visibleText = text
+    .replace(/\n*--- File: [\s\S]*?--- end of [^\n]+---/g, "")
+    .replace(/\n\[Attached (PDF|file): [^\]]+\]/g, "")
+    .trim();
 
   return (
     <div className="flex justify-end">
@@ -517,9 +560,14 @@ function UserMessage({ msg }: { msg: UIMsg }) {
                   className="max-h-48 max-w-[240px] rounded-xl border border-black/10 object-cover shadow-sm"
                 />
               ) : (
-                <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs shadow-sm">
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs shadow-sm"
+                >
                   <FileIcon className="h-4 w-4 text-muted-foreground" />
-                  <span className="max-w-[160px] truncate font-medium text-foreground">{f.filename ?? "file"}</span>
+                  <span className="max-w-[160px] truncate font-medium text-foreground">
+                    {f.filename ?? "file"}
+                  </span>
                 </div>
               ),
             )}
@@ -560,7 +608,6 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
     | { kind: "mcp"; key: string; draft: McpDraft }
     | { kind: "clarify"; key: string; draft: ClarifyDraft }
     | { kind: "plan"; key: string; snapshot: PlanTask[]; running: boolean };
-
 
   const units: Unit[] = [];
   let planIntroduced = false;
@@ -649,9 +696,8 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
   const planUnit = units.find((u) => u.kind === "plan");
   if (planUnit && planUnit.kind === "plan") {
     planUnit.snapshot = JSON.parse(JSON.stringify(plan)) as PlanTask[];
-    const allDone = plan.length > 0 && plan.every(
-      (t) => t.status === "done" || t.status === "warning",
-    );
+    const allDone =
+      plan.length > 0 && plan.every((t) => t.status === "done" || t.status === "warning");
     planUnit.running = !allDone;
   }
 
@@ -664,7 +710,10 @@ function AssistantMessage({ msg, onSend }: { msg: UIMsg; onSend: (text: string) 
         {units.map((u) => {
           if (u.kind === "text") {
             return (
-              <div key={u.key} className="slide-in-left rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-5 py-3.5 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur markdown-body">
+              <div
+                key={u.key}
+                className="slide-in-left rounded-2xl rounded-tl-md border border-black/5 bg-white/80 px-5 py-3.5 text-[15px] leading-relaxed text-foreground shadow-sm backdrop-blur markdown-body"
+              >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{u.text}</ReactMarkdown>
               </div>
             );
@@ -712,7 +761,10 @@ function StatusIcon({ status }: { status: StepStatus }) {
   if (status === "in-progress") {
     return (
       <span className="relative flex h-5 w-5 items-center justify-center">
-        <span className="absolute inset-0 animate-spin rounded-full border-2 border-dashed border-primary/70" style={{ animationDuration: "3s" }} />
+        <span
+          className="absolute inset-0 animate-spin rounded-full border-2 border-dashed border-primary/70"
+          style={{ animationDuration: "3s" }}
+        />
         <span className="h-1.5 w-1.5 rounded-full bg-primary" />
       </span>
     );
@@ -761,32 +813,47 @@ function PlanBlock({ tasks, running }: { tasks: PlanTask[]; running: boolean }) 
         {tasks.map((task, ti) => {
           const pendingSubs = task.subtasks.filter((s) => s.status === "pending").length;
           return (
-            <div key={task.id} className={`group/row px-3 py-3 ${ti > 0 ? "border-t border-black/5" : ""}`}>
+            <div
+              key={task.id}
+              className={`group/row px-3 py-3 ${ti > 0 ? "border-t border-black/5" : ""}`}
+            >
               <div className="flex items-center gap-3">
                 <StatusIcon status={task.status} />
-                <span className={`flex-1 text-[15px] font-medium ${task.status === "done" ? "text-foreground/60" : "text-foreground"}`}>
+                <span
+                  className={`flex-1 text-[15px] font-medium ${task.status === "done" ? "text-foreground/60" : "text-foreground"}`}
+                >
                   {task.title}
                 </span>
-                <StatusBadge status={task.status} count={task.status === "pending" ? pendingSubs : undefined} />
+                <StatusBadge
+                  status={task.status}
+                  count={task.status === "pending" ? pendingSubs : undefined}
+                />
               </div>
-              {task.subtasks.length > 0 && (task.status === "in-progress" || task.subtasks.some((s) => s.status !== "pending")) && (
-                <div className="relative mt-2.5 ml-2.5 space-y-2 border-l border-dashed border-black/15 pl-5">
-                  {task.subtasks.map((sub) => (
-                    <div key={sub.id} className="animate-[fadeInUp_240ms_ease-out] flex items-center gap-2.5">
-                      <StatusIcon status={sub.status} />
-                      <span className={`text-[14px] ${
-                        sub.status === "done"
-                          ? "text-muted-foreground line-through"
-                          : sub.status === "in-progress"
-                            ? "text-foreground"
-                            : "text-foreground/80"
-                      }`}>
-                        {sub.title}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {task.subtasks.length > 0 &&
+                (task.status === "in-progress" ||
+                  task.subtasks.some((s) => s.status !== "pending")) && (
+                  <div className="relative mt-2.5 ml-2.5 space-y-2 border-l border-dashed border-black/15 pl-5">
+                    {task.subtasks.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="animate-[fadeInUp_240ms_ease-out] flex items-center gap-2.5"
+                      >
+                        <StatusIcon status={sub.status} />
+                        <span
+                          className={`text-[14px] ${
+                            sub.status === "done"
+                              ? "text-muted-foreground line-through"
+                              : sub.status === "in-progress"
+                                ? "text-foreground"
+                                : "text-foreground/80"
+                          }`}
+                        >
+                          {sub.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           );
         })}
@@ -810,13 +877,14 @@ function ToolPart({ part }: { part: ToolPartShape }) {
     verb: toolName,
   };
   const Icon = meta.icon;
-  const isRunning =
-    part.state === "input-streaming" || part.state === "input-available";
+  const isRunning = part.state === "input-streaming" || part.state === "input-available";
   const isError = part.state === "output-error";
   const isDone = part.state === "output-available";
 
   return (
-    <div className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}>
+    <div
+      className={`animate-pop overflow-hidden rounded-lg border bg-muted/40 transition-colors ${isRunning ? "border-primary/40" : "border-border"}`}
+    >
       <button
         onClick={() => setOpen((o) => !o)}
         className="clicky-sm flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors hover:bg-muted/70 active:bg-muted"
@@ -874,9 +942,7 @@ function ToolPart({ part }: { part: ToolPartShape }) {
               </pre>
             </div>
           )}
-          {part.errorText && (
-            <div className="text-destructive">{part.errorText}</div>
-          )}
+          {part.errorText && <div className="text-destructive">{part.errorText}</div>}
         </div>
       )}
     </div>
@@ -895,11 +961,26 @@ function summarizeInput(name: string, input: unknown): string {
   return "";
 }
 
-const CHANNEL_META: Record<AgentDraft["channel"], { label: string; icon: typeof Phone; tone: string }> = {
-  sms: { label: "Text message", icon: Phone, tone: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+const CHANNEL_META: Record<
+  AgentDraft["channel"],
+  { label: string; icon: typeof Phone; tone: string }
+> = {
+  sms: {
+    label: "Text message",
+    icon: Phone,
+    tone: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+  },
   email: { label: "Email", icon: Mail, tone: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
-  slack: { label: "Slack", icon: Hash, tone: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
-  "in-app": { label: "In-app notification", icon: MessageSquare, tone: "bg-primary/10 text-primary border-primary/20" },
+  slack: {
+    label: "Slack",
+    icon: Hash,
+    tone: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+  },
+  "in-app": {
+    label: "In-app notification",
+    icon: MessageSquare,
+    tone: "bg-primary/10 text-primary border-primary/20",
+  },
 };
 
 const CADENCE_LABEL: Record<AgentDraft["schedule"]["cadence"], string> = {
@@ -920,21 +1001,69 @@ type BuildStep = {
 
 function buildPlan(d: AgentDraft): BuildStep[] {
   const steps: BuildStep[] = [
-    { id: "validate", label: "Validating spec", detail: `${d.name} · ${d.emoji}`, status: "pending", durationMs: 380 },
-    { id: "compile", label: "Compiling agent definition", detail: "writing manifest.json", status: "pending", durationMs: 520 },
+    {
+      id: "validate",
+      label: "Validating spec",
+      detail: `${d.name} · ${d.emoji}`,
+      status: "pending",
+      durationMs: 380,
+    },
+    {
+      id: "compile",
+      label: "Compiling agent definition",
+      detail: "writing manifest.json",
+      status: "pending",
+      durationMs: 520,
+    },
   ];
   for (const src of (d.dataSources ?? []).slice(0, 3)) {
     const head = src.split(/[ (]/)[0];
-    steps.push({ id: `src-${head}`, label: `Connecting to ${head}`, detail: src, status: "pending", durationMs: 600 + Math.random() * 400 });
+    steps.push({
+      id: `src-${head}`,
+      label: `Connecting to ${head}`,
+      detail: src,
+      status: "pending",
+      durationMs: 600 + Math.random() * 400,
+    });
   }
   for (const t of (d.tools ?? []).slice(0, 3)) {
-    steps.push({ id: `tool-${t}`, label: `Authorizing ${t}`, detail: "OAuth scope verified", status: "pending", durationMs: 450 + Math.random() * 300 });
+    steps.push({
+      id: `tool-${t}`,
+      label: `Authorizing ${t}`,
+      detail: "OAuth scope verified",
+      status: "pending",
+      durationMs: 450 + Math.random() * 300,
+    });
   }
   steps.push(
-    { id: "trigger", label: `Scheduling ${CADENCE_LABEL[d.schedule.cadence].toLowerCase()} trigger`, detail: `fires at ${d.schedule.timeOfDay}`, status: "pending", durationMs: 480 },
-    { id: "delivery", label: `Wiring ${CHANNEL_META[d.channel].label.toLowerCase()} delivery`, detail: d.recipient || "default workspace channel", status: "pending", durationMs: 520 },
-    { id: "dryrun", label: "Running first dry-run", detail: "simulating tomorrow's execution", status: "pending", durationMs: 850 },
-    { id: "deploy", label: "Deploying to Beevr runtime", detail: "edge worker provisioned", status: "pending", durationMs: 700 },
+    {
+      id: "trigger",
+      label: `Scheduling ${CADENCE_LABEL[d.schedule.cadence].toLowerCase()} trigger`,
+      detail: `fires at ${d.schedule.timeOfDay}`,
+      status: "pending",
+      durationMs: 480,
+    },
+    {
+      id: "delivery",
+      label: `Wiring ${CHANNEL_META[d.channel].label.toLowerCase()} delivery`,
+      detail: d.recipient || "default workspace channel",
+      status: "pending",
+      durationMs: 520,
+    },
+    {
+      id: "dryrun",
+      label: "Running first dry-run",
+      detail: "simulating tomorrow's execution",
+      status: "pending",
+      durationMs: 850,
+    },
+    {
+      id: "deploy",
+      label: "Deploying to Beevr runtime",
+      detail: "edge worker provisioned",
+      status: "pending",
+      durationMs: 700,
+    },
   );
   return steps;
 }
@@ -947,11 +1076,24 @@ function agentDraftToWorkflowSpec(d: AgentDraft) {
       const integration = src.split(/[ (]/)[0] || "Source";
       return { title: `Read from ${integration}`, integration, action: src };
     }),
-    ...(d.tools ?? []).map((tool) => ({ title: `Use ${tool}`, integration: tool, action: `Call ${tool} API` })),
+    ...(d.tools ?? []).map((tool) => ({
+      title: `Use ${tool}`,
+      integration: tool,
+      action: `Call ${tool} API`,
+    })),
     {
       title: `Send via ${CHANNEL_META[d.channel].label}`,
-      integration: d.channel === "sms" ? "Twilio" : d.channel === "email" ? "Gmail" : d.channel === "slack" ? "Slack" : "Beevr",
-      action: d.recipient ? `${d.action || "Deliver update"} → ${d.recipient}` : d.action || "Deliver update",
+      integration:
+        d.channel === "sms"
+          ? "Twilio"
+          : d.channel === "email"
+            ? "Gmail"
+            : d.channel === "slack"
+              ? "Slack"
+              : "Beevr",
+      action: d.recipient
+        ? `${d.action || "Deliver update"} → ${d.recipient}`
+        : d.action || "Deliver update",
     },
   ];
 
@@ -961,7 +1103,10 @@ function agentDraftToWorkflowSpec(d: AgentDraft) {
 function normalizeAgentDraft(input: Partial<AgentDraft> | undefined | null): AgentDraft {
   const src = (input ?? {}) as Partial<AgentDraft>;
   const cadence = src.schedule?.cadence ?? "daily";
-  const channel = (src.channel && CHANNEL_META[src.channel as AgentDraft["channel"]]) ? src.channel as AgentDraft["channel"] : "in-app";
+  const channel =
+    src.channel && CHANNEL_META[src.channel as AgentDraft["channel"]]
+      ? (src.channel as AgentDraft["channel"])
+      : "in-app";
   return {
     name: src.name ?? "Untitled agent",
     description: src.description ?? "",
@@ -1109,8 +1254,8 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
                     s.status === "done"
                       ? "text-foreground"
                       : s.status === "running"
-                      ? "text-foreground"
-                      : "text-muted-foreground/60"
+                        ? "text-foreground"
+                        : "text-muted-foreground/60"
                   }`}
                 >
                   {s.label}
@@ -1172,16 +1317,25 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             <Clock className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">When</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              When
+            </div>
             {editing ? (
               <div className="mt-1 flex gap-1.5">
                 <select
                   value={d.schedule.cadence}
-                  onChange={(e) => update("schedule", { ...d.schedule, cadence: e.target.value as AgentDraft["schedule"]["cadence"] })}
+                  onChange={(e) =>
+                    update("schedule", {
+                      ...d.schedule,
+                      cadence: e.target.value as AgentDraft["schedule"]["cadence"],
+                    })
+                  }
                   className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
                 >
                   {Object.entries(CADENCE_LABEL).map(([k, v]) => (
-                    <option key={k} value={k}>{v}</option>
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -1200,11 +1354,15 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
         </div>
 
         <div className="flex items-start gap-3 p-4">
-          <div className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${channel.tone}`}>
+          <div
+            className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${channel.tone}`}
+          >
             <ChannelIcon className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Send via</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Send via
+            </div>
             {editing ? (
               <div className="mt-1 flex flex-col gap-1.5">
                 <select
@@ -1213,11 +1371,19 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
                   className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
                 >
                   {Object.entries(CHANNEL_META).map(([k, v]) => (
-                    <option key={k} value={k}>{v.label}</option>
+                    <option key={k} value={k}>
+                      {v.label}
+                    </option>
                   ))}
                 </select>
                 <input
-                  placeholder={d.channel === "sms" ? "+1 555 0123" : d.channel === "email" ? "you@company.com" : "#channel"}
+                  placeholder={
+                    d.channel === "sms"
+                      ? "+1 555 0123"
+                      : d.channel === "email"
+                        ? "you@company.com"
+                        : "#channel"
+                  }
                   value={d.recipient ?? ""}
                   onChange={(e) => update("recipient", e.target.value)}
                   className="rounded-md border border-black/10 bg-white px-2 py-1 text-sm outline-none focus:border-primary"
@@ -1237,7 +1403,9 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             <Zap className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">What it does</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              What it does
+            </div>
             {editing ? (
               <textarea
                 value={d.action}
@@ -1251,7 +1419,10 @@ function AgentProposalCard({ draft }: { draft: AgentDraft }) {
             {(d.dataSources?.length ?? 0) > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {(d.dataSources ?? []).map((src) => (
-                  <span key={src} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground/80">
+                  <span
+                    key={src}
+                    className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground/80"
+                  >
                     <Plug className="h-2.5 w-2.5" /> {src}
                   </span>
                 ))}
@@ -1298,7 +1469,12 @@ const METHOD_TONE: Record<ApiEndpoint["method"], string> = {
 };
 
 function slugify(s: string) {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 40);
 }
 
 function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
@@ -1314,7 +1490,11 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
       className="clicky-sm inline-flex items-center gap-1 rounded-md border border-black/10 bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:border-black/20"
       title={label}
     >
-      {copied ? <Check className="h-2.5 w-2.5 text-emerald-600" strokeWidth={3} /> : <Copy className="h-2.5 w-2.5" />}
+      {copied ? (
+        <Check className="h-2.5 w-2.5 text-emerald-600" strokeWidth={3} />
+      ) : (
+        <Copy className="h-2.5 w-2.5" />
+      )}
       {copied ? "Copied" : label}
     </button>
   );
@@ -1329,7 +1509,11 @@ function DocsMarkdown({ md }: { md: string }) {
 }
 
 function prettifyJson(s: string): string {
-  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
+  try {
+    return JSON.stringify(JSON.parse(s), null, 2);
+  } catch {
+    return s;
+  }
 }
 
 function ApiProposalCard({ draft }: { draft: ApiDraft }) {
@@ -1362,7 +1546,9 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
         .single();
       if (error) throw error;
       setSaved({ id: row.id });
-      toast.success(`${draft.emoji} ${draft.name} created`, { description: `${draft.method} ${draft.path}` });
+      toast.success(`${draft.emoji} ${draft.name} created`, {
+        description: `${draft.method} ${draft.path}`,
+      });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save API");
     } finally {
@@ -1382,7 +1568,9 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
               <span className="text-2xl leading-none">{draft.emoji}</span>
               <h3 className="text-base font-semibold">{draft.name} is live</h3>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">{draft.method} {draft.path}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {draft.method} {draft.path}
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 onClick={() => navigate({ to: "/app/apis/$id", params: { id: saved.id } })}
@@ -1403,7 +1591,9 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
     );
   }
 
-  const endpoints = draft.endpoints?.length ? draft.endpoints : [{ method: draft.method, path: draft.path, summary: draft.description }];
+  const endpoints = draft.endpoints?.length
+    ? draft.endpoints
+    : [{ method: draft.method, path: draft.path, summary: draft.description }];
   const baseUrl = `https://api.beevr.dev/${slugify(draft.name) || "api"}`;
   const fullUrl = `${baseUrl}${draft.path}`;
   const auth = draft.authentication ?? "bearer";
@@ -1428,13 +1618,21 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
                 {auth === "none" ? "Public" : auth === "api-key" ? "API Key" : "Bearer"}
               </span>
             </div>
-            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">{draft.name}</h3>
-            <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{draft.description}</p>
+            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">
+              {draft.name}
+            </h3>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">
+              {draft.description}
+            </p>
             <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-black/5 bg-muted/30 px-2 py-1.5">
-              <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[draft.method] ?? ""}`}>
+              <span
+                className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[draft.method] ?? ""}`}
+              >
                 {draft.method}
               </span>
-              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">{fullUrl}</code>
+              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">
+                {fullUrl}
+              </code>
               <CopyButton text={fullUrl} label="" />
             </div>
           </div>
@@ -1443,18 +1641,22 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
 
       {/* Tabs */}
       <div className="flex items-center gap-0.5 border-y border-black/5 bg-muted/20 px-3">
-        {([
-          ["overview", "Overview", Layers],
-          ["sample", "Sample", Code2],
-          ["docs", "Docs", FileText],
-        ] as const).map(([id, label, Icon]) => (
+        {(
+          [
+            ["overview", "Overview", Layers],
+            ["sample", "Sample", Code2],
+            ["docs", "Docs", FileText],
+          ] as const
+        ).map(([id, label, Icon]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
             className={`relative inline-flex items-center gap-1.5 px-2.5 py-2 text-[11.5px] font-medium transition ${tab === id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             <Icon className="h-3 w-3" /> {label}
-            {tab === id && <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />}
+            {tab === id && (
+              <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />
+            )}
           </button>
         ))}
       </div>
@@ -1463,11 +1665,18 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
       {tab === "overview" && (
         <div className="space-y-4 p-4">
           <div>
-            <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Endpoints</div>
+            <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+              Endpoints
+            </div>
             <div className="space-y-1.5">
               {endpoints.slice(0, 8).map((ep, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs">
-                  <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}>
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-xs"
+                >
+                  <span
+                    className={`shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_TONE[ep.method] ?? ""}`}
+                  >
                     {ep.method}
                   </span>
                   <code className="shrink-0 font-mono text-foreground">{ep.path}</code>
@@ -1479,7 +1688,9 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
 
           {(draft.params?.length ?? 0) > 0 && (
             <div>
-              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Parameters</div>
+              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                Parameters
+              </div>
               <div className="overflow-hidden rounded-lg border border-black/5">
                 <table className="w-full text-left text-[11.5px]">
                   <thead className="bg-muted/40 text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -1515,7 +1726,10 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {(draft.errors ?? []).map((e) => (
-                  <span key={e.code} className="inline-flex items-center gap-1 rounded-md border border-rose-500/20 bg-rose-500/5 px-2 py-0.5 text-[11px]">
+                  <span
+                    key={e.code}
+                    className="inline-flex items-center gap-1 rounded-md border border-rose-500/20 bg-rose-500/5 px-2 py-0.5 text-[11px]"
+                  >
                     <code className="font-mono font-semibold text-rose-700">{e.status}</code>
                     <code className="font-mono text-muted-foreground">{e.code}</code>
                   </span>
@@ -1529,24 +1743,31 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
       {tab === "sample" && (
         <div className="p-4">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Sample response</span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+              Sample response
+            </span>
             <CopyButton text={prettifyJson(draft.sampleResponse ?? "{}")} />
           </div>
           <pre className="overflow-auto rounded-xl bg-[oklch(0.18_0_0)] p-3 font-mono text-[11px] leading-relaxed text-emerald-200">
-{prettifyJson(draft.sampleResponse ?? "{}")}
+            {prettifyJson(draft.sampleResponse ?? "{}")}
           </pre>
         </div>
       )}
 
-      {tab === "docs" && (
-        draft.docsMarkdown
-          ? <DocsMarkdown md={draft.docsMarkdown} />
-          : <div className="p-6 text-center text-xs text-muted-foreground">No documentation generated.</div>
-      )}
+      {tab === "docs" &&
+        (draft.docsMarkdown ? (
+          <DocsMarkdown md={draft.docsMarkdown} />
+        ) : (
+          <div className="p-6 text-center text-xs text-muted-foreground">
+            No documentation generated.
+          </div>
+        ))}
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/20 px-4 py-3">
-        <span className="text-[11px] text-muted-foreground">Mock API — playground returns the sample response.</span>
+        <span className="text-[11px] text-muted-foreground">
+          Mock API — playground returns the sample response.
+        </span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast("Discarded draft")}
@@ -1559,7 +1780,11 @@ function ApiProposalCard({ draft }: { draft: ApiDraft }) {
             disabled={busy}
             className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {busy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
             {busy ? "Creating…" : "Create API"}
           </button>
         </div>
@@ -1622,7 +1847,9 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
               <span className="text-2xl leading-none">{emoji}</span>
               <h3 className="text-base font-semibold">{name} is live</h3>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Connect from Claude Code, Cursor or Codex with the URL below.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Connect from Claude Code, Cursor or Codex with the URL below.
+            </p>
             <div className="mt-2 flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2 py-1.5">
               <code className="flex-1 font-mono text-[11px]">{url}</code>
               <CopyButton text={url} />
@@ -1633,10 +1860,11 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
     );
   }
 
-  const installSnippet = client === "claude"
-    ? `claude mcp add ${slug} --transport ${transport} ${url}`
-    : client === "cursor"
-    ? `{
+  const installSnippet =
+    client === "claude"
+      ? `claude mcp add ${slug} --transport ${transport} ${url}`
+      : client === "cursor"
+        ? `{
   "mcpServers": {
     "${slug}": {
       "url": "${url}",
@@ -1644,7 +1872,7 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
     }
   }
 }`
-    : `{
+        : `{
   "name": "${slug}",
   "type": "${transport}",
   "url": "${url}"
@@ -1674,11 +1902,15 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
                 </span>
               )}
             </div>
-            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">{name}</h3>
+            <h3 className="mt-1 truncate text-[17px] font-display font-semibold tracking-tight">
+              {name}
+            </h3>
             <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{description}</p>
             <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-black/5 bg-muted/30 px-2 py-1.5">
               <Plug className="h-3 w-3 shrink-0 text-primary" />
-              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">{url}</code>
+              <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-foreground">
+                {url}
+              </code>
               <CopyButton text={url} label="" />
             </div>
           </div>
@@ -1687,18 +1919,22 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
 
       {/* Tabs */}
       <div className="flex items-center gap-0.5 border-y border-black/5 bg-muted/20 px-3">
-        {([
-          ["tools", "Tools", Code2],
-          ["install", "Install", Terminal],
-          ["docs", "Docs", FileText],
-        ] as const).map(([id, label, Icon]) => (
+        {(
+          [
+            ["tools", "Tools", Code2],
+            ["install", "Install", Terminal],
+            ["docs", "Docs", FileText],
+          ] as const
+        ).map(([id, label, Icon]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
             className={`relative inline-flex items-center gap-1.5 px-2.5 py-2 text-[11.5px] font-medium transition ${tab === id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             <Icon className="h-3 w-3" /> {label}
-            {tab === id && <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />}
+            {tab === id && (
+              <span className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />
+            )}
           </button>
         ))}
       </div>
@@ -1714,7 +1950,10 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
               {tools.map((t, i) => {
                 const params = Array.isArray(t?.params) ? t.params : [];
                 return (
-                  <div key={t.name ?? i} className="overflow-hidden rounded-lg border border-black/5 bg-white">
+                  <div
+                    key={t.name ?? i}
+                    className="overflow-hidden rounded-lg border border-black/5 bg-white"
+                  >
                     <button
                       onClick={() => setOpenTool(openTool === i ? null : i)}
                       className="flex w-full items-center gap-2 px-2.5 py-2 text-left text-xs hover:bg-muted/30"
@@ -1722,16 +1961,23 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
                       <Code2 className="h-3 w-3 shrink-0 text-primary" />
                       <code className="font-mono font-semibold">{t.name}</code>
                       <span className="ml-2 truncate text-muted-foreground">{t.description}</span>
-                      <ChevronDown className={`ml-auto h-3 w-3 shrink-0 text-muted-foreground transition-transform ${openTool === i ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`ml-auto h-3 w-3 shrink-0 text-muted-foreground transition-transform ${openTool === i ? "rotate-180" : ""}`}
+                      />
                     </button>
                     {openTool === i && (
                       <div className="border-t border-black/5 bg-muted/10 p-3 text-[11px]">
                         {params.length > 0 && (
                           <div className="mb-2">
-                            <div className="mb-1 text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">Parameters</div>
+                            <div className="mb-1 text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Parameters
+                            </div>
                             <div className="flex flex-wrap gap-1">
                               {params.map((p) => (
-                                <span key={p.name} className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-1.5 py-0.5">
+                                <span
+                                  key={p.name}
+                                  className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-1.5 py-0.5"
+                                >
                                   <code className="font-mono">{p.name}</code>
                                   <span className="text-muted-foreground">{p.type}</span>
                                   {p.required && <span className="text-rose-600">*</span>}
@@ -1741,11 +1987,13 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
                           </div>
                         )}
                         <div className="mb-1 flex items-center justify-between">
-                          <span className="text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">Sample result</span>
+                          <span className="text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Sample result
+                          </span>
                           <CopyButton text={prettifyJson(t.sampleResult ?? "{}")} />
                         </div>
                         <pre className="overflow-auto rounded-md bg-[oklch(0.18_0_0)] p-2 font-mono text-[10.5px] leading-relaxed text-emerald-200">
-{prettifyJson(t.sampleResult ?? "{}")}
+                          {prettifyJson(t.sampleResult ?? "{}")}
                         </pre>
                       </div>
                     )}
@@ -1757,10 +2005,15 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
 
           {resources.length > 0 && (
             <div>
-              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Resources</div>
+              <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                Resources
+              </div>
               <div className="space-y-1">
                 {resources.map((r) => (
-                  <div key={r.uri} className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-[11.5px]">
+                  <div
+                    key={r.uri}
+                    className="flex items-center gap-2 rounded-lg border border-black/5 bg-white px-2.5 py-1.5 text-[11.5px]"
+                  >
                     <FileText className="h-3 w-3 shrink-0 text-primary" />
                     <code className="font-mono">{r.name}</code>
                     <span className="ml-auto truncate text-muted-foreground">{r.description}</span>
@@ -1775,11 +2028,13 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
       {tab === "install" && (
         <div className="space-y-3 p-4">
           <div className="flex items-center gap-1 rounded-lg border border-black/5 bg-muted/30 p-1">
-            {([
-              ["claude", "Claude Code"],
-              ["cursor", "Cursor"],
-              ["codex", "Codex / Cline"],
-            ] as const).map(([id, label]) => (
+            {(
+              [
+                ["claude", "Claude Code"],
+                ["cursor", "Cursor"],
+                ["codex", "Codex / Cline"],
+              ] as const
+            ).map(([id, label]) => (
               <button
                 key={id}
                 onClick={() => setClient(id)}
@@ -1792,12 +2047,16 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
-                {client === "claude" ? "Run in your terminal" : client === "cursor" ? "Add to ~/.cursor/mcp.json" : "Add to your MCP config"}
+                {client === "claude"
+                  ? "Run in your terminal"
+                  : client === "cursor"
+                    ? "Add to ~/.cursor/mcp.json"
+                    : "Add to your MCP config"}
               </span>
               <CopyButton text={installSnippet} />
             </div>
             <pre className="overflow-auto rounded-xl bg-[oklch(0.18_0_0)] p-3 font-mono text-[11px] leading-relaxed text-emerald-200">
-{installSnippet}
+              {installSnippet}
             </pre>
           </div>
           <div className="rounded-lg border border-black/5 bg-muted/20 p-3 text-[11.5px]">
@@ -1805,21 +2064,29 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
               <Shield className="h-3 w-3" /> Authentication
             </div>
             <p className="text-muted-foreground">
-              Pass your Beevr access key as a Bearer token. Generate one in <strong className="text-foreground">Access keys</strong>, then export <code className="rounded bg-white px-1 py-0.5 font-mono">BEEVR_KEY</code> in your shell.
+              Pass your Beevr access key as a Bearer token. Generate one in{" "}
+              <strong className="text-foreground">Access keys</strong>, then export{" "}
+              <code className="rounded bg-white px-1 py-0.5 font-mono">BEEVR_KEY</code> in your
+              shell.
             </p>
           </div>
         </div>
       )}
 
-      {tab === "docs" && (
-        draft.docsMarkdown
-          ? <DocsMarkdown md={draft.docsMarkdown} />
-          : <div className="p-6 text-center text-xs text-muted-foreground">No documentation generated.</div>
-      )}
+      {tab === "docs" &&
+        (draft.docsMarkdown ? (
+          <DocsMarkdown md={draft.docsMarkdown} />
+        ) : (
+          <div className="p-6 text-center text-xs text-muted-foreground">
+            No documentation generated.
+          </div>
+        ))}
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-2 border-t border-black/5 bg-muted/20 px-4 py-3">
-        <span className="text-[11px] text-muted-foreground">Mock MCP — installable from any MCP-aware client.</span>
+        <span className="text-[11px] text-muted-foreground">
+          Mock MCP — installable from any MCP-aware client.
+        </span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast("Discarded draft")}
@@ -1832,7 +2099,11 @@ function McpProposalCard({ draft }: { draft: McpDraft }) {
             disabled={busy}
             className="clicky inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {busy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
             {busy ? "Installing…" : "Install MCP"}
           </button>
         </div>
@@ -1862,7 +2133,10 @@ function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: st
     setAnswers((cur) => {
       const prev = cur[qid] ?? [];
       if (multi) {
-        return { ...cur, [qid]: prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value] };
+        return {
+          ...cur,
+          [qid]: prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+        };
       }
       return { ...cur, [qid]: [value] };
     });
@@ -1916,7 +2190,11 @@ function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: st
               <div className="text-[13px] font-semibold text-foreground">
                 <span className="mr-1.5 text-muted-foreground">{qi + 1}.</span>
                 {q.question}
-                {multi && <span className="ml-2 text-[10px] font-medium text-muted-foreground">(pick any)</span>}
+                {multi && (
+                  <span className="ml-2 text-[10px] font-medium text-muted-foreground">
+                    (pick any)
+                  </span>
+                )}
               </div>
               <div className="grid gap-1.5 sm:grid-cols-2">
                 {q.options.map((o) => {
@@ -1934,14 +2212,18 @@ function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: st
                     >
                       <span
                         className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
-                          active ? "border-primary bg-primary text-white" : "border-black/20 bg-white"
+                          active
+                            ? "border-primary bg-primary text-white"
+                            : "border-black/20 bg-white"
                         }`}
                       >
                         {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
                       </span>
                       <span className="min-w-0 flex-1">
                         <div className="font-medium">{o.label}</div>
-                        {o.description && <div className="text-[11px] text-muted-foreground">{o.description}</div>}
+                        {o.description && (
+                          <div className="text-[11px] text-muted-foreground">{o.description}</div>
+                        )}
                       </span>
                     </button>
                   );
@@ -1958,10 +2240,14 @@ function ClarifyCard({ draft, onSend }: { draft: ClarifyDraft; onSend: (text: st
                   >
                     <span
                       className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
-                        picks.includes("__other__") ? "border-primary bg-primary text-white" : "border-black/20"
+                        picks.includes("__other__")
+                          ? "border-primary bg-primary text-white"
+                          : "border-black/20"
                       }`}
                     >
-                      {picks.includes("__other__") && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                      {picks.includes("__other__") && (
+                        <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                      )}
                     </span>
                     <span className="font-medium text-foreground/80">Other…</span>
                   </button>

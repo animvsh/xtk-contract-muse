@@ -35,16 +35,15 @@ export function ReasoningSteps({ log, live = false }: { log: string; live?: bool
           <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[oklch(0.72_0.21_45)] text-white">
             <Sparkles className="h-3 w-3" />
           </span>
-          <div className="flex-1 pt-0.5 text-sm font-medium leading-relaxed text-foreground">{summary}</div>
+          <div className="flex-1 pt-0.5 text-sm font-medium leading-relaxed text-foreground">
+            {summary}
+          </div>
         </div>
       )}
 
       <div className="relative ml-3 space-y-2.5 border-l border-dashed border-black/[0.08] pl-5">
         {bullets.slice(0, shown).map((b, i) => (
-          <div
-            key={i}
-            className="slide-in-left relative"
-          >
+          <div key={i} className="slide-in-left relative">
             <span className="absolute -left-[26px] top-1.5 grid h-3 w-3 place-items-center rounded-full bg-white ring-2 ring-[oklch(0.72_0.21_45)]/40">
               <span className="h-1 w-1 rounded-full bg-[oklch(0.72_0.21_45)]" />
             </span>
@@ -59,9 +58,18 @@ export function ReasoningSteps({ log, live = false }: { log: string; live?: bool
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Brain className="h-3 w-3" /> thinking
               <span className="inline-flex gap-0.5">
-                <span className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "0ms" }} />
-                <span className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "150ms" }} />
-                <span className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "300ms" }} />
+                <span
+                  className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <span
+                  className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="h-1 w-1 animate-bounce rounded-full bg-muted-foreground/60"
+                  style={{ animationDelay: "300ms" }}
+                />
               </span>
             </div>
           </div>

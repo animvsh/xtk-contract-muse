@@ -18,14 +18,24 @@ const tools = {
     description:
       "FIRST tool call of every response. Lay out a plan as 3-5 high-level parent tasks, each with 1-3 short sub-tasks. Use kebab-case unique IDs. After this, call updateStep to move tasks through 'in-progress' → 'done' (or 'warning') as you actually work.",
     inputSchema: z.object({
-      tasks: z.array(z.object({
-        id: z.string().describe("Unique kebab-case id, e.g. 'research-docs'"),
-        title: z.string().describe("Short parent task title (3-6 words)"),
-        subtasks: z.array(z.object({
-          id: z.string(),
-          title: z.string().describe("Short sub-task title (3-6 words)"),
-        })).min(1).max(4),
-      })).min(3).max(6),
+      tasks: z
+        .array(
+          z.object({
+            id: z.string().describe("Unique kebab-case id, e.g. 'research-docs'"),
+            title: z.string().describe("Short parent task title (3-6 words)"),
+            subtasks: z
+              .array(
+                z.object({
+                  id: z.string(),
+                  title: z.string().describe("Short sub-task title (3-6 words)"),
+                }),
+              )
+              .min(1)
+              .max(4),
+          }),
+        )
+        .min(3)
+        .max(6),
     }),
     execute: async ({ tasks }) => {
       await new Promise((r) => setTimeout(r, 400));
@@ -51,18 +61,47 @@ const tools = {
     execute: async ({ query }) => {
       await new Promise((r) => setTimeout(r, 700));
       const all = [
-        { title: "Beevr Handbook · Employment & Hiring Policy", snippet: "Standard Beevr template v3 — comp grid, equity (4y/1y cliff), PTO, IP assignment.", url: "notion://beevr/handbook/employment" },
-        { title: "Q3 2026 Roadmap", snippet: "Pillars: Cloud Builds GA, Approvals v2, MCP keys, /docs polish. Ship by Sep 30.", url: "notion://beevr/roadmap/q3" },
-        { title: "Beevr Engineering Levels", snippet: "L1–L7 ladder with comp bands and expectations.", url: "notion://beevr/eng/levels" },
-        { title: "About Beevr", snippet: "Beevr is a chat-native company brain that builds and hosts agents safely.", url: "notion://beevr/about" },
-        { title: "Pricing FAQ — Internal", snippet: "Tiers: Starter $0, Team $25/seat, Business $99/seat. Enterprise on request.", url: "notion://beevr/pricing-faq" },
-        { title: "Customer Onboarding Playbook", snippet: "Day 0 welcome, Day 3 check-in, Day 14 health review.", url: "notion://beevr/onboarding" },
+        {
+          title: "Beevr Handbook · Employment & Hiring Policy",
+          snippet:
+            "Standard Beevr template v3 — comp grid, equity (4y/1y cliff), PTO, IP assignment.",
+          url: "notion://beevr/handbook/employment",
+        },
+        {
+          title: "Q3 2026 Roadmap",
+          snippet:
+            "Pillars: Cloud Builds GA, Approvals v2, MCP keys, /docs polish. Ship by Sep 30.",
+          url: "notion://beevr/roadmap/q3",
+        },
+        {
+          title: "Beevr Engineering Levels",
+          snippet: "L1–L7 ladder with comp bands and expectations.",
+          url: "notion://beevr/eng/levels",
+        },
+        {
+          title: "About Beevr",
+          snippet: "Beevr is a chat-native company brain that builds and hosts agents safely.",
+          url: "notion://beevr/about",
+        },
+        {
+          title: "Pricing FAQ — Internal",
+          snippet: "Tiers: Starter $0, Team $25/seat, Business $99/seat. Enterprise on request.",
+          url: "notion://beevr/pricing-faq",
+        },
+        {
+          title: "Customer Onboarding Playbook",
+          snippet: "Day 0 welcome, Day 3 check-in, Day 14 health review.",
+          url: "notion://beevr/onboarding",
+        },
       ];
       const q = query.toLowerCase();
-      const results = all.filter((r) =>
-        r.title.toLowerCase().includes(q) ||
-        r.snippet.toLowerCase().includes(q) ||
-        q.split(/\s+/).some((w) => w.length > 2 && (r.title + r.snippet).toLowerCase().includes(w)),
+      const results = all.filter(
+        (r) =>
+          r.title.toLowerCase().includes(q) ||
+          r.snippet.toLowerCase().includes(q) ||
+          q
+            .split(/\s+/)
+            .some((w) => w.length > 2 && (r.title + r.snippet).toLowerCase().includes(w)),
       );
       return { results: results.length ? results.slice(0, 4) : all.slice(0, 3) };
     },
@@ -73,7 +112,17 @@ const tools = {
     execute: async ({ name }) => {
       await new Promise((r) => setTimeout(r, 600));
       const slug = name.toLowerCase().replace(/[^a-z]/g, "");
-      return { matches: [{ name, email: `${slug}@beevr.dev`, title: "Engineering", recentThreads: 3, lastSeen: "2 days ago" }] };
+      return {
+        matches: [
+          {
+            name,
+            email: `${slug}@beevr.dev`,
+            title: "Engineering",
+            recentThreads: 3,
+            lastSeen: "2 days ago",
+          },
+        ],
+      };
     },
   }),
   searchEmails: tool({
@@ -82,9 +131,24 @@ const tools = {
     execute: async ({ query, days = 7 }) => {
       await new Promise((r) => setTimeout(r, 750));
       const threads = [
-        { from: "maya@northwind.co", subject: "Re: Pricing for 50 seats", preview: "Thanks — can we get the Business tier at $79/seat for an annual deal?", receivedAt: "2d ago" },
-        { from: "jordan@acme.dev", subject: "Pricing question", preview: "Quick one: does Team tier include SSO?", receivedAt: "4d ago" },
-        { from: "ari@helix.ai", subject: "Following up on demo", preview: "Loved the agent builder. What's the smallest plan with approvals?", receivedAt: "5d ago" },
+        {
+          from: "maya@northwind.co",
+          subject: "Re: Pricing for 50 seats",
+          preview: "Thanks — can we get the Business tier at $79/seat for an annual deal?",
+          receivedAt: "2d ago",
+        },
+        {
+          from: "jordan@acme.dev",
+          subject: "Pricing question",
+          preview: "Quick one: does Team tier include SSO?",
+          receivedAt: "4d ago",
+        },
+        {
+          from: "ari@helix.ai",
+          subject: "Following up on demo",
+          preview: "Loved the agent builder. What's the smallest plan with approvals?",
+          receivedAt: "5d ago",
+        },
       ];
       return { threads, window: `last ${days} days`, query };
     },
@@ -130,7 +194,13 @@ const tools = {
     }),
     execute: async ({ to, subject, attachments }) => {
       await new Promise((r) => setTimeout(r, 700));
-      return { delivered: true, to, subject, attachments: attachments ?? [], messageId: `msg_${Math.random().toString(36).slice(2, 10)}` };
+      return {
+        delivered: true,
+        to,
+        subject,
+        attachments: attachments ?? [],
+        messageId: `msg_${Math.random().toString(36).slice(2, 10)}`,
+      };
     },
   }),
   proposeAgent: tool({
@@ -145,11 +215,22 @@ const tools = {
         timeOfDay: z.string().describe("HH:MM 24h, e.g. '08:00'. Use '08:00' for 'every morning'."),
       }),
       trigger: z.string().describe("Plain-English trigger summary, e.g. 'Every morning at 8:00am'"),
-      action: z.string().describe("Plain-English action summary, e.g. 'Send a text message with yesterday's revenue'"),
-      dataSources: z.array(z.string()).describe("Where data comes from, e.g. ['Stripe charges (last 24h)']"),
+      action: z
+        .string()
+        .describe(
+          "Plain-English action summary, e.g. 'Send a text message with yesterday's revenue'",
+        ),
+      dataSources: z
+        .array(z.string())
+        .describe("Where data comes from, e.g. ['Stripe charges (last 24h)']"),
       channel: z.enum(["sms", "email", "slack", "in-app"]),
-      recipient: z.string().optional().describe("Phone number, email, or channel — leave blank if unknown"),
-      tools: z.array(z.string()).describe("Tool/connector names this agent will use, e.g. ['Stripe', 'Twilio']"),
+      recipient: z
+        .string()
+        .optional()
+        .describe("Phone number, email, or channel — leave blank if unknown"),
+      tools: z
+        .array(z.string())
+        .describe("Tool/connector names this agent will use, e.g. ['Stripe', 'Twilio']"),
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
@@ -160,30 +241,62 @@ const tools = {
       name: z.string().describe("Short human name, e.g. 'Tasks API'"),
       description: z.string().describe("One sentence on what the API does"),
       emoji: z.string().describe("Single fitting emoji, e.g. '✅'"),
-      kind: z.enum(["rest", "function"]).describe("'rest' = CRUD on a resource (e.g. /api/tasks). 'function' = single custom endpoint (e.g. /api/summarize-url)."),
-      method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]).describe("Primary method for this endpoint. Use GET for rest list/read."),
-      path: z.string().describe("Endpoint path, e.g. '/api/tasks' or '/api/tasks/:id' or '/api/summarize-url'"),
-      params: z.array(z.object({
-        name: z.string(),
-        in: z.enum(["query", "body", "path"]),
-        type: z.enum(["string", "number", "boolean", "array", "object"]),
-        required: z.boolean(),
-        description: z.string(),
-        example: z.string().optional(),
-      })).describe("Parameters this endpoint accepts. Empty for simple GET list."),
-      sampleResponse: z.string().describe("Example JSON response body (stringified). Make it realistic and pretty-printed."),
-      endpoints: z.array(z.object({
-        method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
-        path: z.string(),
-        summary: z.string(),
-      })).describe("For 'rest' kind, list 4-5 CRUD endpoints (list/get/create/update/delete). For 'function' kind, just the single endpoint."),
-      authentication: z.enum(["none", "api-key", "bearer"]).describe("Auth model. Default to 'api-key' unless the user says public."),
-      errors: z.array(z.object({
-        status: z.number().describe("HTTP status code"),
-        code: z.string().describe("Short error code, e.g. 'not_found'"),
-        message: z.string().describe("Plain-English description"),
-      })).describe("3-5 realistic error responses (400, 401, 404, 422, 500 as relevant)."),
-      docsMarkdown: z.string().describe("Rich markdown documentation (300-700 words). MUST include: ## Overview, ## Authentication, ## Endpoints (with example request and response per endpoint as fenced code blocks), ## Errors, ## Rate limits, ## Changelog. Use realistic content."),
+      kind: z
+        .enum(["rest", "function"])
+        .describe(
+          "'rest' = CRUD on a resource (e.g. /api/tasks). 'function' = single custom endpoint (e.g. /api/summarize-url).",
+        ),
+      method: z
+        .enum(["GET", "POST", "PUT", "DELETE", "PATCH"])
+        .describe("Primary method for this endpoint. Use GET for rest list/read."),
+      path: z
+        .string()
+        .describe("Endpoint path, e.g. '/api/tasks' or '/api/tasks/:id' or '/api/summarize-url'"),
+      params: z
+        .array(
+          z.object({
+            name: z.string(),
+            in: z.enum(["query", "body", "path"]),
+            type: z.enum(["string", "number", "boolean", "array", "object"]),
+            required: z.boolean(),
+            description: z.string(),
+            example: z.string().optional(),
+          }),
+        )
+        .describe("Parameters this endpoint accepts. Empty for simple GET list."),
+      sampleResponse: z
+        .string()
+        .describe(
+          "Example JSON response body (stringified). Make it realistic and pretty-printed.",
+        ),
+      endpoints: z
+        .array(
+          z.object({
+            method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
+            path: z.string(),
+            summary: z.string(),
+          }),
+        )
+        .describe(
+          "For 'rest' kind, list 4-5 CRUD endpoints (list/get/create/update/delete). For 'function' kind, just the single endpoint.",
+        ),
+      authentication: z
+        .enum(["none", "api-key", "bearer"])
+        .describe("Auth model. Default to 'api-key' unless the user says public."),
+      errors: z
+        .array(
+          z.object({
+            status: z.number().describe("HTTP status code"),
+            code: z.string().describe("Short error code, e.g. 'not_found'"),
+            message: z.string().describe("Plain-English description"),
+          }),
+        )
+        .describe("3-5 realistic error responses (400, 401, 404, 422, 500 as relevant)."),
+      docsMarkdown: z
+        .string()
+        .describe(
+          "Rich markdown documentation (300-700 words). MUST include: ## Overview, ## Authentication, ## Endpoints (with example request and response per endpoint as fenced code blocks), ## Errors, ## Rate limits, ## Changelog. Use realistic content.",
+        ),
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
@@ -192,18 +305,35 @@ const tools = {
       "Ask the user 1-3 quick clarifying questions BEFORE creating an agent / API / MCP when critical info is missing or ambiguous (e.g. phone number for SMS agent, which metric to track, which data source to read, cadence/time, which workspace to expose). Each question shows a small UI card with multiple-choice options. After calling this, end your response with ONE short plain-text line like 'A few quick questions to get this right.' DO NOT call proposeAgent / proposeApi / proposeMcp in the same response. The user's answers will arrive as the next user message.",
     inputSchema: z.object({
       intent: z.enum(["agent", "api", "mcp"]).describe("What you're about to create"),
-      summary: z.string().describe("One sentence on what you're planning to build, e.g. 'Daily SMS with employee effectiveness score'"),
-      questions: z.array(z.object({
-        id: z.string().describe("kebab-case id, e.g. 'recipient'"),
-        question: z.string().describe("Short question, e.g. 'Where should I send it?'"),
-        options: z.array(z.object({
-          value: z.string().describe("Short value the assistant will see, e.g. 'sms'"),
-          label: z.string().describe("Display label, e.g. 'Text my phone'"),
-          description: z.string().optional().describe("Optional one-line clarifier"),
-        })).min(2).max(5),
-        multi: z.boolean().optional().describe("Allow multiple selections. Default false."),
-        allowOther: z.boolean().optional().describe("Show a free-text 'Other' option. Default true."),
-      })).min(1).max(3),
+      summary: z
+        .string()
+        .describe(
+          "One sentence on what you're planning to build, e.g. 'Daily SMS with employee effectiveness score'",
+        ),
+      questions: z
+        .array(
+          z.object({
+            id: z.string().describe("kebab-case id, e.g. 'recipient'"),
+            question: z.string().describe("Short question, e.g. 'Where should I send it?'"),
+            options: z
+              .array(
+                z.object({
+                  value: z.string().describe("Short value the assistant will see, e.g. 'sms'"),
+                  label: z.string().describe("Display label, e.g. 'Text my phone'"),
+                  description: z.string().optional().describe("Optional one-line clarifier"),
+                }),
+              )
+              .min(2)
+              .max(5),
+            multi: z.boolean().optional().describe("Allow multiple selections. Default false."),
+            allowOther: z
+              .boolean()
+              .optional()
+              .describe("Show a free-text 'Other' option. Default true."),
+          }),
+        )
+        .min(1)
+        .max(3),
     }),
     execute: async (input) => ({ ok: true, awaiting: true, draft: input }),
   }),
@@ -212,33 +342,51 @@ const tools = {
       "Use WHEN AND ONLY WHEN the user asks to create / build / make / spin up an MCP, MCP server, Model Context Protocol server, CLI tool, or 'something I can use from Claude Code / Cursor / Codex / my coding tool / terminal' to access their workspace. Render a draft MCP server the user can review and save. Do NOT call createPlan, updateStep, proposeApi, proposeAgent, or other tools alongside this — the proposal IS the response.",
     inputSchema: z.object({
       name: z.string().describe("Short human name, e.g. 'Workspace Brain MCP'"),
-      slug: z.string().describe("kebab-case slug used as the server identifier, e.g. 'workspace-brain'"),
+      slug: z
+        .string()
+        .describe("kebab-case slug used as the server identifier, e.g. 'workspace-brain'"),
       description: z.string().describe("One-sentence summary of what the MCP server exposes"),
       emoji: z.string().describe("Single fitting emoji, e.g. '🧠'"),
-      transport: z.enum(["http", "sse", "stdio"]).describe("Default to 'http' (Streamable HTTP) unless the user asks for stdio."),
-      tools: z.array(z.object({
-        name: z.string().describe("snake_case tool name, e.g. 'search_notion'"),
-        description: z.string().describe("One sentence on what the tool does"),
-        params: z.array(z.object({
-          name: z.string(),
-          type: z.enum(["string", "number", "boolean", "array", "object"]),
-          required: z.boolean(),
-          description: z.string(),
-          example: z.string().optional(),
-        })),
-        sampleResult: z.string().describe("Realistic pretty-printed JSON the tool returns"),
-      })).min(3).max(8).describe("3-8 tools the MCP exposes. Pick tools that fit the user's request."),
-      resources: z.array(z.object({
-        uri: z.string().describe("Resource URI, e.g. 'beevr://docs/handbook'"),
-        name: z.string(),
-        description: z.string(),
-      })).describe("0-4 readable resources the MCP exposes. Use [] if not relevant."),
-      docsMarkdown: z.string().describe("Rich markdown docs (300-700 words). MUST include: ## Overview, ## Install (with `claude mcp add`, Cursor settings.json snippet, and an OpenAI Codex / Cline JSON snippet — all using the placeholder URL `https://mcp.beevr.dev/{slug}`), ## Tools (one section per tool with params + example), ## Authentication (Bearer access key), ## Troubleshooting."),
+      transport: z
+        .enum(["http", "sse", "stdio"])
+        .describe("Default to 'http' (Streamable HTTP) unless the user asks for stdio."),
+      tools: z
+        .array(
+          z.object({
+            name: z.string().describe("snake_case tool name, e.g. 'search_notion'"),
+            description: z.string().describe("One sentence on what the tool does"),
+            params: z.array(
+              z.object({
+                name: z.string(),
+                type: z.enum(["string", "number", "boolean", "array", "object"]),
+                required: z.boolean(),
+                description: z.string(),
+                example: z.string().optional(),
+              }),
+            ),
+            sampleResult: z.string().describe("Realistic pretty-printed JSON the tool returns"),
+          }),
+        )
+        .min(3)
+        .max(8)
+        .describe("3-8 tools the MCP exposes. Pick tools that fit the user's request."),
+      resources: z
+        .array(
+          z.object({
+            uri: z.string().describe("Resource URI, e.g. 'beevr://docs/handbook'"),
+            name: z.string(),
+            description: z.string(),
+          }),
+        )
+        .describe("0-4 readable resources the MCP exposes. Use [] if not relevant."),
+      docsMarkdown: z
+        .string()
+        .describe(
+          "Rich markdown docs (300-700 words). MUST include: ## Overview, ## Install (with `claude mcp add`, Cursor settings.json snippet, and an OpenAI Codex / Cline JSON snippet — all using the placeholder URL `https://mcp.beevr.dev/{slug}`), ## Tools (one section per tool with params + example), ## Authentication (Bearer access key), ## Troubleshooting.",
+        ),
     }),
     execute: async (input) => ({ ok: true, draft: input }),
   }),
-
-
 };
 
 export const Route = createFileRoute("/api/chat")({

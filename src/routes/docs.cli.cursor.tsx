@@ -5,7 +5,10 @@ export const Route = createFileRoute("/docs/cli/cursor")({
   head: () => ({
     meta: [
       { title: "Connect Cursor — Beevr Docs" },
-      { name: "description", content: "Use Beevr as a workspace-aware context source inside Cursor." },
+      {
+        name: "description",
+        content: "Use Beevr as a workspace-aware context source inside Cursor.",
+      },
     ],
   }),
   component: Cursor,

@@ -9,7 +9,12 @@ type AgentSpec = {
   steps: Array<{ title: string; integration: string; action: string }>;
 };
 
-async function callLovableAI(systemPrompt: string, userPrompt: string, schema: object, toolName: string) {
+async function callLovableAI(
+  systemPrompt: string,
+  userPrompt: string,
+  schema: object,
+  toolName: string,
+) {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -22,7 +27,12 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, schema: o
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      tools: [{ type: "function", function: { name: toolName, description: "structured output", parameters: schema } }],
+      tools: [
+        {
+          type: "function",
+          function: { name: toolName, description: "structured output", parameters: schema },
+        },
+      ],
       tool_choice: { type: "function", function: { name: toolName } },
     }),
   });
@@ -79,7 +89,13 @@ export const createAgentFromPrompt = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabase
       .from("agents")
-      .insert({ name: spec.name, description: spec.description, spec, status: "active", user_id: userId })
+      .insert({
+        name: spec.name,
+        description: spec.description,
+        spec,
+        status: "active",
+        user_id: userId,
+      })
       .select()
       .single();
     if (error) throw new Error(error.message);
@@ -91,7 +107,11 @@ export const runAgent = createServerFn({ method: "POST" })
   .inputValidator((data: { agentId: string }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: agent } = await supabase.from("agents").select("*").eq("id", data.agentId).single();
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("*")
+      .eq("id", data.agentId)
+      .single();
     if (!agent) throw new Error("Agent not found");
 
     const result = await callLovableAI(
@@ -109,7 +129,9 @@ export const runAgent = createServerFn({ method: "POST" })
     );
 
     const log = `${result.summary}\n\n${result.log_lines.map((l: string) => `• ${l}`).join("\n")}`;
-    await supabase.from("agent_runs").insert({ agent_id: data.agentId, log, status: "completed", user_id: userId });
+    await supabase
+      .from("agent_runs")
+      .insert({ agent_id: data.agentId, log, status: "completed", user_id: userId });
     await supabase
       .from("agents")
       .update({ runs_count: (agent.runs_count ?? 0) + 1 })

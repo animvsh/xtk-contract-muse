@@ -5,7 +5,10 @@ export const Route = createFileRoute("/docs/agents")({
   head: () => ({
     meta: [
       { title: "Agents — Beevr Docs" },
-      { name: "description", content: "List, run, and create Beevr agents from a CLI with the right access key." },
+      {
+        name: "description",
+        content: "List, run, and create Beevr agents from a CLI with the right access key.",
+      },
     ],
   }),
   component: Agents,
@@ -33,8 +36,14 @@ function Agents() {
       <DocsSection title="Common workflows">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
-            { t: "Run Weekly Support Summary", d: "Trigger an existing approved agent and stream output." },
-            { t: "Create Complaint Watchdog", d: "Draft a new agent that monitors and flags risks." },
+            {
+              t: "Run Weekly Support Summary",
+              d: "Trigger an existing approved agent and stream output.",
+            },
+            {
+              t: "Create Complaint Watchdog",
+              d: "Draft a new agent that monitors and flags risks.",
+            },
             { t: "Debug failed agent run", d: "Inspect logs and retry steps from your CLI." },
           ].map((c) => (
             <div key={c.t} className="rounded-xl border border-border bg-card p-4">

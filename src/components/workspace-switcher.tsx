@@ -107,7 +107,9 @@ export function WorkspaceSwitcher() {
                         {w.company}
                       </span>
                     </span>
-                    {active && <Check className="h-3.5 w-3.5 shrink-0 text-[oklch(0.55_0.18_145)]" />}
+                    {active && (
+                      <Check className="h-3.5 w-3.5 shrink-0 text-[oklch(0.55_0.18_145)]" />
+                    )}
                   </button>
                 );
               })}

@@ -5,7 +5,10 @@ export const Route = createFileRoute("/docs/access-keys")({
   head: () => ({
     meta: [
       { title: "Access keys — Beevr Docs" },
-      { name: "description", content: "How Beevr access keys give CLIs safe, scoped access to your workspace." },
+      {
+        name: "description",
+        content: "How Beevr access keys give CLIs safe, scoped access to your workspace.",
+      },
     ],
   }),
   component: AccessKeys,

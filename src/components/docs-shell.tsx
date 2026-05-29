@@ -113,11 +113,21 @@ export function DocsShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function DocsHero({ eyebrow, title, lead }: { eyebrow?: string; title: string; lead?: string }) {
+export function DocsHero({
+  eyebrow,
+  title,
+  lead,
+}: {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+}) {
   return (
     <div className="border-b border-border pb-8">
       {eyebrow && (
-        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</div>
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">
+          {eyebrow}
+        </div>
       )}
       <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
       {lead && <p className="mt-3 max-w-2xl text-base text-muted-foreground">{lead}</p>}

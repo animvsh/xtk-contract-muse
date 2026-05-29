@@ -45,7 +45,18 @@ type Agent = {
 };
 type Run = { id: string; log: string; created_at: string };
 
-const INTEGRATIONS = ["Notion", "Slack", "Gmail", "Drive", "Linear", "GitHub", "HubSpot", "Stripe", "Zoom", "Figma"];
+const INTEGRATIONS = [
+  "Notion",
+  "Slack",
+  "Gmail",
+  "Drive",
+  "Linear",
+  "GitHub",
+  "HubSpot",
+  "Stripe",
+  "Zoom",
+  "Figma",
+];
 const TRIGGER_TYPES = ["manual", "schedule", "webhook", "event"] as const;
 
 const triggerIcon = (type: string) => {
@@ -65,7 +76,9 @@ function AgentDetail() {
   const [running, setRunning] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
   const [tab, setTab] = useState<"logs" | "chat">("logs");
-  const [editing, setEditing] = useState<{ kind: "trigger" } | { kind: "step"; index: number } | null>(null);
+  const [editing, setEditing] = useState<
+    { kind: "trigger" } | { kind: "step"; index: number } | null
+  >(null);
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -73,7 +86,12 @@ function AgentDetail() {
     setLoadError(null);
     const [{ data: a, error: agentError }, { data: r, error: runsError }] = await Promise.all([
       supabase.from("agents").select("*").eq("id", id).single(),
-      supabase.from("agent_runs").select("*").eq("agent_id", id).order("created_at", { ascending: false }).limit(10),
+      supabase
+        .from("agent_runs")
+        .select("*")
+        .eq("agent_id", id)
+        .order("created_at", { ascending: false })
+        .limit(10),
     ]);
     if (agentError || !a) {
       setAgent(null);
@@ -96,7 +114,11 @@ function AgentDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const persistSpec = async (nextSpec: AgentSpec, nextName?: string, nextDescription?: string | null) => {
+  const persistSpec = async (
+    nextSpec: AgentSpec,
+    nextName?: string,
+    nextDescription?: string | null,
+  ) => {
     if (!agent) return;
     const optimistic: Agent = {
       ...agent,
@@ -106,10 +128,15 @@ function AgentDetail() {
     };
     setAgent(optimistic);
     setSaving(true);
-    const update: { spec: AgentSpec; name?: string; description?: string | null } = { spec: nextSpec };
+    const update: { spec: AgentSpec; name?: string; description?: string | null } = {
+      spec: nextSpec,
+    };
     if (nextName !== undefined) update.name = nextName;
     if (nextDescription !== undefined) update.description = nextDescription;
-    const { error } = await supabase.from("agents").update(update as never).eq("id", id);
+    const { error } = await supabase
+      .from("agents")
+      .update(update as never)
+      .eq("id", id);
     setSaving(false);
     if (error) {
       toast.error("Couldn't save changes");
@@ -130,12 +157,17 @@ function AgentDetail() {
     const pushLog = () => {
       setRuns((cur) => {
         const next = cur.filter((r) => r.id !== runId);
-        return [{ id: runId, created_at: startedAt, log: `${summary}\n\n${lines.join("\n")}` }, ...next];
+        return [
+          { id: runId, created_at: startedAt, log: `${summary}\n\n${lines.join("\n")}` },
+          ...next,
+        ];
       });
     };
 
     setActiveIndex(0);
-    lines.push(`• [${new Date().toLocaleTimeString()}] Trigger fired — ${trig.description || trig.type || "manual run"}`);
+    lines.push(
+      `• [${new Date().toLocaleTimeString()}] Trigger fired — ${trig.description || trig.type || "manual run"}`,
+    );
     pushLog();
     await new Promise((r) => setTimeout(r, 600));
 
@@ -151,7 +183,9 @@ function AgentDetail() {
     }
 
     setActiveIndex(-1);
-    lines.push(`• [${new Date().toLocaleTimeString()}] Completed in ${(allSteps.length * 0.8 + 0.6).toFixed(1)}s`);
+    lines.push(
+      `• [${new Date().toLocaleTimeString()}] Completed in ${(allSteps.length * 0.8 + 0.6).toFixed(1)}s`,
+    );
     pushLog();
 
     // Best-effort persist; ignore failures so the demo always feels live.
@@ -170,7 +204,9 @@ function AgentDetail() {
           .update({ runs_count: (agent.runs_count ?? 0) + 1 })
           .eq("id", id);
       }
-    } catch { /* mock-only */ }
+    } catch {
+      /* mock-only */
+    }
 
     toast.success("Agent run completed");
     setRunning(false);
@@ -218,13 +254,18 @@ function AgentDetail() {
   if (!agent) {
     return (
       <div className="mx-auto w-full max-w-3xl px-6 py-10">
-        <Link to="/app/agents" className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+        <Link
+          to="/app/agents"
+          className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-3 w-3" /> Agents
         </Link>
         <div className="rounded-2xl border border-dashed border-black/[0.08] bg-white/60 p-10 text-center">
           <Bot className="mx-auto h-8 w-8 text-muted-foreground/50" />
           <h1 className="mt-3 text-lg font-semibold">Agent unavailable</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{loadError ?? "This agent couldn't be loaded."}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {loadError ?? "This agent couldn't be loaded."}
+          </p>
         </div>
       </div>
     );
@@ -232,7 +273,10 @@ function AgentDetail() {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-7xl flex-col px-6 py-8">
-      <Link to="/app/agents" className="mb-4 inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        to="/app/agents"
+        className="mb-4 inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-3 w-3" /> Agents
       </Link>
       <PageHeader
@@ -240,13 +284,22 @@ function AgentDetail() {
         subtitle={agent.description ?? undefined}
         action={
           <div className="flex items-center gap-2">
-            {saving && <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Saving</span>}
+            {saving && (
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" /> Saving
+              </span>
+            )}
             <button
               onClick={handleRun}
               disabled={running}
               className="clicky flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-40"
             >
-              {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />} Run
+              {running ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}{" "}
+              Run
             </button>
           </div>
         }
@@ -266,7 +319,9 @@ function AgentDetail() {
             if (kind === "trigger") {
               persistSpec({ ...agent.spec, trigger: { ...agent.spec.trigger, x, y } });
             } else {
-              const steps = (agent.spec.steps ?? []).map((s, i) => (i === index ? { ...s, x, y } : s));
+              const steps = (agent.spec.steps ?? []).map((s, i) =>
+                i === index ? { ...s, x, y } : s,
+              );
               persistSpec({ ...agent.spec, steps });
             }
           }}
@@ -291,7 +346,11 @@ function AgentDetail() {
                   <TabBtn active={tab === "logs"} onClick={() => setTab("logs")} icon={ListTree}>
                     Logs
                   </TabBtn>
-                  <TabBtn active={tab === "chat"} onClick={() => setTab("chat")} icon={MessageSquare}>
+                  <TabBtn
+                    active={tab === "chat"}
+                    onClick={() => setTab("chat")}
+                    icon={MessageSquare}
+                  >
                     Edit via chat
                   </TabBtn>
                 </div>
@@ -315,7 +374,10 @@ function AgentDetail() {
   );
 }
 
-function statusFor(i: number, activeIndex: number | undefined): "idle" | "pending" | "active" | "done" {
+function statusFor(
+  i: number,
+  activeIndex: number | undefined,
+): "idle" | "pending" | "active" | "done" {
   if (activeIndex === undefined) return "idle";
   if (activeIndex === -1) return "done";
   if (i < activeIndex) return "done";
@@ -323,12 +385,24 @@ function statusFor(i: number, activeIndex: number | undefined): "idle" | "pendin
   return "pending";
 }
 
-function TabBtn({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: typeof Bot; children: React.ReactNode }) {
+function TabBtn({
+  active,
+  onClick,
+  icon: Icon,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof Bot;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
       className={`clicky-sm flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${
-        active ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+        active
+          ? "bg-white text-foreground shadow-sm"
+          : "text-muted-foreground hover:text-foreground"
       }`}
     >
       <Icon className="h-3.5 w-3.5" /> {children}
@@ -378,10 +452,12 @@ function WorkflowCanvas({
   // Local positions for smooth dragging (committed to spec on drop)
   const initial = useMemo<CanvasNodeMeta[]>(() => {
     const out: CanvasNodeMeta[] = [];
-    const tp = trig.x !== undefined && trig.y !== undefined ? { x: trig.x, y: trig.y } : defaultPosition(0);
+    const tp =
+      trig.x !== undefined && trig.y !== undefined ? { x: trig.x, y: trig.y } : defaultPosition(0);
     out.push({ kind: "trigger", index: 0, ...tp });
     steps.forEach((s, i) => {
-      const p = s.x !== undefined && s.y !== undefined ? { x: s.x, y: s.y } : defaultPosition(i + 1);
+      const p =
+        s.x !== undefined && s.y !== undefined ? { x: s.x, y: s.y } : defaultPosition(i + 1);
       out.push({ kind: "step", index: i, ...p });
     });
     return out;
@@ -393,7 +469,9 @@ function WorkflowCanvas({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef<{ idx: number; ox: number; oy: number; px: number; py: number } | null>(null);
+  const dragRef = useRef<{ idx: number; ox: number; oy: number; px: number; py: number } | null>(
+    null,
+  );
   const panRef = useRef<{ ox: number; oy: number; px: number; py: number } | null>(null);
 
   const onNodePointerDown = (e: React.PointerEvent, idx: number) => {
@@ -408,7 +486,9 @@ function WorkflowCanvas({
       const d = dragRef.current;
       const dx = (e.clientX - d.px) / zoom;
       const dy = (e.clientY - d.py) / zoom;
-      setPositions((cur) => cur.map((n, i) => (i === d.idx ? { ...n, x: d.ox + dx, y: d.oy + dy } : n)));
+      setPositions((cur) =>
+        cur.map((n, i) => (i === d.idx ? { ...n, x: d.ox + dx, y: d.oy + dy } : n)),
+      );
     } else if (panRef.current) {
       const p = panRef.current;
       setPan({ x: p.ox + (e.clientX - p.px), y: p.oy + (e.clientY - p.py) });
@@ -420,12 +500,21 @@ function WorkflowCanvas({
       const d = dragRef.current;
       const final = positions[d.idx];
       if (Math.abs(final.x - d.ox) > 1 || Math.abs(final.y - d.oy) > 1) {
-        onMoveNode(final.kind, final.kind === "trigger" ? 0 : final.index, Math.round(final.x), Math.round(final.y));
+        onMoveNode(
+          final.kind,
+          final.kind === "trigger" ? 0 : final.index,
+          Math.round(final.x),
+          Math.round(final.y),
+        );
       }
       dragRef.current = null;
     }
     panRef.current = null;
-    try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* */ }
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* */
+    }
   };
 
   const onCanvasPointerDown = (e: React.PointerEvent) => {
@@ -451,12 +540,18 @@ function WorkflowCanvas({
           <button
             onClick={() => setZoom((z) => Math.max(0.4, z - 0.1))}
             className="clicky-sm rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
-          >−</button>
-          <div className="w-10 text-center text-[11px] tabular-nums text-muted-foreground">{Math.round(zoom * 100)}%</div>
+          >
+            −
+          </button>
+          <div className="w-10 text-center text-[11px] tabular-nums text-muted-foreground">
+            {Math.round(zoom * 100)}%
+          </div>
           <button
             onClick={() => setZoom((z) => Math.min(1.6, z + 0.1))}
             className="clicky-sm rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
-          >+</button>
+          >
+            +
+          </button>
           <button
             onClick={fitView}
             className="clicky-sm ml-1 flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
@@ -498,7 +593,15 @@ function WorkflowCanvas({
             height="1"
           >
             <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <marker
+                id="arrow"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="8"
+                markerHeight="8"
+                orient="auto-start-reverse"
+              >
                 <path d="M0,0 L10,5 L0,10 z" fill="oklch(0.72 0.05 60)" />
               </marker>
             </defs>
@@ -510,14 +613,18 @@ function WorkflowCanvas({
               const dx = Math.max(60, Math.abs(x2 - x1) * 0.5);
               const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
               const isActive =
-                activeIndex !== undefined &&
-                activeIndex !== -1 &&
-                e.id < activeIndex;
+                activeIndex !== undefined && activeIndex !== -1 && e.id < activeIndex;
               return (
                 <g key={e.id}>
                   <path d={path} fill="none" stroke="oklch(0.85 0.02 70)" strokeWidth={2} />
                   {isActive && (
-                    <path d={path} fill="none" stroke="oklch(0.72 0.21 45)" strokeWidth={2.5} markerEnd="url(#arrow)" />
+                    <path
+                      d={path}
+                      fill="none"
+                      stroke="oklch(0.72 0.21 45)"
+                      strokeWidth={2.5}
+                      markerEnd="url(#arrow)"
+                    />
                   )}
                 </g>
               );
@@ -544,7 +651,11 @@ function WorkflowCanvas({
                 kind={n.kind}
                 index={isTrigger ? 0 : n.index + 1}
                 title={isTrigger ? (data as AgentTrigger).type : (data as AgentStep).title}
-                sub={isTrigger ? (data as AgentTrigger).description : `${(data as AgentStep).integration} · ${(data as AgentStep).action}`}
+                sub={
+                  isTrigger
+                    ? (data as AgentTrigger).description
+                    : `${(data as AgentStep).integration} · ${(data as AgentStep).action}`
+                }
                 Icon={Icon}
                 status={status}
                 selected={selected}
@@ -568,10 +679,25 @@ function WorkflowCanvas({
 }
 
 function FlowNode({
-  x, y, width, height, kind, index, title, sub, Icon, status, selected,
-  onPointerDown, onClick, onDelete,
+  x,
+  y,
+  width,
+  height,
+  kind,
+  index,
+  title,
+  sub,
+  Icon,
+  status,
+  selected,
+  onPointerDown,
+  onClick,
+  onDelete,
 }: {
-  x: number; y: number; width: number; height: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   kind: "trigger" | "step";
   index: number;
   title: string;
@@ -583,11 +709,13 @@ function FlowNode({
   onClick: () => void;
   onDelete?: () => void;
 }) {
-  const ring =
-    selected ? "ring-2 ring-primary"
-    : status === "active" ? "ring-2 ring-[oklch(0.72_0.21_45)]"
-    : status === "done" ? "ring-1 ring-[oklch(0.72_0.21_45)]/40"
-    : "ring-1 ring-black/[0.08]";
+  const ring = selected
+    ? "ring-2 ring-primary"
+    : status === "active"
+      ? "ring-2 ring-[oklch(0.72_0.21_45)]"
+      : status === "done"
+        ? "ring-1 ring-[oklch(0.72_0.21_45)]/40"
+        : "ring-1 ring-black/[0.08]";
   return (
     <div
       data-node
@@ -601,26 +729,39 @@ function FlowNode({
       <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-white bg-[oklch(0.78_0.04_70)]" />
 
       <div className="flex items-center gap-2.5">
-        <span className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-          status === "done" || status === "active"
-            ? "bg-[oklch(0.72_0.21_45)] text-white"
-            : kind === "trigger"
-              ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
-              : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"
-        }`}>
-          {status === "active" ? <Loader2 className="h-4 w-4 animate-spin" /> : status === "done" ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+        <span
+          className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+            status === "done" || status === "active"
+              ? "bg-[oklch(0.72_0.21_45)] text-white"
+              : kind === "trigger"
+                ? "bg-[oklch(0.96_0.02_60)] text-[oklch(0.4_0_0)]"
+                : "bg-[oklch(0.97_0_0)] text-[oklch(0.4_0_0)]"
+          }`}
+        >
+          {status === "active" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : status === "done" ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Icon className="h-4 w-4" />
+          )}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {kind === "trigger" ? "Trigger" : `Step ${index}`}
-            {status === "active" && <Sparkles className="h-2.5 w-2.5 animate-pulse text-[oklch(0.72_0.21_45)]" />}
+            {status === "active" && (
+              <Sparkles className="h-2.5 w-2.5 animate-pulse text-[oklch(0.72_0.21_45)]" />
+            )}
           </div>
           <div className="truncate text-sm font-semibold capitalize text-foreground">{title}</div>
         </div>
         {onDelete && (
           <button
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
             className="clicky-sm rounded-md p-1 text-muted-foreground opacity-0 hover:bg-rose-50 hover:text-rose-600 group-hover/node:opacity-100"
             title="Delete step"
           >
@@ -628,7 +769,9 @@ function FlowNode({
           </button>
         )}
       </div>
-      <div className="mt-1 line-clamp-2 pl-[46px] text-[11px] leading-snug text-muted-foreground">{sub}</div>
+      <div className="mt-1 line-clamp-2 pl-[46px] text-[11px] leading-snug text-muted-foreground">
+        {sub}
+      </div>
     </div>
   );
 }
@@ -653,8 +796,15 @@ function EditPanel({
     return (
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-black/5 p-3">
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Edit trigger</div>
-          <button onClick={onClose} className="clicky-sm rounded-md p-1 text-muted-foreground hover:bg-black/5"><X className="h-4 w-4" /></button>
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Edit trigger
+          </div>
+          <button
+            onClick={onClose}
+            className="clicky-sm rounded-md p-1 text-muted-foreground hover:bg-black/5"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
           <Field label="Trigger type">
@@ -664,7 +814,9 @@ function EditPanel({
               className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-primary"
             >
               {TRIGGER_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>
+                  {t}
+                </option>
               ))}
             </select>
           </Field>
@@ -688,8 +840,15 @@ function EditPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-black/5 p-3">
-        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Edit step {editing.index + 1}</div>
-        <button onClick={onClose} className="clicky-sm rounded-md p-1 text-muted-foreground hover:bg-black/5"><X className="h-4 w-4" /></button>
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Edit step {editing.index + 1}
+        </div>
+        <button
+          onClick={onClose}
+          className="clicky-sm rounded-md p-1 text-muted-foreground hover:bg-black/5"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         <Field label="Title">
@@ -705,8 +864,14 @@ function EditPanel({
             onChange={(e) => onUpdateStep({ integration: e.target.value })}
             className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            {INTEGRATIONS.includes(step.integration) ? null : <option value={step.integration}>{step.integration}</option>}
-            {INTEGRATIONS.map((i) => (<option key={i} value={i}>{i}</option>))}
+            {INTEGRATIONS.includes(step.integration) ? null : (
+              <option value={step.integration}>{step.integration}</option>
+            )}
+            {INTEGRATIONS.map((i) => (
+              <option key={i} value={i}>
+                {i}
+              </option>
+            ))}
           </select>
         </Field>
         <Field label="Action">
@@ -731,7 +896,9 @@ function EditPanel({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
       {children}
     </label>
   );
@@ -749,7 +916,10 @@ function LogsPanel({ runs }: { runs: Run[] }) {
         <div className="divide-y divide-black/[0.05]">
           {runs.map((r, idx) => {
             const open = openId === r.id;
-            const lines = r.log.split("\n").map((l) => l.trim()).filter(Boolean);
+            const lines = r.log
+              .split("\n")
+              .map((l) => l.trim())
+              .filter(Boolean);
             const summary = lines[0]?.startsWith("•") ? "Run completed" : (lines[0] ?? "Run");
             const body = lines.filter((l) => l !== summary);
             const isLive = idx === 0;
@@ -759,13 +929,23 @@ function LogsPanel({ runs }: { runs: Run[] }) {
                   onClick={() => setOpenId(open ? null : r.id)}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-black/[0.02]"
                 >
-                  {open ? <ChevronDown className="h-3 w-3 text-muted-foreground" /> : <ChevronRight className="h-3 w-3 text-muted-foreground" />}
-                  <CircleDot className={`h-2.5 w-2.5 shrink-0 ${isLive ? "animate-pulse text-[oklch(0.72_0.21_45)]" : "text-emerald-500"}`} />
+                  {open ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                  <CircleDot
+                    className={`h-2.5 w-2.5 shrink-0 ${isLive ? "animate-pulse text-[oklch(0.72_0.21_45)]" : "text-emerald-500"}`}
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-xs font-medium text-foreground">{summary}</div>
                   </div>
                   <div className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
-                    {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                    {new Date(r.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </div>
                 </button>
                 {open && (
@@ -775,13 +955,20 @@ function LogsPanel({ runs }: { runs: Run[] }) {
                       const time = b.match(/\[([^\]]+)\]/)?.[1];
                       const text = b.replace(/^•\s*/, "").replace(/^\[[^\]]+\]\s*/, "");
                       return (
-                        <div key={i} className={`flex gap-2 ${isSub ? "pl-5 text-[oklch(0.7_0.05_85)]" : ""}`}>
-                          {time && <span className="shrink-0 text-[oklch(0.55_0.05_85)]">{time}</span>}
+                        <div
+                          key={i}
+                          className={`flex gap-2 ${isSub ? "pl-5 text-[oklch(0.7_0.05_85)]" : ""}`}
+                        >
+                          {time && (
+                            <span className="shrink-0 text-[oklch(0.55_0.05_85)]">{time}</span>
+                          )}
                           <span className="break-all">{text || b}</span>
                         </div>
                       );
                     })}
-                    {body.length === 0 && <div className="text-[oklch(0.6_0.05_85)]">No detail.</div>}
+                    {body.length === 0 && (
+                      <div className="text-[oklch(0.6_0.05_85)]">No detail.</div>
+                    )}
                   </div>
                 )}
               </div>
@@ -795,7 +982,13 @@ function LogsPanel({ runs }: { runs: Run[] }) {
 
 type ChatMsg = { role: "user" | "assistant"; text: string };
 
-function ChatEditor({ agent, onSpecChange }: { agent: Agent; onSpecChange: (next: AgentSpec, summary?: string) => void }) {
+function ChatEditor({
+  agent,
+  onSpecChange,
+}: {
+  agent: Agent;
+  onSpecChange: (next: AgentSpec, summary?: string) => void;
+}) {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
@@ -878,15 +1071,28 @@ function ChatEditor({ agent, onSpecChange }: { agent: Agent; onSpecChange: (next
   );
 }
 
-function applyChatCommand(spec: AgentSpec, text: string): { reply: string; next?: AgentSpec; toast?: string } {
+function applyChatCommand(
+  spec: AgentSpec,
+  text: string,
+): { reply: string; next?: AgentSpec; toast?: string } {
   const t = text.toLowerCase();
   const steps = [...(spec.steps ?? [])];
 
   // change trigger
-  const trigMatch = t.match(/(?:change|set|make)\s+(?:the\s+)?trigger\s+(?:to\s+)?(schedule|webhook|manual|event)(.*)/);
+  const trigMatch = t.match(
+    /(?:change|set|make)\s+(?:the\s+)?trigger\s+(?:to\s+)?(schedule|webhook|manual|event)(.*)/,
+  );
   if (trigMatch) {
     const type = trigMatch[1];
-    const desc = trigMatch[2]?.trim().replace(/^[,:]\s*/, "") || (type === "schedule" ? "Runs on a schedule" : type === "webhook" ? "Triggered by an incoming webhook" : type === "event" ? "Reacts to events" : "Run on demand");
+    const desc =
+      trigMatch[2]?.trim().replace(/^[,:]\s*/, "") ||
+      (type === "schedule"
+        ? "Runs on a schedule"
+        : type === "webhook"
+          ? "Triggered by an incoming webhook"
+          : type === "event"
+            ? "Reacts to events"
+            : "Run on demand");
     return {
       reply: `Trigger updated to "${type}".`,
       next: { ...spec, trigger: { type, description: desc } },
@@ -898,10 +1104,17 @@ function applyChatCommand(spec: AgentSpec, text: string): { reply: string; next?
   const remMatch = t.match(/(?:remove|delete|drop)\s+step\s+(\d+)/);
   if (remMatch) {
     const i = Number(remMatch[1]) - 1;
-    if (i < 0 || i >= steps.length) return { reply: `There's no step ${i + 1}. The agent has ${steps.length} step${steps.length === 1 ? "" : "s"}.` };
+    if (i < 0 || i >= steps.length)
+      return {
+        reply: `There's no step ${i + 1}. The agent has ${steps.length} step${steps.length === 1 ? "" : "s"}.`,
+      };
     const removed = steps[i];
     steps.splice(i, 1);
-    return { reply: `Removed step ${i + 1} ("${removed.title}").`, next: { ...spec, steps }, toast: "Step removed" };
+    return {
+      reply: `Removed step ${i + 1} ("${removed.title}").`,
+      next: { ...spec, steps },
+      toast: "Step removed",
+    };
   }
 
   // rename step
@@ -911,13 +1124,18 @@ function applyChatCommand(spec: AgentSpec, text: string): { reply: string; next?
     const name = renMatch[2].trim().replace(/[."']+$/g, "");
     if (i < 0 || i >= steps.length) return { reply: `There's no step ${i + 1}.` };
     steps[i] = { ...steps[i], title: name };
-    return { reply: `Renamed step ${i + 1} to "${name}".`, next: { ...spec, steps }, toast: "Step renamed" };
+    return {
+      reply: `Renamed step ${i + 1} to "${name}".`,
+      next: { ...spec, steps },
+      toast: "Step renamed",
+    };
   }
 
   // add step
   if (/\b(add|create|insert|append)\b.*\bstep\b/.test(t) || /\badd\b/.test(t)) {
     const integration =
-      INTEGRATIONS.find((i) => t.includes(i.toLowerCase())) ?? INTEGRATIONS[steps.length % INTEGRATIONS.length];
+      INTEGRATIONS.find((i) => t.includes(i.toLowerCase())) ??
+      INTEGRATIONS[steps.length % INTEGRATIONS.length];
     let title = "New step";
     const titleMatch = text.match(/(?:called|named|titled)\s+["']?([^"']{2,40})["']?/i);
     if (titleMatch) title = titleMatch[1].trim();
@@ -925,14 +1143,13 @@ function applyChatCommand(spec: AgentSpec, text: string): { reply: string; next?
     else if (/summar/.test(t)) title = `Summarize with ${integration}`;
     else if (/post|send/.test(t)) title = `Post to ${integration}`;
     else if (/fetch|pull|read|sync/.test(t)) title = `Sync from ${integration}`;
-    const action =
-      /notif|post|send/.test(t)
-        ? `Send a message via ${integration}`
-        : /summar/.test(t)
-          ? `Summarize the latest payload`
-          : /fetch|pull|read|sync/.test(t)
-            ? `Pull recent records from ${integration}`
-            : `Run ${integration} action`;
+    const action = /notif|post|send/.test(t)
+      ? `Send a message via ${integration}`
+      : /summar/.test(t)
+        ? `Summarize the latest payload`
+        : /fetch|pull|read|sync/.test(t)
+          ? `Pull recent records from ${integration}`
+          : `Run ${integration} action`;
     steps.push({ title, integration, action });
     return {
       reply: `Added step ${steps.length}: "${title}" (${integration}).`,
@@ -943,7 +1160,7 @@ function applyChatCommand(spec: AgentSpec, text: string): { reply: string; next?
 
   return {
     reply:
-      "Try one of: \"add a Slack notification step\", \"remove step 2\", \"rename step 1 to Triage\", or \"change trigger to schedule daily\".",
+      'Try one of: "add a Slack notification step", "remove step 2", "rename step 1 to Triage", or "change trigger to schedule daily".',
   };
 }
 
@@ -952,12 +1169,23 @@ function buildMockRuns(agent: Agent): Run[] {
   const trig = agent.spec.trigger?.description ?? "Triggered";
   const now = Date.now();
   const samples = [
-    { summary: `${trig} — completed in 1.4s`, detail: (s: AgentStep) => `${s.integration}: ${s.action} → ok` },
-    { summary: `Scheduled run · processed 12 items`, detail: (s: AgentStep) => `${s.title} via ${s.integration} (${s.action})` },
-    { summary: `Manual run by you — 8 records updated`, detail: (s: AgentStep) => `${s.integration} • ${s.action} • 200 OK` },
+    {
+      summary: `${trig} — completed in 1.4s`,
+      detail: (s: AgentStep) => `${s.integration}: ${s.action} → ok`,
+    },
+    {
+      summary: `Scheduled run · processed 12 items`,
+      detail: (s: AgentStep) => `${s.title} via ${s.integration} (${s.action})`,
+    },
+    {
+      summary: `Manual run by you — 8 records updated`,
+      detail: (s: AgentStep) => `${s.integration} • ${s.action} • 200 OK`,
+    },
   ];
   return samples.map((sample, i) => {
-    const lines = steps.length ? steps.map((s) => `• ${sample.detail(s)}`) : ["• Trigger received", "• Processed payload", "• Wrote results"];
+    const lines = steps.length
+      ? steps.map((s) => `• ${sample.detail(s)}`)
+      : ["• Trigger received", "• Processed payload", "• Wrote results"];
     return {
       id: `mock-${i}`,
       created_at: new Date(now - (i + 1) * 1000 * 60 * 47).toISOString(),
@@ -985,7 +1213,10 @@ function normalizeAgent(a: Agent): Agent {
   const raw = (a.spec ?? {}) as unknown as ChatBrainSpec & Partial<AgentSpec>;
   const trig = raw.trigger;
   const hasObjectTrigger =
-    trig && typeof trig === "object" && "type" in (trig as object) && "description" in (trig as object);
+    trig &&
+    typeof trig === "object" &&
+    "type" in (trig as object) &&
+    "description" in (trig as object);
   const hasArraySteps = Array.isArray((raw as Partial<AgentSpec>).steps);
 
   if (hasObjectTrigger && hasArraySteps) return a;
@@ -1021,7 +1252,13 @@ function normalizeAgent(a: Agent): Agent {
   if (raw.action) {
     const channel = raw.channel ?? "in-app";
     const integration =
-      channel === "sms" ? "Twilio" : channel === "email" ? "Gmail" : channel === "slack" ? "Slack" : "Beevr";
+      channel === "sms"
+        ? "Twilio"
+        : channel === "email"
+          ? "Gmail"
+          : channel === "slack"
+            ? "Slack"
+            : "Beevr";
     steps.push({
       title: `Send via ${integration}`,
       integration,

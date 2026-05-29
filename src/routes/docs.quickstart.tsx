@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DocsShell, DocsHero, DocsSection, StepList, CopyBlock, NextSteps } from "@/components/docs-shell";
+import {
+  DocsShell,
+  DocsHero,
+  DocsSection,
+  StepList,
+  CopyBlock,
+  NextSteps,
+} from "@/components/docs-shell";
 
 export const Route = createFileRoute("/docs/quickstart")({
   head: () => ({

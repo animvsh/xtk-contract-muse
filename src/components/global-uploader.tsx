@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { UploadCloud, CheckCircle2, X, AlertCircle, FileText, Image as ImageIcon, FileVideo, FileAudio, File } from "lucide-react";
+import {
+  UploadCloud,
+  CheckCircle2,
+  X,
+  AlertCircle,
+  FileText,
+  Image as ImageIcon,
+  FileVideo,
+  FileAudio,
+  File,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -60,7 +70,10 @@ export function GlobalUploader() {
           setItems((prev) =>
             prev.map((it) =>
               it.id === item.id && it.status === "uploading"
-                ? { ...it, progress: Math.min(92, it.progress + Math.max(2, (95 - it.progress) * 0.08)) }
+                ? {
+                    ...it,
+                    progress: Math.min(92, it.progress + Math.max(2, (95 - it.progress) * 0.08)),
+                  }
                 : it,
             ),
           );
@@ -75,16 +88,24 @@ export function GlobalUploader() {
 
         if (error) {
           setItems((prev) =>
-            prev.map((it) => (it.id === item.id ? { ...it, status: "error", error: error.message, progress: 100 } : it)),
+            prev.map((it) =>
+              it.id === item.id
+                ? { ...it, status: "error", error: error.message, progress: 100 }
+                : it,
+            ),
           );
           toast.error(`Upload failed: ${file.name}`);
           continue;
         }
 
-        const { data: signed } = await supabase.storage.from("user-uploads").createSignedUrl(path, 60 * 60 * 24);
+        const { data: signed } = await supabase.storage
+          .from("user-uploads")
+          .createSignedUrl(path, 60 * 60 * 24);
         setItems((prev) =>
           prev.map((it) =>
-            it.id === item.id ? { ...it, status: "done", progress: 100, url: signed?.signedUrl } : it,
+            it.id === item.id
+              ? { ...it, status: "done", progress: 100, url: signed?.signedUrl }
+              : it,
           ),
         );
       }
@@ -220,7 +241,9 @@ export function GlobalUploader() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-xs font-medium text-[oklch(0.2_0_0)]">{it.name}</div>
+                        <div className="truncate text-xs font-medium text-[oklch(0.2_0_0)]">
+                          {it.name}
+                        </div>
                         <div className="text-[10px] text-[oklch(0.5_0_0)]">
                           {fmtSize(it.size)}
                           {it.status === "error" && it.error ? ` · ${it.error}` : ""}

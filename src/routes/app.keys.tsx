@@ -92,8 +92,8 @@ function KeysPage() {
           </div>
           <h3 className="text-lg font-semibold">No access keys yet</h3>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-            Create a key to give OpenCode, Claude Code, Cursor, or any CLI safe
-            access to your workspace.
+            Create a key to give OpenCode, Claude Code, Cursor, or any CLI safe access to your
+            workspace.
           </p>
           <button
             onClick={() => setOpen(true)}
@@ -143,7 +143,9 @@ function KeyCard({ k, onToggle }: { k: AccessKey; onToggle: () => void }) {
             <StatusPill status={k.status} />
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span>Used by <span className="font-medium text-foreground">{clientLabel(k.client)}</span></span>
+            <span>
+              Used by <span className="font-medium text-foreground">{clientLabel(k.client)}</span>
+            </span>
             <span>·</span>
             <span>Scope: {k.scope_label || scopeLabel(k.scope)}</span>
             <span>·</span>
@@ -155,9 +157,7 @@ function KeyCard({ k, onToggle }: { k: AccessKey; onToggle: () => void }) {
               </>
             )}
           </div>
-          <div className="mt-2 font-mono text-xs text-muted-foreground">
-            {k.key_prefix}••••••••
-          </div>
+          <div className="mt-2 font-mono text-xs text-muted-foreground">{k.key_prefix}••••••••</div>
         </div>
         <div className="flex shrink-0 items-center gap-1">
           <button
@@ -184,7 +184,9 @@ function StatusPill({ status }: { status: string }) {
     revoked: "bg-destructive/15 text-destructive",
   };
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${map[status] ?? "bg-muted text-muted-foreground"}`}>
+    <span
+      className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${map[status] ?? "bg-muted text-muted-foreground"}`}
+    >
       {status}
     </span>
   );
@@ -236,7 +238,11 @@ function CreateKeyModal({
 
   return (
     <Modal onClose={onClose} title="Create access key">
-      <Stepper step={step} total={5} labels={["Client", "Access", "Permissions", "Safety", "Review"]} />
+      <Stepper
+        step={step}
+        total={5}
+        labels={["Client", "Access", "Permissions", "Safety", "Review"]}
+      />
 
       {step === 1 && (
         <Section title="What will use this access key?">
@@ -316,7 +322,9 @@ function CreateKeyModal({
               onChange={(e) => setExpiresEnabled(e.target.checked)}
               className="h-4 w-4 accent-primary"
             />
-            <span>Expire this key automatically after <strong>30 days</strong></span>
+            <span>
+              Expire this key automatically after <strong>30 days</strong>
+            </span>
           </label>
         </Section>
       )}
@@ -331,7 +339,10 @@ function CreateKeyModal({
           />
           <div className="mt-3 space-y-3 rounded-xl border border-border bg-muted/30 p-4 text-sm">
             <Row label="Used by" value={clientLabel(client)} />
-            <Row label="Scope" value={scopeLbl ? `${scopeLabel(scope)} · ${scopeLbl}` : scopeLabel(scope)} />
+            <Row
+              label="Scope"
+              value={scopeLbl ? `${scopeLabel(scope)} · ${scopeLbl}` : scopeLabel(scope)}
+            />
             <Row label="Permission" value={permissionLabel(permission)} />
             <Row label="Safety" value={SAFETY.find((s) => s.id === safety)!.label} />
             <Row label="Expires" value={expiresEnabled ? "30 days" : "Never"} />
@@ -350,7 +361,9 @@ function CreateKeyModal({
         {step < 5 ? (
           <button
             onClick={() => setStep(step + 1)}
-            disabled={step === 2 && (scope === "team" || scope === "collection") && !scopeLbl.trim()}
+            disabled={
+              step === 2 && (scope === "team" || scope === "collection") && !scopeLbl.trim()
+            }
             className="clicky flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             Continue <ArrowRight className="h-4 w-4" />
@@ -413,7 +426,8 @@ function KeyCreatedModal({ k, onClose }: { k: AccessKey; onClose: () => void }) 
         <div className="flex items-center gap-3 rounded-xl bg-green-500/10 p-3 text-sm text-green-800">
           <ShieldCheck className="h-5 w-5 shrink-0" />
           <span>
-            Use this key to connect <strong>{clientLabel(k.client)}</strong> to this workspace. The full key is shown <strong>only once</strong>.
+            Use this key to connect <strong>{clientLabel(k.client)}</strong> to this workspace. The
+            full key is shown <strong>only once</strong>.
           </span>
         </div>
 
@@ -448,7 +462,10 @@ function KeyCreatedModal({ k, onClose }: { k: AccessKey; onClose: () => void }) 
         </div>
 
         <div className="flex justify-end gap-2 border-t border-border pt-4">
-          <button onClick={onClose} className="clicky-sm rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted">
+          <button
+            onClick={onClose}
+            className="clicky-sm rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
+          >
             Done
           </button>
           <button

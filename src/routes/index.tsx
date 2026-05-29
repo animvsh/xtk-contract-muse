@@ -1,5 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, ArrowRight, Check, Sparkles, Zap, Shield, Bot, FileText, MessageSquare, Mail, Send, Upload, FileStack, Paperclip, Search, TrendingUp, Plug, LineChart, Lock } from "lucide-react";
+import {
+  Brain,
+  ArrowRight,
+  Check,
+  Sparkles,
+  Zap,
+  Shield,
+  Bot,
+  FileText,
+  MessageSquare,
+  Mail,
+  Send,
+  Upload,
+  FileStack,
+  Paperclip,
+  Search,
+  TrendingUp,
+  Plug,
+  LineChart,
+  Lock,
+} from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -19,10 +39,19 @@ function Reveal({
   const [vis, setVis] = useState(false);
   useEffect(() => {
     if (!ref.current) return;
-    if (typeof IntersectionObserver === "undefined") { setVis(true); return; }
+    if (typeof IntersectionObserver === "undefined") {
+      setVis(true);
+      return;
+    }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { setVis(true); io.disconnect(); } }),
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.12 }
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setVis(true);
+            io.disconnect();
+          }
+        }),
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.12 },
     );
     io.observe(ref.current);
     return () => io.disconnect();
@@ -47,41 +76,63 @@ function useParallax(strength = 1) {
       raf = requestAnimationFrame(() => {
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
-        setXY({ x: ((e.clientX - cx) / cx) * 24 * strength, y: ((e.clientY - cy) / cy) * 24 * strength });
+        setXY({
+          x: ((e.clientX - cx) / cx) * 24 * strength,
+          y: ((e.clientY - cy) / cy) * 24 * strength,
+        });
       });
     };
     window.addEventListener("mousemove", onMove, { passive: true });
-    return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(raf); };
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(raf);
+    };
   }, [strength]);
   return xy;
 }
 
 // Animated count-up triggered when in view
-function CountUp({ to, prefix = "", duration = 1600 }: { to: number; prefix?: string; duration?: number }) {
+function CountUp({
+  to,
+  prefix = "",
+  duration = 1600,
+}: {
+  to: number;
+  prefix?: string;
+  duration?: number;
+}) {
   const ref = useRef<HTMLSpanElement | null>(null);
   const [n, setN] = useState(0);
   const started = useRef(false);
   useEffect(() => {
     if (!ref.current) return;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const tick = (t: number) => {
-            const p = Math.min(1, (t - start) / duration);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setN(Math.round(to * eased));
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        }
-      });
-    }, { threshold: 0.4 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !started.current) {
+            started.current = true;
+            const start = performance.now();
+            const tick = (t: number) => {
+              const p = Math.min(1, (t - start) / duration);
+              const eased = 1 - Math.pow(1 - p, 3);
+              setN(Math.round(to * eased));
+              if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
     io.observe(ref.current);
     return () => io.disconnect();
   }, [to, duration]);
-  return <span ref={ref}>{prefix}{n.toLocaleString()}</span>;
+  return (
+    <span ref={ref}>
+      {prefix}
+      {n.toLocaleString()}
+    </span>
+  );
 }
 
 const CONNECTORS: { name: string; slug: string; color: string }[] = [
@@ -105,14 +156,21 @@ const CONNECTORS: { name: string; slug: string; color: string }[] = [
   { name: "Shopify", slug: "shopify", color: "7AB55C" },
 ];
 
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Beevr — Your company's brain" },
-      { name: "description", content: "Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate work — it knows your business." },
+      {
+        name: "description",
+        content:
+          "Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate work — it knows your business.",
+      },
       { property: "og:title", content: "Beevr — Your company's brain" },
-      { property: "og:description", content: "One AI brain across your whole company. Ask anything, find what you'd normally miss, and let agents act on your behalf." },
+      {
+        property: "og:description",
+        content:
+          "One AI brain across your whole company. Ask anything, find what you'd normally miss, and let agents act on your behalf.",
+      },
     ],
   }),
   component: Landing,
@@ -133,13 +191,24 @@ function Landing() {
               <span className="text-xl font-bold tracking-tight">Beevr</span>
             </Link>
             <nav className="hidden items-center gap-10 text-[15px] font-medium text-[oklch(0.25_0_0)] md:flex">
-              <a href="#brain" className="story-link transition-colors hover:text-black">Brain</a>
-              <a href="#insights" className="story-link transition-colors hover:text-black">Insights</a>
-              <a href="#agents" className="story-link transition-colors hover:text-black">Agents</a>
-              <a href="#pricing" className="story-link transition-colors hover:text-black">Pricing</a>
+              <a href="#brain" className="story-link transition-colors hover:text-black">
+                Brain
+              </a>
+              <a href="#insights" className="story-link transition-colors hover:text-black">
+                Insights
+              </a>
+              <a href="#agents" className="story-link transition-colors hover:text-black">
+                Agents
+              </a>
+              <a href="#pricing" className="story-link transition-colors hover:text-black">
+                Pricing
+              </a>
             </nav>
             <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/auth" className="clicky-sm hidden text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black sm:inline">
+              <Link
+                to="/auth"
+                className="clicky-sm hidden text-[15px] font-medium text-[oklch(0.25_0_0)] hover:text-black sm:inline"
+              >
                 Sign in
               </Link>
               <Link
@@ -155,17 +224,24 @@ function Landing() {
           <section className="px-5 pb-16 pt-8 text-center sm:px-8 sm:pb-20 sm:pt-12 md:px-10">
             <Reveal delay={1}>
               <h1 className="font-display mx-auto mt-7 max-w-4xl text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:mt-8 sm:text-6xl md:text-[88px]">
-                Your company's <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">brain.</span>
+                Your company's{" "}
+                <span className="font-display-italic font-semibold text-[oklch(0.62_0.22_40)]">
+                  brain.
+                </span>
               </h1>
             </Reveal>
 
             <Reveal delay={2}>
               <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.4_0_0)] sm:mt-6 sm:text-lg">
-                Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask questions, uncover insights and automate the work in between.
+                Beevr connects your docs, chats, CRM and data into one AI brain for your team. Ask
+                questions, uncover insights and automate the work in between.
               </p>
             </Reveal>
 
-            <Reveal delay={3} className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
+            <Reveal
+              delay={3}
+              className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10"
+            >
               <Link
                 to="/onboarding"
                 className="clicky shine group inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)] sm:px-6 sm:py-3.5 sm:text-[15px]"
@@ -182,10 +258,20 @@ function Landing() {
             </Reveal>
 
             {/* Trust strip */}
-            <Reveal delay={4} className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[oklch(0.5_0_0)]">
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Connects to 40+ tools</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Live in under 10 minutes</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> SOC 2 ready</span>
+            <Reveal
+              delay={4}
+              className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[oklch(0.5_0_0)]"
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Connects to 40+ tools
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> Live in under 10
+                minutes
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-[oklch(0.55_0.18_140)]" /> SOC 2 ready
+              </span>
             </Reveal>
 
             {/* Connector marquee */}
@@ -196,7 +282,12 @@ function Landing() {
                     key={i}
                     className="mr-3 inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[oklch(0.3_0_0)]"
                   >
-                    <img src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`} alt="" className="h-3.5 w-3.5" loading="lazy" />
+                    <img
+                      src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`}
+                      alt=""
+                      className="h-3.5 w-3.5"
+                      loading="lazy"
+                    />
                     {c.name}
                   </span>
                 ))}
@@ -210,7 +301,8 @@ function Landing() {
                 <div
                   className="landing-tilt"
                   style={{
-                    filter: "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
+                    filter:
+                      "drop-shadow(0 30px 50px rgba(20,10,0,0.18)) drop-shadow(0 10px 20px rgba(20,10,0,0.08))",
                   }}
                 >
                   <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]">
@@ -222,7 +314,10 @@ function Landing() {
           </section>
 
           {/* Value prop pillars */}
-          <section id="brain" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
+          <section
+            id="brain"
+            className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10"
+          >
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Brain className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> It knows your business
@@ -231,7 +326,8 @@ function Landing() {
                 Ask anything. <span className="font-display-italic">Get answers with sources.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Beevr learns from your company's conversations, customers, revenue and workflows — then answers in plain English with the exact emails, deals and docs to back it up.
+                Beevr learns from your company's conversations, customers, revenue and workflows —
+                then answers in plain English with the exact emails, deals and docs to back it up.
               </p>
             </Reveal>
 
@@ -239,7 +335,9 @@ function Landing() {
             <Reveal>
               <div className="mx-auto mt-12 max-w-5xl rounded-3xl border border-black/[0.06] bg-white p-6 sm:p-8">
                 <div className="mb-5 flex items-center justify-between">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[oklch(0.5_0_0)]">Native connectors</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[oklch(0.5_0_0)]">
+                    Native connectors
+                  </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-[oklch(0.45_0_0)]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.55_0.18_140)] breathe" />
                     {CONNECTORS.length}+ live
@@ -262,24 +360,43 @@ function Landing() {
                   ))}
                 </div>
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.05] pt-4 text-[11px] text-[oklch(0.5_0_0)]">
-                  <span className="inline-flex items-center gap-1.5"><Lock className="h-3 w-3" /> Permission-aware — people only see what they already could</span>
-                  <span className="inline-flex items-center gap-1.5"><Plug className="h-3 w-3" /> Custom connectors built on request</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Lock className="h-3 w-3" /> Permission-aware — people only see what they
+                    already could
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Plug className="h-3 w-3" /> Custom connectors built on request
+                  </span>
                 </div>
               </div>
             </Reveal>
 
             <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: Search, title: "“Why did churn increase?”", desc: "Beevr ties Stripe cancellations back to the support threads, NPS drops and product changes that caused them." },
-                { icon: MessageSquare, title: "“What did we promise this customer?”", desc: "It pulls the email thread, the deal notes and the contract — so nobody re-promises or under-delivers." },
-                { icon: Lock, title: "“Which accounts are at risk?”", desc: "It watches usage, sentiment and engagement across your stack and flags the accounts trending the wrong way." },
+                {
+                  icon: Search,
+                  title: "“Why did churn increase?”",
+                  desc: "Beevr ties Stripe cancellations back to the support threads, NPS drops and product changes that caused them.",
+                },
+                {
+                  icon: MessageSquare,
+                  title: "“What did we promise this customer?”",
+                  desc: "It pulls the email thread, the deal notes and the contract — so nobody re-promises or under-delivers.",
+                },
+                {
+                  icon: Lock,
+                  title: "“Which accounts are at risk?”",
+                  desc: "It watches usage, sentiment and engagement across your stack and flags the accounts trending the wrong way.",
+                },
               ].map((f, i) => (
-                <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
+                <Reveal key={f.title} delay={(i + 1) as 1 | 2 | 3}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:border-[oklch(0.68_0.22_40)]/40 hover:-translate-y-0.5">
                     <div className="bobble mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.97_0.05_70)] text-[oklch(0.62_0.22_40)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
                       <f.icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-display text-lg font-semibold tracking-tight transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
+                    <h3 className="font-display text-lg font-semibold tracking-tight transition-colors group-hover:text-[oklch(0.62_0.22_40)]">
+                      {f.title}
+                    </h3>
                     <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                   </div>
                 </Reveal>
@@ -292,13 +409,17 @@ function Landing() {
             <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2 md:items-center">
               <Reveal>
                 <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
-                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Discover what you're missing
+                  <LineChart className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Discover what you're
+                  missing
                 </div>
                 <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-                  <span className="headline-underline">Notices the patterns</span> your team would miss.
+                  <span className="headline-underline">Notices the patterns</span> your team would
+                  miss.
                 </h2>
                 <p className="mt-4 text-[oklch(0.4_0_0)]">
-                  Beevr doesn't just answer questions — it reads across your whole company and proactively surfaces the opportunities, risks and shifts that matter, delivered to Slack or email.
+                  Beevr doesn't just answer questions — it reads across your whole company and
+                  proactively surfaces the opportunities, risks and shifts that matter, delivered to
+                  Slack or email.
                 </p>
                 <ul className="mt-6 space-y-2.5 text-sm">
                   {[
@@ -318,7 +439,8 @@ function Landing() {
                   to="/onboarding"
                   className="clicky shine group mt-8 inline-flex items-center gap-2 rounded-xl bg-[oklch(0.15_0_0)] px-5 py-3 text-sm font-semibold text-white hover:bg-black"
                 >
-                  <Sparkles className="h-4 w-4" /> Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
+                  <Sparkles className="h-4 w-4" /> Join the waitlist{" "}
+                  <ArrowRight className="nudge-x h-4 w-4" />
                 </Link>
               </Reveal>
 
@@ -327,8 +449,12 @@ function Landing() {
                   <div className="pointer-events-none absolute -inset-6 rounded-[32px] bg-[oklch(0.68_0.22_40)] opacity-15 blur-[60px]" />
                   <div className="tilt-card relative rounded-2xl border border-black/5 bg-white p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.18)]">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-semibold text-[oklch(0.3_0_0)]">This week · Revenue</div>
-                      <span className="rounded-full bg-[oklch(0.96_0.06_140)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.18_140)]">+12% MoM</span>
+                      <div className="text-xs font-semibold text-[oklch(0.3_0_0)]">
+                        This week · Revenue
+                      </div>
+                      <span className="rounded-full bg-[oklch(0.96_0.06_140)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.18_140)]">
+                        +12% MoM
+                      </span>
                     </div>
                     <div className="mt-3 flex items-baseline gap-2">
                       <span className="text-3xl font-bold tracking-tight tabular-nums">
@@ -341,7 +467,11 @@ function Landing() {
                         <div
                           key={i}
                           className="bar-grow flex-1 rounded-t bg-[oklch(0.68_0.22_40)]"
-                          style={{ height: `${h}%`, opacity: 0.5 + i * 0.04, animationDelay: `${i * 60}ms` }}
+                          style={{
+                            height: `${h}%`,
+                            opacity: 0.5 + i * 0.04,
+                            animationDelay: `${i * 60}ms`,
+                          }}
                         />
                       ))}
                     </div>
@@ -351,9 +481,14 @@ function Landing() {
                         { label: "Enterprise", val: "+2%", color: "oklch(0.6_0.05_85)" },
                         { label: "SMB churn", val: "-2pts", color: "oklch(0.55_0.18_140)" },
                       ].map((r) => (
-                        <div key={r.label} className="flex items-center justify-between rounded-lg border border-black/5 px-3 py-2 text-xs transition-colors hover:bg-[oklch(0.985_0.005_85)]">
+                        <div
+                          key={r.label}
+                          className="flex items-center justify-between rounded-lg border border-black/5 px-3 py-2 text-xs transition-colors hover:bg-[oklch(0.985_0.005_85)]"
+                        >
                           <span className="text-[oklch(0.3_0_0)]">{r.label}</span>
-                          <span className="font-semibold tabular-nums" style={{ color: r.color }}>{r.val}</span>
+                          <span className="font-semibold tabular-nums" style={{ color: r.color }}>
+                            {r.val}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -364,7 +499,10 @@ function Landing() {
           </section>
 
           {/* Agents */}
-          <section id="agents" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
+          <section
+            id="agents"
+            className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10"
+          >
             <Reveal className="mx-auto max-w-3xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Bot className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Your brain takes action
@@ -373,22 +511,37 @@ function Landing() {
                 Create AI agents in <span className="headline-underline">plain English.</span>
               </h2>
               <p className="mt-4 text-[oklch(0.4_0_0)]">
-                Describe the work in a sentence. Beevr spins up an agent that watches your data, runs on a schedule and ships results back into Slack, email or your tools.
+                Describe the work in a sentence. Beevr spins up an agent that watches your data,
+                runs on a schedule and ships results back into Slack, email or your tools.
               </p>
             </Reveal>
 
             <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
               {[
-                { icon: TrendingUp, title: "Weekly revenue summary", desc: "“Send a weekly revenue summary every Monday morning to #revenue.”" },
-                { icon: Zap, title: "Stalled deal alerts", desc: "“Alert me when any enterprise deal stalls more than 7 days.”" },
-                { icon: MessageSquare, title: "Support routing", desc: "“Route urgent support tickets to on-call and tag the rest by intent.”" },
+                {
+                  icon: TrendingUp,
+                  title: "Weekly revenue summary",
+                  desc: "“Send a weekly revenue summary every Monday morning to #revenue.”",
+                },
+                {
+                  icon: Zap,
+                  title: "Stalled deal alerts",
+                  desc: "“Alert me when any enterprise deal stalls more than 7 days.”",
+                },
+                {
+                  icon: MessageSquare,
+                  title: "Support routing",
+                  desc: "“Route urgent support tickets to on-call and tag the rest by intent.”",
+                },
               ].map((f, i) => (
-                <Reveal key={f.title} delay={((i + 1) as 1 | 2 | 3)}>
+                <Reveal key={f.title} delay={(i + 1) as 1 | 2 | 3}>
                   <div className="alive tilt-card group h-full rounded-2xl border border-black/5 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[oklch(0.68_0.22_40)]/40 hover:shadow-lg">
                     <div className="bobble mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.15_0_0)] text-white transition-transform group-hover:scale-110 group-hover:rotate-[-6deg]">
                       <f.icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">{f.title}</h3>
+                    <h3 className="font-semibold transition-colors group-hover:text-[oklch(0.62_0.22_40)]">
+                      {f.title}
+                    </h3>
                     <p className="mt-2 text-sm text-[oklch(0.4_0_0)]">{f.desc}</p>
                   </div>
                 </Reveal>
@@ -400,11 +553,26 @@ function Landing() {
           <section className="border-t border-black/5 bg-white px-5 py-16 sm:px-10">
             <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
               {[
-                { icon: Shield, title: "Enterprise-grade", desc: "SOC 2, role-based access, audit logs, regional data residency." },
-                { icon: Lock, title: "Your data stays yours", desc: "We never train on your content. Encrypted at rest and in transit." },
-                { icon: Zap, title: "Live in 10 minutes", desc: "OAuth into your stack, Beevr indexes in the background — no IT ticket." },
+                {
+                  icon: Shield,
+                  title: "Enterprise-grade",
+                  desc: "SOC 2, role-based access, audit logs, regional data residency.",
+                },
+                {
+                  icon: Lock,
+                  title: "Your data stays yours",
+                  desc: "We never train on your content. Encrypted at rest and in transit.",
+                },
+                {
+                  icon: Zap,
+                  title: "Live in 10 minutes",
+                  desc: "OAuth into your stack, Beevr indexes in the background — no IT ticket.",
+                },
               ].map((f) => (
-                <div key={f.title} className="flex gap-4 rounded-2xl border border-black/5 bg-[oklch(0.985_0_0)] p-5">
+                <div
+                  key={f.title}
+                  className="flex gap-4 rounded-2xl border border-black/5 bg-[oklch(0.985_0_0)] p-5"
+                >
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[oklch(0.62_0.22_40)] ring-1 ring-black/5">
                     <f.icon className="h-5 w-5" />
                   </div>
@@ -418,14 +586,20 @@ function Landing() {
           </section>
 
           {/* Pricing */}
-          <section id="pricing" className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10">
+          <section
+            id="pricing"
+            className="border-t border-black/5 bg-[oklch(0.985_0.005_85)] px-5 py-20 sm:px-10"
+          >
             <div className="mx-auto max-w-2xl text-center">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[oklch(0.4_0_0)]">
                 <Sparkles className="h-3 w-3 text-[oklch(0.68_0.22_40)]" /> Private beta
               </div>
-              <h2 className="font-display mt-4 text-5xl font-semibold tracking-[-0.02em]">Custom pricing, <span className="font-display-italic">hand-rolled.</span></h2>
+              <h2 className="font-display mt-4 text-5xl font-semibold tracking-[-0.02em]">
+                Custom pricing, <span className="font-display-italic">hand-rolled.</span>
+              </h2>
               <p className="mt-3 text-[oklch(0.4_0_0)]">
-                Beevr is tailored for each team in our beta. Join the waitlist and we'll put together a plan that fits your stack, volume and goals.
+                Beevr is tailored for each team in our beta. Join the waitlist and we'll put
+                together a plan that fits your stack, volume and goals.
               </p>
               <div className="mx-auto mt-10 max-w-md rounded-2xl border border-[oklch(0.68_0.22_40)] bg-white p-8 text-left shadow-[0_20px_60px_-20px_oklch(0.68_0.22_40_/_0.4)]">
                 <div className="text-sm font-medium text-[oklch(0.4_0_0)]">Tailored plan</div>
@@ -433,7 +607,12 @@ function Landing() {
                   <span className="text-4xl font-bold">Let's talk</span>
                 </div>
                 <ul className="mt-6 space-y-2 text-sm">
-                  {["Scoped to your team size", "Connectors built for your stack", "White-glove onboarding", "Direct line to the founders"].map((f) => (
+                  {[
+                    "Scoped to your team size",
+                    "Connectors built for your stack",
+                    "White-glove onboarding",
+                    "Direct line to the founders",
+                  ].map((f) => (
                     <li key={f} className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-[oklch(0.68_0.22_40)]" /> {f}
                     </li>
@@ -455,17 +634,22 @@ function Landing() {
               Give your team a brain that never forgets.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-[oklch(0.4_0_0)]">
-              We onboard a small batch of teams every week. Tell us what you're building and we'll get you set up live.
+              We onboard a small batch of teams every week. Tell us what you're building and we'll
+              get you set up live.
             </p>
             <Link
               to="/onboarding"
               className="clicky shine group mt-8 inline-flex items-center gap-2 rounded-xl bg-[oklch(0.68_0.22_40)] px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[oklch(0.68_0.22_40)]/40 hover:bg-[oklch(0.62_0.22_40)]"
             >
-              <Sparkles className="h-4 w-4" /> Join the waitlist <ArrowRight className="nudge-x h-4 w-4" />
+              <Sparkles className="h-4 w-4" /> Join the waitlist{" "}
+              <ArrowRight className="nudge-x h-4 w-4" />
             </Link>
           </section>
 
-          <footer id="contacts" className="border-t border-black/5 bg-white py-8 text-center text-xs text-[oklch(0.4_0_0)]">
+          <footer
+            id="contacts"
+            className="border-t border-black/5 bg-white py-8 text-center text-xs text-[oklch(0.4_0_0)]"
+          >
             © 2026 Beevr Inc. — Your company's brain.
           </footer>
         </div>
@@ -493,8 +677,17 @@ function useTick(ms: number) {
 
 function DashboardPreview() {
   const [view, setView] = useState<ViewKey>("files");
-  const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean; visible: boolean }>({ x: 0, y: 0, click: false, visible: false });
-  const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({ files: null, agents: null, brain: null });
+  const [cursor, setCursor] = useState<{ x: number; y: number; click: boolean; visible: boolean }>({
+    x: 0,
+    y: 0,
+    click: false,
+    visible: false,
+  });
+  const navRefs = useRef<Record<ViewKey, HTMLDivElement | null>>({
+    files: null,
+    agents: null,
+    brain: null,
+  });
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   // Initialize cursor on the active nav item once mounted
@@ -534,10 +727,12 @@ function DashboardPreview() {
         const y = tr.top - rr.top + tr.height / 2;
         setCursor((c) => ({ ...c, x, y, click: false, visible: true }));
         timers.push(setTimeout(() => setCursor((c) => ({ ...c, click: true })), 900));
-        timers.push(setTimeout(() => {
-          setView(next);
-          setCursor((c) => ({ ...c, click: false }));
-        }, 1100));
+        timers.push(
+          setTimeout(() => {
+            setView(next);
+            setCursor((c) => ({ ...c, click: false }));
+          }, 1100),
+        );
       }
       timers.push(setTimeout(cycle, 8000));
     };
@@ -566,14 +761,18 @@ function DashboardPreview() {
             <BrandLogo className="h-8 w-8 object-contain" />
             Beevr
           </div>
-          <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Main</div>
+          <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">
+            Main
+          </div>
           <div className="space-y-1">
             {NAV.map((n) => {
               const active = view === n.key;
               return (
                 <div
                   key={n.key}
-                  ref={(el) => { navRefs.current[n.key] = el; }}
+                  ref={(el) => {
+                    navRefs.current[n.key] = el;
+                  }}
                   className={`demo-nav-item flex items-center gap-2 rounded-lg px-2 py-1.5 ${
                     active
                       ? "is-active bg-[oklch(0.97_0.05_70)] font-medium text-[oklch(0.62_0.22_40)]"
@@ -588,7 +787,9 @@ function DashboardPreview() {
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Team Spaces</div>
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Docs</div>
           </div>
-          <div className="mt-6 mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">Other</div>
+          <div className="mt-6 mb-2 text-[10px] font-medium uppercase tracking-wider text-[oklch(0.5_0_0)]">
+            Other
+          </div>
           <div className="space-y-1">
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Settings</div>
             <div className="px-2 py-1.5 text-[oklch(0.4_0_0)]">Get Help</div>
@@ -612,7 +813,8 @@ function DashboardPreview() {
           left: cursor.x,
           top: cursor.y,
           opacity: cursor.visible ? 1 : 0,
-          transition: "left 900ms cubic-bezier(0.65, 0, 0.35, 1), top 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease",
+          transition:
+            "left 900ms cubic-bezier(0.65, 0, 0.35, 1), top 900ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease",
         }}
       >
         <svg
@@ -622,7 +824,13 @@ function DashboardPreview() {
           className={`demo-cursor ${cursor.click ? "is-clicking" : ""}`}
           style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
         >
-          <path d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z" fill="#111" stroke="white" strokeWidth="1.2" strokeLinejoin="round"/>
+          <path
+            d="M3 2 L3 17 L8 13 L11 20 L14 19 L11 12 L18 12 Z"
+            fill="#111"
+            stroke="white"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
         </svg>
         {cursor.click && (
           <span className="absolute -left-2 -top-2 h-7 w-7 animate-ping rounded-full bg-[oklch(0.68_0.22_40)] opacity-50" />
@@ -654,15 +862,25 @@ function FilesView() {
           <h4 className="text-sm font-semibold">Upload knowledge</h4>
           <span className="text-[10px] text-[oklch(0.4_0_0)]">PDF · DOCX · MD · CSV</span>
         </div>
-        <div className={`relative grid h-40 place-items-center rounded-xl border-2 border-dashed transition-all duration-300 ${
-          dropped ? "border-[oklch(0.68_0.22_40)] bg-[oklch(0.97_0.05_70)]" : "border-black/10 bg-[oklch(0.98_0_0)]"
-        }`}>
+        <div
+          className={`relative grid h-40 place-items-center rounded-xl border-2 border-dashed transition-all duration-300 ${
+            dropped
+              ? "border-[oklch(0.68_0.22_40)] bg-[oklch(0.97_0.05_70)]"
+              : "border-black/10 bg-[oklch(0.98_0_0)]"
+          }`}
+        >
           <div className="flex flex-col items-center gap-2 text-center">
-            <div className={`grid h-10 w-10 place-items-center rounded-xl transition-all ${dropped ? "bg-[oklch(0.68_0.22_40)] text-white scale-110" : "bg-white text-[oklch(0.4_0_0)] border border-black/10"}`}>
+            <div
+              className={`grid h-10 w-10 place-items-center rounded-xl transition-all ${dropped ? "bg-[oklch(0.68_0.22_40)] text-white scale-110" : "bg-white text-[oklch(0.4_0_0)] border border-black/10"}`}
+            >
               <Upload className="h-5 w-5" />
             </div>
-            <div className="text-xs font-semibold">{dropped ? "contract.pdf" : "Drop a file or click to browse"}</div>
-            <div className="text-[10px] text-[oklch(0.4_0_0)]">{dropped ? "812 KB" : "Up to 50 MB per file"}</div>
+            <div className="text-xs font-semibold">
+              {dropped ? "contract.pdf" : "Drop a file or click to browse"}
+            </div>
+            <div className="text-[10px] text-[oklch(0.4_0_0)]">
+              {dropped ? "812 KB" : "Up to 50 MB per file"}
+            </div>
           </div>
 
           {/* Floating file icon that drops in */}
@@ -689,13 +907,22 @@ function FilesView() {
               <span className="tabular-nums text-[10px] text-[oklch(0.4_0_0)]">{progress}%</span>
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/5">
-              <div className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500" style={{ width: `${progress}%` }} />
+              <div
+                className="h-full rounded-full bg-[oklch(0.68_0.22_40)] transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
             </div>
             <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[oklch(0.4_0_0)]">
               {done ? (
-                <><Check className="h-3 w-3 text-[oklch(0.55_0.18_140)]" /> Indexed · 142 chunks · ready to query</>
+                <>
+                  <Check className="h-3 w-3 text-[oklch(0.55_0.18_140)]" /> Indexed · 142 chunks ·
+                  ready to query
+                </>
               ) : (
-                <><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> Extracting text · embedding chunks…</>
+                <>
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" />{" "}
+                  Extracting text · embedding chunks…
+                </>
               )}
             </div>
           </div>
@@ -715,15 +942,22 @@ function FilesView() {
                 <div className="truncate text-xs font-medium">contract.pdf</div>
                 <div className="text-[10px] text-[oklch(0.4_0_0)]">812 KB · 142 chunks</div>
               </div>
-              <span className="rounded bg-white px-1.5 py-0.5 text-[9px] text-[oklch(0.55_0.18_140)]">New</span>
+              <span className="rounded bg-white px-1.5 py-0.5 text-[9px] text-[oklch(0.55_0.18_140)]">
+                New
+              </span>
             </li>
           )}
           {existing.map((f) => (
-            <li key={f.name} className="flex items-center gap-2 rounded-lg border border-black/5 p-2">
+            <li
+              key={f.name}
+              className="flex items-center gap-2 rounded-lg border border-black/5 p-2"
+            >
               <FileText className="h-4 w-4 text-[oklch(0.5_0_0)]" />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-xs font-medium">{f.name}</div>
-                <div className="text-[10px] text-[oklch(0.4_0_0)]">{f.size} · {f.chunks} chunks</div>
+                <div className="text-[10px] text-[oklch(0.4_0_0)]">
+                  {f.size} · {f.chunks} chunks
+                </div>
               </div>
               <span className="text-[9px] text-[oklch(0.4_0_0)]">{f.src}</span>
             </li>
@@ -738,7 +972,8 @@ function FilesView() {
 function AgentsView() {
   const tick = useTick(280);
   const cycle = tick;
-  const fullPrompt = "Create an agent that summarizes Stripe revenue every Monday at 9am and posts it to #revenue in Slack.";
+  const fullPrompt =
+    "Create an agent that summarizes Stripe revenue every Monday at 9am and posts it to #revenue in Slack.";
   const typedLen = Math.min(fullPrompt.length, cycle * 10);
   const typed = fullPrompt.slice(0, typedLen);
   const sent = typedLen >= fullPrompt.length;
@@ -751,7 +986,9 @@ function AgentsView() {
     "Ready to deploy?",
   ];
   const replyStart = Math.ceil(fullPrompt.length / 10) + 1;
-  const visibleReply = sent ? replyLines.slice(0, Math.max(0, Math.min(replyLines.length, cycle - replyStart))) : [];
+  const visibleReply = sent
+    ? replyLines.slice(0, Math.max(0, Math.min(replyLines.length, cycle - replyStart)))
+    : [];
   const created = sent && cycle - replyStart > replyLines.length + 1;
 
   return (
@@ -783,7 +1020,13 @@ function AgentsView() {
               </div>
               <div className="min-w-0 flex-1 space-y-0.5 font-mono text-[11px] leading-relaxed text-[oklch(0.2_0_0)]">
                 {visibleReply.map((l, i) => (
-                  <div key={i} className="animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>{l}</div>
+                  <div
+                    key={i}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    {l}
+                  </div>
                 ))}
                 {visibleReply.length > 0 && visibleReply.length < replyLines.length && (
                   <span className="inline-block h-3 w-1.5 animate-pulse bg-[oklch(0.68_0.22_40)]" />
@@ -797,14 +1040,18 @@ function AgentsView() {
           <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2">
             <Paperclip className="h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
             <div className="min-w-0 flex-1 text-xs text-[oklch(0.2_0_0)]">
-              {sent ? <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span> : (
+              {sent ? (
+                <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span>
+              ) : (
                 <>
                   {typed}
                   <span className="inline-block h-3 w-[2px] -mb-0.5 animate-pulse bg-[oklch(0.2_0_0)] align-middle" />
                 </>
               )}
             </div>
-            <button className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${typedLen > 0 ? "bg-[oklch(0.68_0.22_40)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}>
+            <button
+              className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${typedLen > 0 ? "bg-[oklch(0.68_0.22_40)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}
+            >
               <Send className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -825,10 +1072,13 @@ function AgentsView() {
                   <div className="truncate text-xs font-semibold">Revenue Digest</div>
                   <div className="text-[10px] text-[oklch(0.4_0_0)]">Mon 9:00 · Stripe → Slack</div>
                 </div>
-                <span className="rounded bg-white px-1.5 py-0.5 text-[9px] font-medium text-[oklch(0.55_0.18_140)]">New</span>
+                <span className="rounded bg-white px-1.5 py-0.5 text-[9px] font-medium text-[oklch(0.55_0.18_140)]">
+                  New
+                </span>
               </div>
               <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[oklch(0.4_0_0)]">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" /> Deploying…
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[oklch(0.68_0.22_40)]" />{" "}
+                Deploying…
               </div>
             </div>
           )}
@@ -850,7 +1100,9 @@ function AgentRow({ name, sub, running }: { name: string; sub: string; running?:
         <div className="truncate text-xs font-semibold">{name}</div>
         <div className="text-[10px] text-[oklch(0.4_0_0)]">{sub}</div>
       </div>
-      <span className={`h-1.5 w-1.5 rounded-full ${running ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.85_0_0)]"}`} />
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${running ? "animate-pulse bg-[oklch(0.68_0.22_40)]" : "bg-[oklch(0.85_0_0)]"}`}
+      />
     </div>
   );
 }
@@ -863,9 +1115,14 @@ function BrainView() {
   const typedLen = Math.min(question.length, cycle * 10);
   const typed = question.slice(0, typedLen);
   const sent = typedLen >= question.length;
-  const answerWords = "MRR is $284k, up 12% MoM. The Mid-market segment is leading growth at +28% — driven by 14 new SaaS customers. Enterprise is flat; SMB churn is down 2pts.".split(" ");
+  const answerWords =
+    "MRR is $284k, up 12% MoM. The Mid-market segment is leading growth at +28% — driven by 14 new SaaS customers. Enterprise is flat; SMB churn is down 2pts.".split(
+      " ",
+    );
   const answerStart = Math.ceil(question.length / 10) + 1;
-  const shownWords = sent ? answerWords.slice(0, Math.max(0, Math.min(answerWords.length, (cycle - answerStart) * 4))) : [];
+  const shownWords = sent
+    ? answerWords.slice(0, Math.max(0, Math.min(answerWords.length, (cycle - answerStart) * 4)))
+    : [];
   const sources = [
     { name: "Stripe · Invoices", icon: Send, color: "oklch(0.55_0.2_270)" },
     { name: "Hubspot · Deals", icon: Mail, color: "oklch(0.6_0.2_25)" },
@@ -888,8 +1145,12 @@ function BrainView() {
         <div className="flex-1 space-y-2.5 overflow-hidden p-4 text-xs">
           {sent && (
             <div className="flex items-start justify-end gap-2 animate-fade-in">
-              <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[oklch(0.97_0_0)] px-3 py-2">{question}</div>
-              <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-[10px] font-semibold text-white">A</div>
+              <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[oklch(0.97_0_0)] px-3 py-2">
+                {question}
+              </div>
+              <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[oklch(0.65_0.2_40)] text-[10px] font-semibold text-white">
+                A
+              </div>
             </div>
           )}
           {sent && shownWords.length > 0 && (
@@ -911,14 +1172,18 @@ function BrainView() {
           <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2">
             <MessageSquare className="h-3.5 w-3.5 text-[oklch(0.5_0_0)]" />
             <div className="min-w-0 flex-1 text-xs">
-              {sent ? <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span> : (
+              {sent ? (
+                <span className="text-[oklch(0.5_0_0)]">Ask a follow-up…</span>
+              ) : (
                 <>
                   {typed}
                   <span className="inline-block h-3 w-[2px] -mb-0.5 animate-pulse bg-[oklch(0.2_0_0)] align-middle" />
                 </>
               )}
             </div>
-            <button className={`grid h-7 w-7 place-items-center rounded-lg ${typedLen > 0 ? "bg-[oklch(0.15_0_0)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}>
+            <button
+              className={`grid h-7 w-7 place-items-center rounded-lg ${typedLen > 0 ? "bg-[oklch(0.15_0_0)] text-white" : "bg-[oklch(0.95_0_0)] text-[oklch(0.6_0_0)]"}`}
+            >
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
