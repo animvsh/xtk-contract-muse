@@ -1,8 +1,8 @@
 import { MemoryClient } from "@xtraceai/memory";
 
 export const xtrace = new MemoryClient({
-  apiKey: import.meta.env.XTRACE_API_KEY || "",
-  orgId: import.meta.env.XTRACE_ORG_ID || "default",
+  apiKey: import.meta.env.VITE_XTRACE_API_KEY || "",
+  orgId: import.meta.env.VITE_XTRACE_ORG_ID || "",
 });
 
 export async function ingestMemory(messages: Array<{ role: string; content: string }>, userId?: string, convId?: string) {
